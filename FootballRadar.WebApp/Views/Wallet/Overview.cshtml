@@ -1,0 +1,156 @@
+﻿@using FootballRadar.WebApp.Controllers
+@model FootballRadar.WebApp.Models.WalletOverviewViewModel
+@{
+    ViewData["Title"] = "Wallet";
+}
+<div class="row justify-content-center">
+    <div class="col-md-5">
+        <h2 class="mb-4">My Wallet</h2>
+        <div class="card mb-4">
+            <div class="card-body text-center">
+                <h5 class="card-title">Current Balance</h5>
+                <h2 id="balanceDisplay" class="text-primary">@Model.Credits.ToString("N2") Credits</h2>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Deposit</h5>
+                        <div id="depositResult"></div>
+                        <div id="depositSpinner" class="text-center d-none">
+                            <div class="spinner-border text-success" role="status"></div>
+                            <p class="mt-2">Processing...</p>
+                        </div>
+                        <form id="depositForm">
+                            <div class="mb-3">
+                                <label class="form-label">Currency</label>
+                                <select asp-for="DepositCurrency" class="form-select"
+                                        onchange="document.getElementById('depositLabel').textContent = 'Amount in ' + this.value">
+                                    @foreach (var currency in Model.AvailableCurrencies)
+                                    {
+                                        <option value="@currency">@currency</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label id="depositLabel" class="form-label">Amount in @Model.DepositCurrency</label>
+                                <input asp-for="DepositAmount" type="number" class="form-control" min="1" step="0.01" value="10" />
+                            </div>
+                            <button type="submit" class="btn btn-success w-100">Deposit</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Withdraw</h5>
+                        <div id="withdrawResult"></div>
+                        <div id="withdrawSpinner" class="text-center d-none">
+                        <div class="spinner-border text-danger" role="status"></div>
+                            <p class="mt-2">Processing...</p>
+                        </div>
+                        <form id="withdrawForm">
+                            <div class="mb-3">
+                                <label class="form-label">Currency</label>
+                                <select asp-for="WithdrawCurrency" class="form-select" onchange="document.getElementById('withdrawLabel').textContent = 'Amount in ' + this.value">
+                                    @foreach (var currency in Model.AvailableCurrencies)
+                                    {
+                                        <option value="@currency">@currency</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label id="withdrawLabel" class="form-label">Amount in @Model.WithdrawCurrency</label>
+                                <input asp-for="WithdrawAmount" type="number" class="form-control" min="1" step="0.01" value="10" />
+                            </div>
+                            <button type="submit" class="btn btn-danger w-100">Withdraw</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Balance polling
+        setInterval(async () => {
+            const response = await fetch('@Url.Action(nameof(FootballRadar.WebApp.Controllers.WalletController.GetBalance), "Wallet")');
+            const data = await response.json();
+            document.getElementById('balanceDisplay').textContent = data.credits.toFixed(2) + ' Credits';
+        }, 4000);
+
+        // Helper function für polling
+        function pollTransactionStatus(transactionId, spinnerId, resultId, successMsg, failMsg) {
+            const spinner = document.getElementById(spinnerId);
+            const result = document.getElementById(resultId);
+
+            const interval = setInterval(async () => {
+                const statusResponse = await fetch(`/Wallet/TransactionStatus/${transactionId}`);
+                const statusData = await statusResponse.json();
+
+                if (statusData.status === 'Completed') {
+                    clearInterval(interval);
+                    spinner.classList.add('d-none');
+                    result.innerHTML = `<div class="alert alert-success">${successMsg}</div>`;
+                    document.getElementById('balanceDisplay').textContent = statusData.credits?.toFixed(2) + ' Credits';
+                } else if (statusData.status === 'Failed') {
+                    clearInterval(interval);
+                    spinner.classList.add('d-none');
+                    result.innerHTML = `<div class="alert alert-danger">${failMsg}</div>`;
+                }
+            }, 2000);
+        }
+
+        // Deposit form
+        document.getElementById('depositForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const spinner = document.getElementById('depositSpinner');
+            const result = document.getElementById('depositResult');
+            spinner.classList.remove('d-none');
+            result.innerHTML = '';
+
+            const response = await fetch('@Url.Action(nameof(FootballRadar.WebApp.Controllers.WalletController.Deposit), "Wallet")', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams(new FormData(e.target))
+            });
+
+            const data = await response.json();
+            if (data.error) {
+                spinner.classList.add('d-none');
+                result.innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+                return;
+            }
+
+            pollTransactionStatus(data.transactionId, 'depositSpinner', 'depositResult', 'Deposit successful!', 'Deposit failed.');
+        });
+
+        // Withdraw form
+        document.getElementById('withdrawForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const spinner = document.getElementById('withdrawSpinner');
+            const result = document.getElementById('withdrawResult');
+            spinner.classList.remove('d-none');
+            result.innerHTML = '';
+
+            const response = await fetch('@Url.Action(nameof(FootballRadar.WebApp.Controllers.WalletController.Withdraw), "Wallet")', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams(new FormData(e.target))
+            });
+
+            const data = await response.json();
+            if (data.error) {
+                spinner.classList.add('d-none');
+                result.innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+                return;
+            }
+
+            pollTransactionStatus(data.transactionId, 'withdrawSpinner', 'withdrawResult', 'Withdraw successful!', 'Withdraw failed. Insufficient credits.');
+        });
+    </script>
+}

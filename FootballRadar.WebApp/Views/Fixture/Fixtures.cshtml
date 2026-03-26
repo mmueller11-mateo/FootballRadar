@@ -1,0 +1,125 @@
+﻿@model FootballRadar.WebApp.Models.FixturesViewModel
+@{
+    ViewData["Title"] = Model.LeagueName;
+}
+<form method="get" class="mb-4">
+    <input type="hidden" name="leagueId" value="@Model.LeagueId" />
+    <div class="d-flex align-items-center gap-2">
+        <label class="form-label mb-0">Season:</label>
+        <select name="season" class="form-select w-auto" onchange="this.form.submit()">
+            @foreach (var season in Model.Seasons)
+            {
+                <option value="@season" selected="@(season == Model.SelectedSeason)">@season</option>
+            }
+        </select>
+    </div>
+</form>
+<div class="container mt-4">
+    <div class="d-flex align-items-center mb-4">
+        @if (Model.LeagueLogo != null)
+        {
+            <img src="@Model.LeagueLogo" alt="@Model.LeagueName" height="50" class="me-3" />
+        }
+        <h2>@Model.LeagueName</h2>
+    </div>
+
+    <!-- Upcoming Fixtures -->
+    <h4 class="mb-3">Upcoming Fixtures</h4>
+    @if (!Model.UpcomingFixtures.Any())
+    {
+        <p class="text-muted">No upcoming fixtures.</p>
+    }
+    else
+    {
+        <div class="table-responsive mb-5">
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Date</th>
+                        <th>Round</th>
+                        <th class="text-end">Home</th>
+                        <th class="text-center">vs</th>
+                        <th>Away</th>
+                        <th class="text-center">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var fixture in Model.UpcomingFixtures)
+                    {
+                        <tr>
+                            <td>@fixture.Date.ToString("dd.MM.yyyy HH:mm")</td>
+                            <td>@fixture.Round</td>
+                            <td class="text-end">
+                                @if (fixture.HomeLogo != null)
+                                {
+                                    <img src="@fixture.HomeLogo" height="20" class="me-2" />
+                                }
+                                @fixture.HomeTeam
+                            </td>
+                            <td class="text-center">-</td>
+                            <td>
+                                @if (fixture.AwayLogo != null)
+                                {
+                                    <img src="@fixture.AwayLogo" height="20" class="me-2" />
+                                }
+                                @fixture.AwayTeam
+                            </td>
+                            <td class="text-center"><span class="badge bg-secondary">@fixture.Status</span></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+
+    <!-- Past Fixtures -->
+    <h4 class="mb-3">Past Fixtures</h4>
+    @if (!Model.PastFixtures.Any())
+    {
+        <p class="text-muted">No past fixtures.</p>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Date</th>
+                        <th>Round</th>
+                        <th class="text-end">Home</th>
+                        <th class="text-center">Score</th>
+                        <th>Away</th>
+                        <th class="text-center">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var fixture in Model.PastFixtures)
+                    {
+                        <tr>
+                            <td>@fixture.Date.ToString("dd.MM.yyyy HH:mm")</td>
+                            <td>@fixture.Round</td>
+                            <td class="text-end">
+                                @if (fixture.HomeLogo != null)
+                                {
+                                    <img src="@fixture.HomeLogo" height="20" class="me-2" />
+                                }
+                                @fixture.HomeTeam
+                            </td>
+                            <td class="text-center fw-bold">
+                                @(fixture.HomeGoals.HasValue ? $"{fixture.HomeGoals} - {fixture.AwayGoals}" : "- -")
+                            </td>
+                            <td>
+                                @if (fixture.AwayLogo != null)
+                                {
+                                    <img src="@fixture.AwayLogo" height="20" class="me-2" />
+                                }
+                                @fixture.AwayTeam
+                            </td>
+                            <td class="text-center"><span class="badge bg-success">@fixture.Status</span></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

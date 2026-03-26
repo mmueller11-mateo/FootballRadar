@@ -1,0 +1,17 @@
+﻿namespace FootballRadar.Business.Entities.LeagueEntities
+{
+    public class Match
+    {
+        public Guid Id { get; set; }
+        public int ApiFixtureId { get; set; }
+        public DateTimeOffset Date { get; set; }
+        public int Season { get; set; }
+        public string? Round { get; set; }
+        public string? Status { get; set; }
+        public Guid LeagueId { get; set; }
+        public Guid HomeTeamId { get; set; }
+        public Guid AwayTeamId { get; set; }
+        public int? HomeGoals { get; set; }
+        public int? AwayGoals { get; set; }
+    }
+}

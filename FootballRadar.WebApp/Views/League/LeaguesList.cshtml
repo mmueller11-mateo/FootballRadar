@@ -1,0 +1,35 @@
+﻿@using FootballRadar.Business.Entities.LeagueEntities
+@using FootballRadar.WebApp.Controllers
+@using FootballRadar.WebApp.Controllers.FootballRadar.WebApp.Controllers
+@model IReadOnlyCollection<PublicLeague>
+
+<h2>Leagues</h2>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Logo</th>
+            <th>Name</th>
+            <th>Fixtures</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var league in Model.OrderBy(t => t.CountryId).ThenBy(t => t.Name))
+        {
+            <tr>
+                <td>
+                    <img src="https://media.api-sports.io/football/leagues/@(league.ApiLeagueId).png" width="30" />
+                </td>
+                <td>
+                    <a href="@Url.Action(nameof(TeamController.TeamsList), "Team", new { leagueId = league.ApiLeagueId, season = 2024 })">
+                        @league.Name
+                    </a>
+                </td>
+                <td>
+                    <a href="@Url.Action(nameof(FixtureController.Fixtures), "Fixture", new { leagueId = league.ApiLeagueId, season = 2024 })" class="btn btn-sm btn-outline-primary">
+                        Fixtures
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

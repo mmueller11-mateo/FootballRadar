@@ -1,0 +1,28 @@
+﻿@using FootballRadar.Admin.WebApp.Controllers
+@{
+    ViewData["Title"] = "FootballRadar Admin";
+}
+
+<h2>FootballRadar Admin</h2>
+<p>Choose a section:</p>
+
+<div class="list-group">
+
+    <a class="list-group-item list-group-item-action"
+       href="@Url.Action(nameof(LeagueController.LeaguesList), "League")">
+        Leagues
+    </a>
+
+    <a class="list-group-item list-group-item-action"
+       href="@Url.Action(nameof(NationalTeamController.NationalTeamsList), "NationalTeam")">
+        National Teams
+    </a>
+    <a class="list-group-item list-group-item-action"
+       href="@Url.Action(nameof(CountryController.CountriesList), "Country")">
+        Countries
+    </a>
+    <a class="list-group-item list-group-item-action"
+       href="@Url.Action(nameof(TeamController.TeamsList), "Team")">
+        Teams
+    </a>
+</div>

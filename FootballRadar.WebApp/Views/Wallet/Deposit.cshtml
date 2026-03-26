@@ -1,0 +1,23 @@
+﻿@using FootballRadar.WebApp.Controllers
+@model FootballRadar.WebApp.Models.DepositViewModel
+
+@{
+    ViewData["Title"] = "Deposit";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-4">
+        <h2 class="mb-4">Deposit CHF</h2>
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success">@TempData["Success"]</div>
+        }
+        <form method="post">
+            <div class="mb-3">
+                <label asp-for="Amount" class="form-label">Amount (CHF)</label>
+                <input asp-for="Amount" type="number" class="form-control" min="1" step="0.01" value="10" />
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Deposit</button>
+        </form>
+    </div>
+</div>

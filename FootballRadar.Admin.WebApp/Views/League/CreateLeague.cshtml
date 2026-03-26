@@ -1,0 +1,33 @@
+﻿@using FootballRadar.Admin.WebApp.Controllers
+@using FootballRadar.Admin.WebApp.Models
+@model CreateLeagueViewModel
+
+<h2>Create new league</h2>
+
+<form method="post" action="@Url.Action(nameof(LeagueController.CreateLeague), "League")">
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+    <div class="form-group mb-3">
+        <label>Name</label>
+        <input type="text" name="Name" class="form-control" value="@Model?.Name" />
+        @Html.ValidationMessageFor(m => m.Name, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group mb-3">
+        <label>Country</label>
+        <select name="CountryId" class="form-control">
+            <option value="">-- Please Choose --</option>
+            @foreach (var country in Model.Countries)
+            {
+                <option value="@country.Id" selected="@(country.Id == Model.CountryId ? "selected" : null)">
+                    @country.Name
+                </option>
+            }
+        </select>
+        @Html.ValidationMessageFor(m => m.CountryId, "", new { @class = "text-danger" })
+    </div>
+
+    <button type="submit" class="btn btn-success">Create</button>
+    <a class="btn btn-secondary" href="@Url.Action(nameof(LeagueController.LeaguesList), "League")">Back to list</a>
+</form>

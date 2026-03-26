@@ -1,0 +1,41 @@
+﻿@using FootballRadar.Admin.WebApp.Controllers
+@using FootballRadar.Admin.WebApp.Models
+@model IReadOnlyCollection<LeagueViewModel>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">Leagues (@Model.Count())</h2>
+
+    <a class="btn btn-primary"
+       href="@Url.Action(nameof(LeagueController.CreateLeague), nameof(LeagueController).Replace("Controller", ""))">
+        + Create League
+    </a>
+</div>
+
+<table class="table table-striped table-hover align-middle">
+    <thead class="table-light">
+        <tr>
+            <th>Name</th>
+            <th>Country</th>
+            <th style="width: 120px;"></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var leagues in Model.OrderBy(l => l.CountryName).ThenBy(l => l.Name))
+        {
+            <tr>
+                <td>
+                <strong>@leagues.Name</strong>
+                    <td>@leagues.CountryName</td>
+                    <td class="text-end">
+                        <form method="post" action="@Url.Action(nameof(LeagueController.Delete), nameof(LeagueController).Replace("Controller", ""))" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@leagues.Id" />
+                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                Delete
+                            </button>
+                        </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
