@@ -18,6 +18,7 @@
     <ProjectReference Include="..\FootballRadar.Abstractions\FootballRadar.Abstractions.csproj" />
     <ProjectReference Include="..\FootballRadar.Business.Services\FootballRadar.Business.Services.csproj" />
     <ProjectReference Include="..\FootballRadar.Data\FootballRadar.Data.csproj" />
+    <ProjectReference Include="..\FootballRadar.Web.Utilities\FootballRadar.Web.Utilities.csproj" />
   </ItemGroup>
 
 </Project>

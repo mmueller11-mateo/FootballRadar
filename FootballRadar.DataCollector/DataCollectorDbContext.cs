@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.Text.Json;
 
-namespace FootballRadar.DataCollector
+namespace FootballRadar.DataCollector.ApiSports
 {
     public class DataCollectorDbContext : DbContext
     {
@@ -26,7 +26,6 @@ namespace FootballRadar.DataCollector
         public DbSet<ManagerStatistics> ManagerStatistics { get; set; }
         public DbSet<Match> Matches { get; set; }
         public DbSet<NationalTeamManagerAssignment> NationalTeamManagerAssignments { get; set; }
-        public DbSet<NationalTeamPlayer> NationalTeamPlayers { get; set; }
         public DbSet<Player> Players { get; set; }
         public DbSet<PlayerContract> PlayerContracts { get; set; }
         public DbSet<PlayerInjury> PlayerInjuries { get; set; }

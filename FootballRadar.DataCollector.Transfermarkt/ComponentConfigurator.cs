@@ -1,10 +1,10 @@
-﻿using FootballRadar.DataCollector.ApiSports.FootballAPI;
-using FootballRadar.DataCollector.ApiSports.Services;
-using Microsoft.Data.SqlClient;
+﻿using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using Refit;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
-namespace FootballRadar.DataCollector.ApiSports
+namespace FootballRadar.DataCollector.Kaggle
 {
     public static class ComponentConfigurator
     {
@@ -23,14 +23,7 @@ namespace FootballRadar.DataCollector.ApiSports
                 options.EnableDetailedErrors(hostEnvironment.IsDevelopment());
             });
 
-            services.AddRefitClient<IApiSportsClient>()
-                .ConfigureHttpClient(c =>
-                {
-                    c.BaseAddress = new Uri("https://v3.football.api-sports.io");
-                    c.DefaultRequestHeaders.Add("x-apisports-key", configuration["ApiSports:ApiKey"]);
-                });
             services.AddHostedService<Worker>();
-            services.AddSingleton<IApiSportsServiceAgent, ApiSportsServiceAgent>();
         }
     }
 }

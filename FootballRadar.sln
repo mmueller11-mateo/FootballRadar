@@ -7,9 +7,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FootballRadar.WebApp", "Foo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FootballRadar.Business.Entities", "FootballRadar.Business.Entities\FootballRadar.Business.Entities.csproj", "{A875819B-A3E9-4B53-9F32-BB5827776079}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FootballRadar.DataCollector", "FootballRadar.DataCollector\FootballRadar.DataCollector.csproj", "{1CEBD694-23FF-482C-A5BF-30E12CBE2518}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FootballRadar.DataCollector.ApiSports", "FootballRadar.DataCollector\FootballRadar.DataCollector.ApiSports.csproj", "{1CEBD694-23FF-482C-A5BF-30E12CBE2518}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DataCollector", "DataCollector", "{73F864D3-E764-471F-AD98-3A4A5062DD43}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DataCollectors", "DataCollectors", "{73F864D3-E764-471F-AD98-3A4A5062DD43}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Admin", "Admin", "{191CF619-8168-4F00-975D-7230E3EADE38}"
 EndProject
@@ -34,6 +34,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FootballRadar.Abstractions", "FootballRadar.Abstractions\FootballRadar.Abstractions.csproj", "{66C242D9-F67D-BE41-1A34-DCB6AB12558F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FootballRadar.Data", "FootballRadar.Data\FootballRadar.Data.csproj", "{C0166C46-911F-E708-B073-DF185C6B6421}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FootballRadar.Web.Utilities", "FootballRadar.Web.Utilities\FootballRadar.Web.Utilities.csproj", "{FA6CA344-1B73-4356-B2DE-C8D98D03718C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FootballRadar.DataCollector.Kaggle", "FootballRadar.DataCollector.Transfermarkt\FootballRadar.DataCollector.Kaggle.csproj", "{36190385-CCD2-49F9-90FC-25AB4D47F7D1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -89,6 +93,14 @@ Global
 		{C0166C46-911F-E708-B073-DF185C6B6421}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C0166C46-911F-E708-B073-DF185C6B6421}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C0166C46-911F-E708-B073-DF185C6B6421}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FA6CA344-1B73-4356-B2DE-C8D98D03718C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FA6CA344-1B73-4356-B2DE-C8D98D03718C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FA6CA344-1B73-4356-B2DE-C8D98D03718C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FA6CA344-1B73-4356-B2DE-C8D98D03718C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{36190385-CCD2-49F9-90FC-25AB4D47F7D1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{36190385-CCD2-49F9-90FC-25AB4D47F7D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{36190385-CCD2-49F9-90FC-25AB4D47F7D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{36190385-CCD2-49F9-90FC-25AB4D47F7D1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -106,6 +118,8 @@ Global
 		{25E7366E-4B06-418B-82F8-96F8639AA380} = {D17BCEFD-1EA0-45B1-8EBA-EE7000E74405}
 		{66C242D9-F67D-BE41-1A34-DCB6AB12558F} = {D17BCEFD-1EA0-45B1-8EBA-EE7000E74405}
 		{C0166C46-911F-E708-B073-DF185C6B6421} = {D17BCEFD-1EA0-45B1-8EBA-EE7000E74405}
+		{FA6CA344-1B73-4356-B2DE-C8D98D03718C} = {4CC03FBA-ADFA-4975-AEEB-40FE05423084}
+		{36190385-CCD2-49F9-90FC-25AB4D47F7D1} = {73F864D3-E764-471F-AD98-3A4A5062DD43}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FD9C6AED-E047-4039-800F-486A7669CE72}

@@ -4,10 +4,12 @@
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
-        public int Age { get; set; }
-        public int Weight { get; set; }
-        public int Height { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public int? Weight { get; set; }
+        public int? Height { get; set; }
         public DateTimeOffset BirthDate { get; set; }
         public Guid NationalityCountryId { get; set; }
+        public string? Photo { get; set; }
     }
 }

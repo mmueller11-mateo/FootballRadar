@@ -1,28 +1,23 @@
 using FootballRadar.Business.Entities;
 using FootballRadar.Business.Entities.LeagueEntities;
+using FootballRadar.Business.Entities.PlayerIEntities;
 using FootballRadar.Business.Entities.TeamEntities;
-using FootballRadar.DataCollector.Services.Interface;
+using FootballRadar.DataCollector.ApiSports.Services;
 using Microsoft.EntityFrameworkCore;
 
-namespace FootballRadar.DataCollector
+namespace FootballRadar.DataCollector.ApiSports
 {
     internal class Worker : BackgroundService
     {
         private readonly ILogger<Worker> _logger;
-        private readonly ILeagueService _leagueService;
-        private readonly ICountryService _countryService;
-        private readonly ITeamService _teamService;
-        private readonly IFixtureService _fixtureService;
-        private readonly IDbContextFactory<DataCollectorDbContext> _dbContextFactory;
+        private readonly IApiSportsServiceAgent serviceAgent;
+        private readonly IDbContextFactory<DataCollectorDbContext> dbContextFactory;
 
-        public Worker(ILogger<Worker> logger, ILeagueService leagueService, IDbContextFactory<DataCollectorDbContext> dbContextFactory, ICountryService countryService, ITeamService teamService, IFixtureService fictureService)
+        public Worker(ILogger<Worker> logger, IApiSportsServiceAgent apiSportsServiceAgent, IDbContextFactory<DataCollectorDbContext> dbContextFactory)
         {
             _logger = logger;
-            _leagueService = leagueService;
-            _dbContextFactory = dbContextFactory;
-            _countryService = countryService;
-            _teamService = teamService;
-            _fixtureService = fictureService;
+            serviceAgent = apiSportsServiceAgent;
+            this.dbContextFactory = dbContextFactory;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -48,13 +43,83 @@ namespace FootballRadar.DataCollector
             //    await GetLeaguesJob(cancellationToken);
             //    await GetTeamsJob(cancellationToken);
             //    await GetStandingsJob(cancellationToken);
-            await GetFixturesJob(cancellationToken);
+            await GetPlayersJob(cancellationToken);
+            ////await GetFixturesJob(cancellationToken);
+        }
+
+        private async Task GetPlayersJob(CancellationToken cancellationToken)
+        {
+            using var dbContext = await dbContextFactory.CreateDbContextAsync();
+            dbContext.ChangeTracker.AutoDetectChangesEnabled = true;
+            dbContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.TrackAll;
+
+            var teams = await dbContext.Teams
+                .Where(t => t.ApiTeamId != null)
+                .ToListAsync(cancellationToken);
+
+            foreach (var team in teams)
+            {
+                if (cancellationToken.IsCancellationRequested)
+                    break;
+
+                try
+                {
+                    var players = await serviceAgent.GetPlayersAsync(team.ApiTeamId!.Value, 2024);
+
+                    _logger.LogInformation("Spieler von API für {Team}: {Count}", team.Name, players.Count);
+                    foreach (var p in players)
+                    {
+                        _logger.LogInformation("Spieler: {Name}", p.Player.Name);
+
+                        bool alreadyExists = await dbContext.Players
+                            .AnyAsync(x => x.Name == p.Player.Name, cancellationToken);
+
+                        if (alreadyExists)
+                            continue;
+
+                        var country = await dbContext.Countries
+                            .FirstOrDefaultAsync(c => c.Name == p.Player.Nationality, cancellationToken);
+
+                        var player = new Player
+                        {
+                            Id = Guid.NewGuid(),
+                            Name = p.Player.Name,
+                            FirstName = p.Player.Firstname ?? string.Empty,
+                            LastName = p.Player.Lastname ?? string.Empty,
+                            Height = ParseNumber(p.Player.Height),
+                            Weight = ParseNumber(p.Player.Weight),
+                            BirthDate = DateTimeOffset.MinValue,
+                            NationalityCountryId = country?.Id ?? Guid.Empty,
+                            Photo = p.Player.Photo
+                        };
+
+                        dbContext.Entry(player).State = EntityState.Added;
+                    }
+
+                    await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken);
+                }
+                catch (Refit.ApiException ex) when ((int)ex.StatusCode == 429)
+                {
+                    _logger.LogWarning("Rate limit erreicht, warte 60 Sekunden...");
+                    await Task.Delay(TimeSpan.FromSeconds(60), cancellationToken);
+                }
+
+                await dbContext.SaveChangesAsync(cancellationToken);
+                await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken);
+            }
+        }
+
+        private static int ParseNumber(string? value)
+        {
+            if (string.IsNullOrWhiteSpace(value)) return 0;
+            var digits = new string(value.Where(char.IsDigit).ToArray());
+            return int.TryParse(digits, out var result) ? result : 0;
         }
 
         private async Task GetLeaguesJob(CancellationToken cancellationToken)
         {
-            var leagues = await _leagueService.GetLeaguesAsync();
-            using var dbContext = await _dbContextFactory.CreateDbContextAsync();
+            var leagues = await serviceAgent.GetLeaguesAsync();
+            using var dbContext = await dbContextFactory.CreateDbContextAsync();
 
             foreach (var league in leagues)
             {
@@ -87,8 +152,8 @@ namespace FootballRadar.DataCollector
 
         private async Task GetCountriesJob(CancellationToken cancellationToken)
         {
-            var countries = await _countryService.GetCountriesAsync();
-            using var dbContext = await _dbContextFactory.CreateDbContextAsync();
+            var countries = await serviceAgent.GetCountriesAsync();
+            using var dbContext = await dbContextFactory.CreateDbContextAsync();
             foreach (var country in countries)
             {
                 if (cancellationToken.IsCancellationRequested)
@@ -123,7 +188,7 @@ namespace FootballRadar.DataCollector
 
         private async Task GetTeamsJob(CancellationToken cancellationToken)
         {
-            using var dbContext = await _dbContextFactory.CreateDbContextAsync();
+            using var dbContext = await dbContextFactory.CreateDbContextAsync();
 
             foreach (var leagueId in TopLeagueIds)
             {
@@ -134,7 +199,7 @@ namespace FootballRadar.DataCollector
 
                 var league = await dbContext.Leagues.FirstOrDefaultAsync(l => l.ApiLeagueId == leagueId);
                 var country = league?.CountryId != null ? await dbContext.Countries.FirstOrDefaultAsync(c => c.Id == league.CountryId) : null;
-                var teams = await _teamService.GetTeamsAsync(leagueId, 2023);
+                var teams = await serviceAgent.GetTeamsAsync(leagueId, 2023);
 
                 foreach (var team in teams)
                 {
@@ -158,7 +223,7 @@ namespace FootballRadar.DataCollector
         }
         private async Task GetStandingsJob(CancellationToken cancellationToken)
         {
-            using var dbContext = await _dbContextFactory.CreateDbContextAsync();
+            using var dbContext = await dbContextFactory.CreateDbContextAsync();
 
             foreach (var leagueId in TopLeagueIds)
             {
@@ -167,7 +232,7 @@ namespace FootballRadar.DataCollector
 
                 try
                 {
-                    var standings = await _leagueService.GetStandingsAsync(leagueId, 2024);
+                    var standings = await serviceAgent.GetStandingsAsync(leagueId, 2024);
 
                     var league = await dbContext.Leagues.FirstOrDefaultAsync(l => l.ApiLeagueId == leagueId);
                     if (league == null)
@@ -224,7 +289,7 @@ namespace FootballRadar.DataCollector
 
         private async Task GetFixturesJob(CancellationToken cancellationToken)
         {
-            using var dbContext = await _dbContextFactory.CreateDbContextAsync();
+            using var dbContext = await dbContextFactory.CreateDbContextAsync();
 
             foreach (var leagueId in TopLeagueIds)
             {
@@ -235,7 +300,7 @@ namespace FootballRadar.DataCollector
 
                 try
                 {
-                    var fixtures = await _fixtureService.GetFixturesAsync(leagueId, 2024);
+                    var fixtures = await serviceAgent.GetFixturesAsync(leagueId, 2024);
 
                     var league = await dbContext.Leagues.FirstOrDefaultAsync(l => l.ApiLeagueId == leagueId);
                     if (league == null)

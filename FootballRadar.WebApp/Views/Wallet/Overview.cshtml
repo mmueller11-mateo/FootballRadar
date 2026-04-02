@@ -113,7 +113,7 @@
             spinner.classList.remove('d-none');
             result.innerHTML = '';
 
-            const response = await fetch('@Url.Action(nameof(FootballRadar.WebApp.Controllers.WalletController.Deposit), "Wallet")', {
+            const response = await fetch('@Url.Action(nameof(FootballRadar.WebApp.Controllers.WalletController.Deposit), ControllerName.For<WalletController>())', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: new URLSearchParams(new FormData(e.target))
@@ -137,7 +137,7 @@
             spinner.classList.remove('d-none');
             result.innerHTML = '';
 
-            const response = await fetch('@Url.Action(nameof(FootballRadar.WebApp.Controllers.WalletController.Withdraw), "Wallet")', {
+            const response = await fetch('@Url.Action(nameof(FootballRadar.WebApp.Controllers.WalletController.Withdraw), ControllerName.For<WalletController>())', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: new URLSearchParams(new FormData(e.target))

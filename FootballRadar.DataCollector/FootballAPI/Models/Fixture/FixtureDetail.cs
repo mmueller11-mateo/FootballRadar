@@ -1,4 +1,4 @@
-﻿namespace FootballRadar.DataCollector.FootballAPI.Models.Fixture
+﻿namespace FootballRadar.DataCollector.ApiSports.FootballAPI.Models.Fixture
 {
     public class FixtureDetail
     {

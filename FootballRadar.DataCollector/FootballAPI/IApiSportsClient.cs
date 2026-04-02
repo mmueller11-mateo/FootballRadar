@@ -1,12 +1,13 @@
-﻿using FootballRadar.DataCollector.FootballAPI.Models;
-using FootballRadar.DataCollector.FootballAPI.Models.Country;
-using FootballRadar.DataCollector.FootballAPI.Models.Fixture;
-using FootballRadar.DataCollector.FootballAPI.Models.League;
-using FootballRadar.DataCollector.FootballAPI.Models.Standing;
-using FootballRadar.DataCollector.FootballAPI.Models.Team;
+﻿using FootballRadar.DataCollector.ApiSports.FootballAPI.Models;
+using FootballRadar.DataCollector.ApiSports.FootballAPI.Models.Country;
+using FootballRadar.DataCollector.ApiSports.FootballAPI.Models.Fixture;
+using FootballRadar.DataCollector.ApiSports.FootballAPI.Models.League;
+using FootballRadar.DataCollector.ApiSports.FootballAPI.Models.Player;
+using FootballRadar.DataCollector.ApiSports.FootballAPI.Models.Standing;
+using FootballRadar.DataCollector.ApiSports.FootballAPI.Models.Team;
 using Refit;
 
-namespace FootballRadar.DataCollector.FootballAPI
+namespace FootballRadar.DataCollector.ApiSports.FootballAPI
 {
     public interface IApiSportsClient
     {
@@ -31,5 +32,8 @@ namespace FootballRadar.DataCollector.FootballAPI
 
         [Get("/fixtures")]
         Task<ApiSportsResponse<FixtureResponse>> GetFixturesAsync([Query] int league, [Query] int season);
+
+        [Get("/players")]
+        Task<ApiSportsResponse<PlayerResponse>> GetPlayersAsync([Query] int team, [Query] int season, [Query] int page = 1);
     }
 }

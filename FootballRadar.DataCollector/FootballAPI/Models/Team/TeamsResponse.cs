@@ -1,11 +1,11 @@
-﻿using FootballRadar.DataCollector.FootballAPI.Models.Country;
+﻿using FootballRadar.DataCollector.ApiSports.FootballAPI.Models.Country;
 
-namespace FootballRadar.DataCollector.FootballAPI.Models.Team
+namespace FootballRadar.DataCollector.ApiSports.FootballAPI.Models.Team
 {
     public class TeamResponse
     {
-        public TeamInfo Team { get; set; }
-        public VenueInfo Venue { get; set; }
-        public CountryInfo Country { get; set; }
+        public required TeamInfo Team { get; set; }
+        public required VenueInfo Venue { get; set; }
+        public required CountryInfo Country { get; set; }
     }
 }

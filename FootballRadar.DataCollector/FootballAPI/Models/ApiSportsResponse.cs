@@ -1,7 +1,7 @@
-﻿namespace FootballRadar.DataCollector.FootballAPI.Models
+﻿namespace FootballRadar.DataCollector.ApiSports.FootballAPI.Models
 {
     public class ApiSportsResponse<T>
     {
-        public IReadOnlyCollection<T> Response { get; set; }
+        public required IReadOnlyCollection<T> Response { get; set; }
     }
 }

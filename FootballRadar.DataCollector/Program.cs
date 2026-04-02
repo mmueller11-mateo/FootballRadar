@@ -1,4 +1,4 @@
-using FootballRadar.DataCollector;
+using FootballRadar.DataCollector.ApiSports;
 
 var builder = Host.CreateApplicationBuilder(args);
 builder.Services.ConfigureServices(builder.Configuration, builder.Environment);

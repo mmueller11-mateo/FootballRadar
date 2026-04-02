@@ -1,4 +1,4 @@
-﻿namespace FootballRadar.DataCollector.FootballAPI.Models.Country
+﻿namespace FootballRadar.DataCollector.ApiSports.FootballAPI.Models.Country
 {
     public class CountryResponse
     {

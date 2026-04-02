@@ -1,4 +1,4 @@
-﻿namespace FootballRadar.DataCollector.FootballAPI.Models.Standing
+﻿namespace FootballRadar.DataCollector.ApiSports.FootballAPI.Models.Standing
 {
     public class StandingGoals
     {

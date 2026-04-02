@@ -1,7 +1,7 @@
-﻿namespace FootballRadar.DataCollector.FootballAPI.Models.Standing
+﻿namespace FootballRadar.DataCollector.ApiSports.FootballAPI.Models.Standing
 {
     public class StandingsResponse
     {
-        public LeagueStandings League { get; set; }
+        public required LeagueStandings League { get; set; }
     }
 }

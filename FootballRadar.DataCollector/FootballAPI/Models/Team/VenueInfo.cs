@@ -1,8 +1,8 @@
-﻿namespace FootballRadar.DataCollector.FootballAPI.Models.Team
+﻿namespace FootballRadar.DataCollector.ApiSports.FootballAPI.Models.Team
 {
     public class VenueInfo
     {
-        public string Name { get; set; }
-        public string City { get; set; }
+        public required string Name { get; set; }
+        public required string City { get; set; }
     }
 }
