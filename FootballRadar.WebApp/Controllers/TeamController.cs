@@ -29,7 +29,9 @@ namespace FootballRadar.WebApp.Controllers
                     Team = new StandingTeamViewModel
                     {
                         Name = s.Team?.Name ?? "Unknown",
-                        Logo = s.Team?.Logo
+                        Logo = s.Team?.Logo,
+                        ApiTeamId = s.Team?.ApiTeamId
+
                     },
                     All = new StandingStatsViewModel
                     {

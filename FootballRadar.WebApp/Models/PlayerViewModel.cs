@@ -1,14 +1,12 @@
-﻿namespace FootballRadar.Business.Entities.PlayerIEntities
+﻿namespace FootballRadar.WebApp.Models
 {
-    public class Player
+    public class PlayerViewModel
     {
-        public Guid Id { get; set; }
         public string Name { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public DateTimeOffset BirthDate { get; set; }
-        public Guid NationalityCountryId { get; set; }
         public string? Photo { get; set; }
-        public int? ApiTeamId { get; set; }
+        public Guid Nationality { get; set; }
     }
 }

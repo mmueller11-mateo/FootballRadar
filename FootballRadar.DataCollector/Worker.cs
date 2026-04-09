@@ -4,18 +4,19 @@ using FootballRadar.Business.Entities.PlayerIEntities;
 using FootballRadar.Business.Entities.TeamEntities;
 using FootballRadar.DataCollector.ApiSports.Services;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 namespace FootballRadar.DataCollector.ApiSports
 {
     internal class Worker : BackgroundService
     {
-        private readonly ILogger<Worker> _logger;
+        private readonly ILogger<Worker> logger;
         private readonly IApiSportsServiceAgent serviceAgent;
         private readonly IDbContextFactory<DataCollectorDbContext> dbContextFactory;
 
         public Worker(ILogger<Worker> logger, IApiSportsServiceAgent apiSportsServiceAgent, IDbContextFactory<DataCollectorDbContext> dbContextFactory)
         {
-            _logger = logger;
+            this.logger = logger;
             serviceAgent = apiSportsServiceAgent;
             this.dbContextFactory = dbContextFactory;
         }
@@ -33,7 +34,7 @@ namespace FootballRadar.DataCollector.ApiSports
             }
             catch (OperationCanceledException)
             {
-                _logger.LogInformation("Timed Hosted Service is stopping.");
+                logger.LogInformation("Timed Hosted Service is stopping.");
             }
         }
 
@@ -50,12 +51,9 @@ namespace FootballRadar.DataCollector.ApiSports
         private async Task GetPlayersJob(CancellationToken cancellationToken)
         {
             using var dbContext = await dbContextFactory.CreateDbContextAsync();
-            dbContext.ChangeTracker.AutoDetectChangesEnabled = true;
-            dbContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.TrackAll;
-
             var teams = await dbContext.Teams
-                .Where(t => t.ApiTeamId != null)
-                .ToListAsync(cancellationToken);
+         .Where(t => t.ApiTeamId != null && TopTeamIds.Contains(t.ApiTeamId!.Value))
+         .ToListAsync(cancellationToken);
 
             foreach (var team in teams)
             {
@@ -66,11 +64,8 @@ namespace FootballRadar.DataCollector.ApiSports
                 {
                     var players = await serviceAgent.GetPlayersAsync(team.ApiTeamId!.Value, 2024);
 
-                    _logger.LogInformation("Spieler von API für {Team}: {Count}", team.Name, players.Count);
                     foreach (var p in players)
                     {
-                        _logger.LogInformation("Spieler: {Name}", p.Player.Name);
-
                         bool alreadyExists = await dbContext.Players
                             .AnyAsync(x => x.Name == p.Player.Name, cancellationToken);
 
@@ -79,6 +74,12 @@ namespace FootballRadar.DataCollector.ApiSports
 
                         var country = await dbContext.Countries
                             .FirstOrDefaultAsync(c => c.Name == p.Player.Nationality, cancellationToken);
+                        var birthDate = DateTimeOffset.TryParseExact(
+                            p.Player.Birth?.Date,
+                            "yyyy-MM-dd",
+                            CultureInfo.InvariantCulture,
+                            DateTimeStyles.None,
+                            out var bd) ? bd : DateTimeOffset.MinValue;
 
                         var player = new Player
                         {
@@ -86,11 +87,10 @@ namespace FootballRadar.DataCollector.ApiSports
                             Name = p.Player.Name,
                             FirstName = p.Player.Firstname ?? string.Empty,
                             LastName = p.Player.Lastname ?? string.Empty,
-                            Height = ParseNumber(p.Player.Height),
-                            Weight = ParseNumber(p.Player.Weight),
-                            BirthDate = DateTimeOffset.MinValue,
+                            BirthDate = birthDate,
                             NationalityCountryId = country?.Id ?? Guid.Empty,
-                            Photo = p.Player.Photo
+                            Photo = p.Player.Photo,
+                            ApiTeamId = team.ApiTeamId
                         };
 
                         dbContext.Entry(player).State = EntityState.Added;
@@ -100,7 +100,6 @@ namespace FootballRadar.DataCollector.ApiSports
                 }
                 catch (Refit.ApiException ex) when ((int)ex.StatusCode == 429)
                 {
-                    _logger.LogWarning("Rate limit erreicht, warte 60 Sekunden...");
                     await Task.Delay(TimeSpan.FromSeconds(60), cancellationToken);
                 }
 
@@ -179,11 +178,18 @@ namespace FootballRadar.DataCollector.ApiSports
 
         private static readonly int[] TopLeagueIds = {
             39,   // Premier League
-            40,   // Championship
+            //40,   // Championship
             //140,  // La Liga
             //78,   // Bundesliga
             //135,  // Serie A
             //61,   // Ligue 1
+        };
+
+        private static readonly int[] TopTeamIds = {
+            /*33,  */// Manchester United
+            40,  // Liverpool
+            42,  // Arsenal
+            50,  // Manchester City
         };
 
         private async Task GetTeamsJob(CancellationToken cancellationToken)
@@ -237,7 +243,7 @@ namespace FootballRadar.DataCollector.ApiSports
                     var league = await dbContext.Leagues.FirstOrDefaultAsync(l => l.ApiLeagueId == leagueId);
                     if (league == null)
                     {
-                        _logger.LogWarning("Liga nicht gefunden für ApiLeagueId: {LeagueId}", leagueId);
+                        logger.LogWarning("Liga nicht gefunden für ApiLeagueId: {LeagueId}", leagueId);
                         continue;
                     }
 
@@ -249,7 +255,7 @@ namespace FootballRadar.DataCollector.ApiSports
                         var team = await dbContext.Teams.FirstOrDefaultAsync(t => t.ApiTeamId == standing.Team.Id);
                         if (team == null)
                         {
-                            _logger.LogWarning("Team nicht gefunden für ApiTeamId: {TeamId}", standing.Team.Id);
+                            logger.LogWarning("Team nicht gefunden für ApiTeamId: {TeamId}", standing.Team.Id);
                             continue;
                         }
 
@@ -281,7 +287,7 @@ namespace FootballRadar.DataCollector.ApiSports
                 }
                 catch (Refit.ApiException ex) when ((int)ex.StatusCode == 429)
                 {
-                    _logger.LogWarning("Rate limit erreicht, warte 60 Sekunden...");
+                    logger.LogWarning("Rate limit erreicht, warte 60 Sekunden...");
                     await Task.Delay(TimeSpan.FromSeconds(60));
                 }
             }
@@ -305,7 +311,7 @@ namespace FootballRadar.DataCollector.ApiSports
                     var league = await dbContext.Leagues.FirstOrDefaultAsync(l => l.ApiLeagueId == leagueId);
                     if (league == null)
                     {
-                        _logger.LogWarning("Liga nicht gefunden für ApiLeagueId: {LeagueId}", leagueId);
+                        logger.LogWarning("Liga nicht gefunden für ApiLeagueId: {LeagueId}", leagueId);
                         continue;
                     }
 
@@ -321,7 +327,7 @@ namespace FootballRadar.DataCollector.ApiSports
 
                         if (homeTeam == null || awayTeam == null)
                         {
-                            _logger.LogWarning("Team nicht gefunden für Fixture {FixtureId}", fixture.Fixture.Id);
+                            logger.LogWarning("Team nicht gefunden für Fixture {FixtureId}", fixture.Fixture.Id);
                             continue;
                         }
 
@@ -356,7 +362,7 @@ namespace FootballRadar.DataCollector.ApiSports
                 }
                 catch (Refit.ApiException ex) when ((int)ex.StatusCode == 429)
                 {
-                    _logger.LogWarning("Rate limit erreicht, warte 60 Sekunden...");
+                    logger.LogWarning("Rate limit erreicht, warte 60 Sekunden...");
                     await Task.Delay(TimeSpan.FromSeconds(60));
                 }
             }

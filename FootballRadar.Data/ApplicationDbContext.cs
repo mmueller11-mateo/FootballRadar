@@ -1,6 +1,7 @@
 ﻿using FootballRadar.Business.Entities;
 using FootballRadar.Business.Entities.Betting;
 using FootballRadar.Business.Entities.LeagueEntities;
+using FootballRadar.Business.Entities.PlayerIEntities;
 using FootballRadar.Business.Entities.TeamEntities;
 using FootballRadar.Business.Entities.TransferEntities;
 using Microsoft.EntityFrameworkCore;
@@ -28,6 +29,7 @@ namespace FootballRadar.Data
         public DbSet<User> Users { get; set; }
         public DbSet<Wallet> Wallets { get; set; }
         public DbSet<WalletTransaction> WalletTransactions { get; set; }
+        public DbSet<Player> Players { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

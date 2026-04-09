@@ -55,8 +55,26 @@ namespace FootballRadar.DataCollector.ApiSports.Services
 
         public async Task<IReadOnlyCollection<PlayerResponse>> GetPlayersAsync(int teamId, int season)
         {
-            var response = await client.GetPlayersAsync(teamId, season);
-            return response.Response;
+            var allPlayers = new List<PlayerResponse>();
+            int page = 1;
+
+            while (true)
+            {
+                var response = await client.GetPlayersAsync(teamId, season, page);
+
+                if (response.Response == null || response.Response.Count == 0)
+                    break;
+
+                allPlayers.AddRange(response.Response);
+
+                if (page >= response.Paging.Total)
+                    break;
+
+                page++;
+                await Task.Delay(TimeSpan.FromSeconds(1));
+            }
+
+            return allPlayers;
         }
     }
 }

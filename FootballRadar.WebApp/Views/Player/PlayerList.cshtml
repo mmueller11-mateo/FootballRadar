@@ -1,0 +1,24 @@
+﻿@model FootballRadar.WebApp.Models.TeamPlayersViewModel
+
+<h2 class="mb-4">Squad</h2>
+
+<div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
+    @foreach (var player in Model.Players)
+    {
+        <div class="col">
+            <div class="card h-100 shadow-sm">
+                @if (player.Photo != null)
+                {
+                    <img src="@player.Photo" class="card-img-top p-3" style="height:180px; object-fit:contain;" alt="@player.Name" />
+                }
+                <div class="card-body">
+                    <h6 class="card-title mb-1">@player.FirstName @player.LastName</h6>
+                    <small class="text-muted">@player.Name</small>
+                    <p class="mt-2 mb-0 small">
+                        🎂 @player.BirthDate.ToString("dd.MM.yyyy")
+                    </p>
+                </div>
+            </div>
+        </div>
+    }
+</div>

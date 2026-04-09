@@ -20,7 +20,7 @@
                     <img src="https://media.api-sports.io/football/leagues/@(league.ApiLeagueId).png" width="30" />
                 </td>
                 <td>
-                    <a href="@Url.Action(nameof(TeamController.TeamsList), "Team", new { leagueId = league.ApiLeagueId, season = 2024 })">
+                    <a href="@Url.Action(nameof(TeamController.TeamsList), "Team", new { leagueId = league.ApiLeagueId, season = 2024 })"  class=" btn btn-sm btn-outline-primary">
                         @league.Name
                     </a>
                 </td>
