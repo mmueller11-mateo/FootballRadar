@@ -10,6 +10,7 @@ namespace My.Framework.EventHandling
         public static void ConfigureServices(IServiceCollection services, IConfiguration configuration, IHostEnvironment hostEnvironment)
         {
             services.AddTransient<IEventPublisher, EventPublisher>();
+            services.AddTransient<IEventHandlerProvider, EventHandlerProvider>();
         }
     }
 }

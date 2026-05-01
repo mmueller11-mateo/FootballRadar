@@ -1,66 +1,54 @@
 ﻿using FootballRadar.Abstractions;
-
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Hosting;
 
 using My.Framework.EventHandling;
 
 namespace FootballRadar.EventHandling
 {
-	internal sealed class EventDispacher : BackgroundService
-	{
-		private static readonly Guid SystemId = Guid.Empty;
+    internal sealed class EventDispacher : BackgroundService
+    {
+        private readonly IEventHandlerProvider eventHandlerProvider;
+        private readonly IUserRepository userRepository;
+        private readonly IEventRepository eventRepository;
+        public EventDispacher(IEventHandlerProvider eventHandlerProvider, IUserRepository userRepository, IEventRepository eventRepository)
+        {
+            this.eventHandlerProvider = eventHandlerProvider;
+            this.userRepository = userRepository;
+            this.eventRepository = eventRepository;
+        }
 
-		private readonly IUserRepository userRepository;
-		private readonly IEventRepository eventRepository;
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        {
+            await DoWork(stoppingToken);
 
-		// see https://learn.microsoft.com/en-us/aspnet/core/signalr/hubcontext?view=aspnetcore-10.0
-		private readonly IHubContext<EventNotificationHub> eventHub;
+            using PeriodicTimer dailyTimer = new(TimeSpan.FromMinutes(5));
 
-		public EventDispacher(IUserRepository userRepository, IEventRepository eventRepository, IHubContext<EventNotificationHub> eventHub)
-		{
-			this.eventRepository = eventRepository;
-			this.userRepository = userRepository;
-			this.eventHub = eventHub;
-		}
+            try
+            {
+                while (await dailyTimer.WaitForNextTickAsync(stoppingToken))
+                {
+                    await DoWork(stoppingToken);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+            }
+        }
 
-		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-		{
-			await DoWork(stoppingToken);
+        private async Task DoWork(CancellationToken cancellationToken)
+        {
+            var events = await eventRepository.LoadEvents(Array.Empty<string>(), cancellationToken);
 
-			using PeriodicTimer dailyTimer = new(TimeSpan.FromMinutes(5));
+            foreach (var eventRecord in events)
+            {
+                var eventData = EventSerializer.Deserialize(eventRecord.EventData, eventRecord.EventType);
 
-			try
-			{
-				while (await dailyTimer.WaitForNextTickAsync(stoppingToken))
-				{
-					await DoWork(stoppingToken);
-				}
-			}
-			catch (OperationCanceledException)
-			{
-			}
-		}
+                var eventHandler = eventHandlerProvider.GetHandlerForEvent(eventData);
 
-		private async Task DoWork(CancellationToken cancellationToken)
-		{
-			var currentUser = await userRepository.GetCurrentUserProfile(cancellationToken);
+                await eventHandler.Handle(eventData, cancellationToken);
 
-			// here we get the list of events (by their type) that the user wants to be notified about
-			var eventsOfInterest = currentUser.EventNotificationPreferences.Where(@event => @event.Value == true).Select(@event => @event.Key).ToArray();
-
-			// here we load only the events of interest from the database
-			var events = await eventRepository.LoadEvents(eventsOfInterest, cancellationToken);
-
-			foreach (var eventRecord in events)
-			{
-				var eventData = EventSerializer.Deserialize(eventRecord.EventData, eventRecord.EventType);
-
-				// here we serialize the actual event data to send it to the client (user's browser).
-				var notificationPayload = EventSerializer.Serialize(eventData);
-
-				await eventHub.Clients.User(currentUser.UserId.ToString()).SendAsync(method: "ReceiveNotification", arg1: SystemId, arg2: notificationPayload, cancellationToken);
-			}
-		}
-	}
+                await eventRepository.MarkEventAsProcessed(eventRecord.Id, cancellationToken);
+            }
+        }
+    }
 }
