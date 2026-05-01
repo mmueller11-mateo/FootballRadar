@@ -2,7 +2,7 @@
 {
     public class ApiSportsResponse<T>
     {
-        public required IReadOnlyCollection<T> Response { get; set; }
-        public Paging Paging { get; set; }
+        public required List<T> Response { get; set; }
+        public required Paging Paging { get; set; }
     }
 }

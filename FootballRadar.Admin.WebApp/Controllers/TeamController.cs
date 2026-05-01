@@ -19,11 +19,14 @@ namespace FootballRadar.Admin.WebApp.Controllers
         public async Task<IActionResult> TeamsList()
         {
             var teams = await _mediator.Send(new GetTeamsQuery());
+            var countries = await _mediator.Send(new GetCountriesQuery());
             var vm = teams.Select(t => new TeamViewModel
             {
                 Id = t.Id,
                 Name = t.Name,
                 Logo = t.Logo,
+                Code = t.Code,
+                CountryFlag = countries.FirstOrDefault(c => c.Id == t.CountryId)!.Flag
             });
             return View(vm);
         }
@@ -33,10 +36,11 @@ namespace FootballRadar.Admin.WebApp.Controllers
             var countries = await _mediator.Send(new GetCountriesQuery());
             var vm = new CreateTeamViewModel
             {
+
                 Countries = countries.Select(c => new CountryOption
                 {
                     Id = c.Id,
-                    Name = c.Name
+                    Name = c.Name,
                 }).ToList()
             };
             return View(vm);
@@ -61,7 +65,8 @@ namespace FootballRadar.Admin.WebApp.Controllers
                 Name = vm.Name,
                 CountryId = vm.CountryId,
                 ApiTeamId = vm.ApiTeamId,
-                Logo = vm.Logo
+                Logo = vm.Logo,
+                Code = vm.Code
             });
             return RedirectToAction(nameof(TeamsList));
         }

@@ -6,7 +6,6 @@
         [TestMethod]
         public void TestMethod1()
         {
-            CreateCountryCommandHandler sut;
         }
     }
 }

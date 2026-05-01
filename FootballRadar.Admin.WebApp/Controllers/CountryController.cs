@@ -22,7 +22,9 @@ namespace FootballRadar.Admin.WebApp.Controllers
             var vm = countries.Select(c => new CountryViewModel
             {
                 Id = c.Id,
-                Name = c.Name
+                Name = c.Name,
+                Code = c.Code,
+                Flag = c.Flag,
             });
             return View(vm);
         }

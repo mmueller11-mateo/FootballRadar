@@ -2,6 +2,6 @@
 {
     public class LeagueStandings
     {
-        public required List<Standing> Standings { get; set; }
+        public required List<List<Standing>> Standings { get; set; }
     }
 }

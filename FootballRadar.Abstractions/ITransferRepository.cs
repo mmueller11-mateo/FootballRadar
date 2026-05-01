@@ -5,7 +5,8 @@ namespace FootballRadar.Abstractions
 {
     public interface ITransferRepository
     {
-        Task<IReadOnlyCollection<TransferRumor>> GetTransferRumors(RumorStatus rumorStatus);
+        Task<IEnumerable<TransferRumor>> GetTransferRumors(RumorStatus rumorStatus);
         Task<TransferRumor?> GetTransferRumorById(Guid id);
+        Task AddTransferRumor(TransferRumor transferRumor);
     }
 }

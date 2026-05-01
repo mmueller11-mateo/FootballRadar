@@ -9,12 +9,12 @@ namespace FootballRadar.DataCollector.ApiSports.Services
 {
     internal interface IApiSportsServiceAgent
     {
-        Task<IReadOnlyCollection<CountryResponse>> GetCountriesAsync();
-        Task<IReadOnlyCollection<FixtureResponse>> GetFixturesAsync(int leagueId, int season);
-        Task<IReadOnlyCollection<LeagueResponse>> GetLeaguesAsync();
-        Task<IReadOnlyCollection<Standing>> GetStandingsAsync(int leagueId, int season);
-        Task<IReadOnlyCollection<TeamResponse>> GetTeamsAsync(int leagueId, int season);
-        Task<IReadOnlyCollection<TeamInfo>> GetTeamsByLeagueAsync(int leagueId, int season);
-        Task<IReadOnlyCollection<PlayerResponse>> GetPlayersAsync(int teamId, int season);
+        Task<IEnumerable<CountryResponse>> GetCountriesAsync();
+        Task<IEnumerable<FixtureResponse>> GetFixturesAsync(int leagueId, int season);
+        Task<IEnumerable<LeagueResponse>> GetLeaguesAsync();
+        Task<IEnumerable<Standing>> GetStandingsAsync(int leagueId, int season);
+        Task<IEnumerable<TeamResponse>> GetTeamsAsync(int leagueId, int season);
+        Task<IEnumerable<TeamInfo>> GetTeamsByLeagueAsync(int leagueId, int season);
+        Task<IEnumerable<PlayerResponse>> GetPlayersAsync(int teamId, int season);
     }
 }

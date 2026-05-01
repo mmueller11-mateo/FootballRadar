@@ -39,6 +39,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FootballRadar.Web.Utilities
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FootballRadar.DataCollector.Kaggle", "FootballRadar.DataCollector.Transfermarkt\FootballRadar.DataCollector.Kaggle.csproj", "{36190385-CCD2-49F9-90FC-25AB4D47F7D1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "My.Framework.EventHandling", "My.Framework.EventHandling\My.Framework.EventHandling.csproj", "{5CFC9AF7-2529-46FB-9E45-9ECBD41C2EC6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FootballRadar.EventHandling", "FootballRadar.EventHandling\FootballRadar.EventHandling.csproj", "{FE862BCC-F6EA-4E22-96F4-0B5F8D0CF140}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -101,6 +105,14 @@ Global
 		{36190385-CCD2-49F9-90FC-25AB4D47F7D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{36190385-CCD2-49F9-90FC-25AB4D47F7D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{36190385-CCD2-49F9-90FC-25AB4D47F7D1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5CFC9AF7-2529-46FB-9E45-9ECBD41C2EC6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5CFC9AF7-2529-46FB-9E45-9ECBD41C2EC6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5CFC9AF7-2529-46FB-9E45-9ECBD41C2EC6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5CFC9AF7-2529-46FB-9E45-9ECBD41C2EC6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FE862BCC-F6EA-4E22-96F4-0B5F8D0CF140}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE862BCC-F6EA-4E22-96F4-0B5F8D0CF140}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE862BCC-F6EA-4E22-96F4-0B5F8D0CF140}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE862BCC-F6EA-4E22-96F4-0B5F8D0CF140}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -120,6 +132,7 @@ Global
 		{C0166C46-911F-E708-B073-DF185C6B6421} = {D17BCEFD-1EA0-45B1-8EBA-EE7000E74405}
 		{FA6CA344-1B73-4356-B2DE-C8D98D03718C} = {4CC03FBA-ADFA-4975-AEEB-40FE05423084}
 		{36190385-CCD2-49F9-90FC-25AB4D47F7D1} = {73F864D3-E764-471F-AD98-3A4A5062DD43}
+		{FE862BCC-F6EA-4E22-96F4-0B5F8D0CF140} = {4CC03FBA-ADFA-4975-AEEB-40FE05423084}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FD9C6AED-E047-4039-800F-486A7669CE72}

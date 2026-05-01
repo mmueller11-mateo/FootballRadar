@@ -3,7 +3,7 @@ using MediatR;
 
 namespace FootballRadar.Admin.Business.Services.Queries
 {
-    public sealed class GetCountriesQuery : IRequest<IReadOnlyCollection<Country>>
+    public sealed class GetCountriesQuery : IRequest<IEnumerable<Country>>
     {
     }
 }

@@ -4,7 +4,7 @@ using MediatR;
 
 namespace FootballRadar.Business.Services.Queries
 {
-    public sealed class GetTransferRumorsQuery : IRequest<IReadOnlyCollection<TransferRumor>>
+    public sealed class GetTransferRumorsQuery : IRequest<IEnumerable<TransferRumor>>
     {
         public required RumorStatus RumorStatus { get; init; }
     }

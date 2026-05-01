@@ -6,6 +6,6 @@
         public int Win { get; set; }
         public int Draw { get; set; }
         public int Lose { get; set; }
-        public StandingGoalsViewModel Goals { get; set; }
+        public required StandingGoalsViewModel Goals { get; set; }
     }
 }

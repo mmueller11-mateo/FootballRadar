@@ -30,7 +30,7 @@ sealed class CreateCountryCommandHandler : IRequestHandler<CreateCountryCommand,
             Flag = request.Flag
         };
 
-        _countryRepository.AddAsync(country);
+        await _countryRepository.AddAsync(country);
         return country;
     }
 }

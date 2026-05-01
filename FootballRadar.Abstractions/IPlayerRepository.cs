@@ -4,6 +4,8 @@ namespace FootballRadar.Abstractions
 {
     public interface IPlayerRepository
     {
-        Task<IReadOnlyCollection<Player>> GetByApiTeamIdAsync(int apiTeamId);
+        Task<IEnumerable<Player>> GetByApiTeamIdAsync(int apiTeamId);
+        Task<IEnumerable<Player>> GetByTeamAndSeasonAsync(int apiTeamId, int season, CancellationToken cancellationToken);
+        Task<IEnumerable<int>> GetSeasonsByTeamAsync(int apiTeamId, CancellationToken cancellationToken);
     }
 }

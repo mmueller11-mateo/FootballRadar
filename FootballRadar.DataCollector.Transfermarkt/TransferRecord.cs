@@ -3,7 +3,7 @@
     public class TransferRecord
     {
         public int PlayerId { get; set; }
-        public DateTime TransferDate { get; set; }
+        public DateTimeOffset TransferDate { get; set; }
         public required string TransferSeason { get; set; }
 
         public int FromClubId { get; set; }

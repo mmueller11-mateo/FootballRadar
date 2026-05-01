@@ -17,6 +17,13 @@
     </select>
     <button type="submit" class="btn btn-primary">Go</button>
 </form>
+@if (!Model.Standings.Any())
+{
+    <div class="alert alert-info">Data not available</div>
+}
+else
+{
+   
 <table class="table table-striped table-hover align-middle">
     <thead class="table-light">
         <tr>
@@ -48,7 +55,7 @@
                 <td>@standing.GoalsDiff</td>
                 <td><strong>@standing.Points</strong></td>
                 <td>
-                    <a href="@Url.Action(nameof(PlayerController.PlayerList), "Player", new { apiTeamId = standing.Team.ApiTeamId })"
+                    <a href="@Url.Action(nameof(PlayerController.PlayerList), ControllerName.For<PlayerController>(), new { apiTeamId = standing.Team.ApiTeamId })"
                        class="btn btn-sm btn-outline-primary">
                         Players
                     </a>
@@ -57,3 +64,4 @@
         }
     </tbody>
 </table>
+}

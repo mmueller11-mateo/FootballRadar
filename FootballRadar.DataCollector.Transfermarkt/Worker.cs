@@ -67,9 +67,10 @@ namespace FootballRadar.DataCollector.Kaggle
             logger.LogInformation("Imported {Count} transfer records.", extRecords.Count);
 
             await using var db = await dbContextFactory.CreateDbContextAsync(cancellationToken);
-
-            var players = await db.Players
-                .ToDictionaryAsync(p => NameNormalizer.Normalize(p.Name), p => p, cancellationToken);
+            var players = db.Players
+                .AsEnumerable()
+                .GroupBy(p => NameNormalizer.Normalize(p.Name))
+                .ToDictionary(g => g.Key, g => g.First());
 
             var teams = await db.Teams
                 .ToDictionaryAsync(t => NameNormalizer.Normalize(t.Name), t => t, cancellationToken);
@@ -89,20 +90,18 @@ namespace FootballRadar.DataCollector.Kaggle
                     continue;
                 }
 
-                if (!teams.TryGetValue(fromTeamKey, out var fromTeam) ||
-                    !teams.TryGetValue(toTeamKey, out var toTeam))
+                if (!teams.TryGetValue(fromTeamKey, out var fromTeam) || !teams.TryGetValue(toTeamKey, out var toTeam))
                 {
                     skipped++;
                     continue;
                 }
 
-                logger.LogInformation(
-                    "MATCH: {Player} | {FromTeam} -> {ToTeam} | Fee: {Fee} | Date: {Date}",
+                logger.LogInformation("MATCH: {Player} | {FromTeam} -> {ToTeam} | Fee: {Fee} | Date: {Date}",
                     player.Name,
                     fromTeam.Name,
                     toTeam.Name,
                     record.TransferFee,
-                    record.TransferDate.ToShortDateString());
+                    record.TransferDate);
 
                 matched++;
             }

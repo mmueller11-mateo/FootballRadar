@@ -1,9 +1,13 @@
-﻿namespace FootballRadar.WebApp.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace FootballRadar.WebApp.Models
 {
     public class StandingTeamViewModel
     {
-        public string Name { get; set; }
-        public string? Logo { get; set; }
+        [Required]
+        public string Name { get; set; } = string.Empty;
+        [Required]
+        public string Logo { get; set; } = string.Empty;
         public int? ApiTeamId { get; set; }
     }
 }

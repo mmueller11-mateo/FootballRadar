@@ -1,11 +1,12 @@
 ﻿@using FootballRadar.Admin.WebApp.Controllers
 @using FootballRadar.Admin.WebApp.Models
-@model IReadOnlyCollection<TeamViewModel>
+@using FootballRadar.Web.Utilities
+@model IEnumerable<TeamViewModel>
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h2 class="mb-0">Teams (@Model.Count())</h2>
     <a class="btn btn-primary"
-       href="@Url.Action(nameof(TeamController.CreateTeam), nameof(TeamController).Replace("Controller", ""))">
+       href="@Url.Action(nameof(TeamController.CreateTeam), ControllerName.For<TeamController>())">
         + Create Team
     </a>
 </div>
@@ -15,19 +16,26 @@
         <tr>
             <th>Logo</th>
             <th>Name</th>
+            <th>Code</th>
             <th>Country</th>
             <th style="width: 120px;"></th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var team in Model.OrderBy(t => t.Country).ThenBy(t => t.Name))
+        @foreach (var team in Model.OrderBy(t => t.CountryFlag).ThenBy(t => t.Name))
         {
             <tr>
                 <td><img src="@team.Logo" style="height: 32px; width: 32px; object-fit: contain;" /></td>
                 <td><strong>@team.Name</strong></td>
-                <td>@team.Country</td>
+                <td>@team.Code</td>
+                <td>
+                    @if (team.CountryFlag != null)
+                    {
+                        <img src="@team.CountryFlag" width="25" />
+                    }
+                </td>
                 <td class="text-end">
-                    <form method="post" action="@Url.Action(nameof(TeamController.Delete), nameof(TeamController).Replace("Controller", ""))" class="d-inline">
+                    <form method="post" action="@Url.Action(nameof(TeamController.Delete), ControllerName.For<TeamController>())" class="d-inline">
                         @Html.AntiForgeryToken()
                         <input type="hidden" name="id" value="@team.Id" />
                         <button type="submit" class="btn btn-sm btn-outline-danger">

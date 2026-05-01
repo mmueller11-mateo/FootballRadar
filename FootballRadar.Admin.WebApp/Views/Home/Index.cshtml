@@ -1,4 +1,5 @@
 ﻿@using FootballRadar.Admin.WebApp.Controllers
+@using FootballRadar.Web.Utilities
 @{
     ViewData["Title"] = "FootballRadar Admin";
 }
@@ -9,20 +10,20 @@
 <div class="list-group">
 
     <a class="list-group-item list-group-item-action"
-       href="@Url.Action(nameof(LeagueController.LeaguesList), "League")">
+       href="@Url.Action(nameof(LeagueController.LeaguesList), ControllerName.For<LeagueController>())">
         Leagues
     </a>
 
     <a class="list-group-item list-group-item-action"
-       href="@Url.Action(nameof(NationalTeamController.NationalTeamsList), "NationalTeam")">
+       href="@Url.Action(nameof(NationalTeamController.NationalTeamsList), ControllerName.For<NationalTeamController>())">
         National Teams
     </a>
     <a class="list-group-item list-group-item-action"
-       href="@Url.Action(nameof(CountryController.CountriesList), "Country")">
+       href="@Url.Action(nameof(CountryController.CountriesList), ControllerName.For<CountryController>())">
         Countries
     </a>
     <a class="list-group-item list-group-item-action"
-       href="@Url.Action(nameof(TeamController.TeamsList), "Team")">
+       href="@Url.Action(nameof(TeamController.TeamsList), ControllerName.For<TeamController>())">
         Teams
     </a>
 </div>

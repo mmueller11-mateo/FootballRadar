@@ -1,7 +1,7 @@
 ﻿@using FootballRadar.Business.Entities.LeagueEntities
 @using FootballRadar.WebApp.Controllers
 @using FootballRadar.WebApp.Controllers.FootballRadar.WebApp.Controllers
-@model IReadOnlyCollection<PublicLeague>
+@model IEnumerable<PublicLeague>
 
 <h2>Leagues</h2>
 <table class="table table-striped">
@@ -20,12 +20,12 @@
                     <img src="https://media.api-sports.io/football/leagues/@(league.ApiLeagueId).png" width="30" />
                 </td>
                 <td>
-                    <a href="@Url.Action(nameof(TeamController.TeamsList), "Team", new { leagueId = league.ApiLeagueId, season = 2024 })"  class=" btn btn-sm btn-outline-primary">
+                    <a href="@Url.Action(nameof(TeamController.TeamsList), ControllerName.For<TeamController>() , new { leagueId=league.ApiLeagueId, season=2024 })" class=" btn btn-sm btn-outline-primary">
                         @league.Name
                     </a>
                 </td>
                 <td>
-                    <a href="@Url.Action(nameof(FixtureController.Fixtures), "Fixture", new { leagueId = league.ApiLeagueId, season = 2024 })" class="btn btn-sm btn-outline-primary">
+                    <a href="@Url.Action(nameof(FixtureController.Fixtures), ControllerName.For<FixtureController>(), new { leagueId = league.ApiLeagueId, season = 2024 })" class="btn btn-sm btn-outline-primary">
                         Fixtures
                     </a>
                 </td>

@@ -1,0 +1,111 @@
+﻿@using FootballRadar.Business.Entities.Betting.Enums
+@model FootballRadar.WebApp.Models.PlaceBetViewModel
+
+<div class="container mt-4" style="max-width: 700px;">
+    <h2 class="mb-4">Place Bet</h2>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <p class="text-muted mb-2">@Model.Round — @Model.MatchDate.ToString("dd.MM.yyyy HH:mm")</p>
+            <div class="d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center gap-2">
+                    @if (Model.HomeLogo != null)
+                    {
+                        <img src="@Model.HomeLogo" height="35" />
+                    }
+                    <strong>@Model.HomeTeam</strong>
+                </div>
+                <span class="fw-bold text-muted">vs</span>
+                <div class="d-flex align-items-center gap-2">
+                    <strong>@Model.AwayTeam</strong>
+                    @if (Model.AwayLogo != null)
+                    {
+                        <img src="@Model.AwayLogo" height="35" />
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="alert alert-info mb-4">
+        Available Credits: <strong>@Model.AvailableCredits.ToString("N2")</strong>
+    </div>
+
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+    <form method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="MatchId" value="@Model.MatchId" />
+
+        <div class="form-group mb-4">
+            <label class="form-label fw-bold">Your Prediction</label>
+            <div class="d-flex gap-3 mt-2">
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="Prediction"
+                           value="@MatchPrediction.HomeWin" id="homeWin" required />
+                    <label class="form-check-label" for="homeWin">@Model.HomeTeam Win</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="Prediction"
+                           value="@MatchPrediction.Draw" id="draw" />
+                    <label class="form-check-label" for="draw">Draw</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="Prediction"
+                           value="@MatchPrediction.AwayWin" id="awayWin" />
+                    <label class="form-check-label" for="awayWin">@Model.AwayTeam Win</label>
+                </div>
+            </div>
+            @Html.ValidationMessageFor(m => m.Prediction, "", new { @class = "text-danger" })
+        </div>
+
+        <div class="form-group mb-3">
+            <label class="form-label fw-bold">Credits</label>
+            <input type="number" name="Credits" class="form-control"
+                   step="1" min="1" max="@Model.AvailableCredits" value="@Model.Credits" />
+            @Html.ValidationMessageFor(m => m.Credits, "", new { @class = "text-danger" })
+        </div>
+
+        <div class="d-flex gap-2 mt-4">
+            <button type="submit" class="btn btn-success">Place Bet</button>
+            <a href="javascript:history.back()" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+
+    @if (Model.HeadToHead.Any())
+    {
+        <div class="mt-5">
+            <h5 class="mb-3">Head to Head</h5>
+            <table class="table table-sm table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Date</th>
+                        <th class="text-end">Home</th>
+                        <th class="text-center">Score</th>
+                        <th>Away</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var h2h in Model.HeadToHead)
+                    {
+                        <tr>
+                            <td>@h2h.Date.ToString("dd.MM.yyyy")</td>
+                            <td class="text-end">@h2h.HomeTeam</td>
+                            <td class="text-center fw-bold">
+                                @(h2h.HomeGoals.HasValue ? $"{h2h.HomeGoals} - {h2h.AwayGoals}" : "- -")
+                            </td>
+                            <td>@h2h.AwayTeam</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="mt-5">
+            <h5 class="mb-3">Head to Head</h5>
+            <p class="text-muted">No previous matches found.</p>
+        </div>
+    }
+</div>

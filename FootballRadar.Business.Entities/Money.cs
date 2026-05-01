@@ -112,7 +112,7 @@ namespace FootballRadar.Business.Entities
 
         #region === Equability ===
 
-        public override bool Equals(object other)
+        public override bool Equals(object? other)
         {
             if (other is Money money)
             {
@@ -227,15 +227,15 @@ namespace FootballRadar.Business.Entities
 
         private static bool VerifyCurrencyCompatibility(Money left, Money right)
         {
-            if (left == null)
-            {
-                throw new ArgumentNullException(nameof(left));
-            }
+            //if (left == null)
+            //{
+            //    throw new ArgumentNullException(nameof(left));
+            //}
 
-            if (right == null)
-            {
-                throw new ArgumentNullException(nameof(right));
-            }
+            //if (right == null)
+            //{
+            //    throw new ArgumentNullException(nameof(right));
+            //}
 
             var currencyCompatible = !left.IsCurrencyDefined()
                                      || !right.IsCurrencyDefined()

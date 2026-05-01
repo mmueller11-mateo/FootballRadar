@@ -25,8 +25,9 @@ namespace FootballRadar.Admin.WebApp.Controllers
             {
                 Id = l.Id,
                 Name = l.Name,
-                CountryName = countries.FirstOrDefault(c => c.Id == l.CountryId)?.Name ?? "Unknown"
-            });
+                CountryName = countries.FirstOrDefault(c => c.Id == l.CountryId)?.Name ?? "Unknown",
+                Logo = l.Logo
+            }).ToList();
 
             return View(vm);
         }
@@ -39,7 +40,9 @@ namespace FootballRadar.Admin.WebApp.Controllers
                 Countries = countries.Select(c => new CountryViewModel
                 {
                     Id = c.Id,
-                    Name = c.Name
+                    Name = c.Name,
+                    Code = c.Code,
+                    Flag = c.Flag
                 }).ToList()
             };
             return View(vm);
@@ -54,7 +57,9 @@ namespace FootballRadar.Admin.WebApp.Controllers
                 vm.Countries = countries.Select(c => new CountryViewModel
                 {
                     Id = c.Id,
-                    Name = c.Name
+                    Name = c.Name,
+                    Code = c.Code,
+                    Flag = c.Flag
                 }).ToList();
                 return View(vm);
             }
@@ -63,7 +68,8 @@ namespace FootballRadar.Admin.WebApp.Controllers
             {
                 Name = vm.Name,
                 CountryId = vm.CountryId,
-                ApiLeagueId = vm.ApiLeagueId
+                ApiLeagueId = vm.ApiLeagueId,
+                Logo = vm.Logo
             });
 
             return RedirectToAction(nameof(LeaguesList));

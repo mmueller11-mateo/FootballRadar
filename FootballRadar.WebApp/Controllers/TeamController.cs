@@ -28,8 +28,8 @@ namespace FootballRadar.WebApp.Controllers
                     GoalsDiff = s.Standing.GoalsDiff,
                     Team = new StandingTeamViewModel
                     {
-                        Name = s.Team?.Name ?? "Unknown",
-                        Logo = s.Team?.Logo,
+                        Name = s.Team!.Name ?? "Unknown",
+                        Logo = s.Team.Logo,
                         ApiTeamId = s.Team?.ApiTeamId
 
                     },

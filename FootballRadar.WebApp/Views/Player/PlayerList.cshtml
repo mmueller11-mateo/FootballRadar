@@ -1,7 +1,22 @@
-﻿@model FootballRadar.WebApp.Models.TeamPlayersViewModel
+﻿@using FootballRadar.WebApp.Controllers
+@model FootballRadar.WebApp.Models.TeamPlayersViewModel
 
-<h2 class="mb-4">Squad</h2>
+<h2 class="mb-3">Squad</h2>
 
+<!-- Saison-Tabs -->
+<ul class="nav nav-pills mb-4">
+    @foreach (var s in Model.AvailableSeasons)
+    {
+        <li class="nav-item">
+            <a class="nav-link @(s == Model.Season ? "active" : "")"
+               href="@Url.Action(nameof(PlayerController.PlayerList), ControllerName.For<PlayerController>(), new { apiTeamId = Model.ApiTeamId, season = s })">
+                @s / @(s + 1)
+            </a>
+        </li>
+    }
+</ul>
+
+<!-- Spieler-Grid -->
 <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
     @foreach (var player in Model.Players)
     {

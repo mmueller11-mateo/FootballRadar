@@ -8,6 +8,6 @@ namespace FootballRadar.Abstractions
         Task<Wallet?> GetByIdAsync(Guid id);
         Task<Wallet?> GetByUserIdAsync(Guid userId);
         Task UpdateAsync(Wallet wallet);
-        Task<IReadOnlyCollection<WalletTransaction>> GetTransactionsByWalletIdAsync(Guid walletId);
+        Task<IEnumerable<WalletTransaction>> GetTransactionsByWalletIdAsync(Guid walletId);
     }
 }

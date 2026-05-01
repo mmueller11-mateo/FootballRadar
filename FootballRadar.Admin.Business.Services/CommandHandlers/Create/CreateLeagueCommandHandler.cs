@@ -29,8 +29,8 @@ namespace FootballRadar.Admin.Business.Services.CommandHandlers.Create
                 Id = Guid.NewGuid(),
                 Name = request.Name,
                 CountryId = request.CountryId,
-                ApiLeagueId = request.ApiLeagueId
-
+                ApiLeagueId = request.ApiLeagueId,
+                Logo = request.Logo
             };
 
 

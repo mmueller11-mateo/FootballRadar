@@ -76,9 +76,13 @@
 
 @section Scripts {
     <script>
+        const balanceUrl = '@Html.Raw(Url.Action(nameof(WalletController.GetBalance), ControllerName.For<WalletController>()))';
+        const depositUrl = '@Html.Raw(Url.Action(nameof(WalletController.Deposit), ControllerName.For<WalletController>()))';
+        const withdrawUrl = '@Html.Raw(Url.Action(nameof(WalletController.Withdraw), ControllerName.For<WalletController>()))';
+
         // Balance polling
         setInterval(async () => {
-            const response = await fetch('@Url.Action(nameof(FootballRadar.WebApp.Controllers.WalletController.GetBalance), "Wallet")');
+            const response = await fetch(balanceUrl);
             const data = await response.json();
             document.getElementById('balanceDisplay').textContent = data.credits.toFixed(2) + ' Credits';
         }, 4000);
@@ -113,7 +117,7 @@
             spinner.classList.remove('d-none');
             result.innerHTML = '';
 
-            const response = await fetch('@Url.Action(nameof(FootballRadar.WebApp.Controllers.WalletController.Deposit), ControllerName.For<WalletController>())', {
+            const response = await fetch(depositUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: new URLSearchParams(new FormData(e.target))
@@ -137,7 +141,7 @@
             spinner.classList.remove('d-none');
             result.innerHTML = '';
 
-            const response = await fetch('@Url.Action(nameof(FootballRadar.WebApp.Controllers.WalletController.Withdraw), ControllerName.For<WalletController>())', {
+            const response = await fetch(withdrawUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: new URLSearchParams(new FormData(e.target))

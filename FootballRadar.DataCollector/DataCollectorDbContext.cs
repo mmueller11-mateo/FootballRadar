@@ -42,7 +42,7 @@ namespace FootballRadar.DataCollector.ApiSports
         public DbSet<Standing> Standings { get; set; }
         public DbSet<StandingStats> StandingStats { get; set; }
         public DbSet<Match> Fixtures { get; set; }
-
+        public DbSet<TeamSeasonPlayer> TeamSeasonPlayers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

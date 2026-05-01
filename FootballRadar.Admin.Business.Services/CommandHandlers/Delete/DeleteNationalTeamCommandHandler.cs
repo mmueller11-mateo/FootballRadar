@@ -23,7 +23,6 @@ namespace FootballRadar.Admin.Business.Services.CommandHandlers.Delete
             }
 
             _nationalTeamRepository.Delete(nationalTeam);
-            await _nationalTeamRepository.SaveChangesAsync();
             return true;
         }
     }

@@ -5,7 +5,7 @@ using MediatR;
 
 namespace FootballRadar.Admin.Business.Services.QueryHandlers
 {
-    sealed class GetLeaguesQueryHandler : IRequestHandler<GetLeaguesQuery, IReadOnlyCollection<PublicLeague>>
+    sealed class GetLeaguesQueryHandler : IRequestHandler<GetLeaguesQuery, IEnumerable<PublicLeague>>
     {
         private readonly ILeagueRepository _leagueRepository;
 
@@ -14,7 +14,7 @@ namespace FootballRadar.Admin.Business.Services.QueryHandlers
             this._leagueRepository = leagueRepository;
         }
 
-        public async Task<IReadOnlyCollection<PublicLeague>> Handle(GetLeaguesQuery request, CancellationToken cancellationToken)
+        public async Task<IEnumerable<PublicLeague>> Handle(GetLeaguesQuery request, CancellationToken cancellationToken)
         {
             return await _leagueRepository.GetAllAsync();
         }

@@ -1,5 +1,5 @@
-﻿using FootballRadar.Business.Entities;
-using FootballRadar.Business.Entities.Betting;
+﻿using FootballRadar.Business.Entities.Betting;
+using FootballRadar.Business.Entities.Betting.Enums;
 using MediatR;
 
 namespace FootballRadar.Business.Services.Commands
@@ -8,8 +8,7 @@ namespace FootballRadar.Business.Services.Commands
     {
         public required Guid UserId { get; init; }
         public required Guid MatchId { get; init; }
-        public required int HomeTeamScore { get; init; }
-        public required int AwayTeamScore { get; init; }
-        public required Money Amount { get; init; }
+        public required decimal Credits { get; init; }
+        public required MatchPrediction Prediction { get; init; }
     }
 }

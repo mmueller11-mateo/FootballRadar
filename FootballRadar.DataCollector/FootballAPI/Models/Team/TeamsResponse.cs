@@ -6,6 +6,6 @@ namespace FootballRadar.DataCollector.ApiSports.FootballAPI.Models.Team
     {
         public required TeamInfo Team { get; set; }
         public required VenueInfo Venue { get; set; }
-        public required CountryInfo Country { get; set; }
+        public CountryInfo? Country { get; set; }
     }
 }

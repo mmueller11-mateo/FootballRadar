@@ -1,5 +1,6 @@
 ﻿using FootballRadar.Abstractions;
 using FootballRadar.Business.Services.Background;
+using FootballRadar.Business.Services.BackgroundServices;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -18,6 +19,7 @@ namespace FootballRadar.Business.Services
             services.AddTransient<IPasswordHasher, PasswordHasher>();
             services.AddTransient<ICurrencyConverter, CurrencyConverter>();
             services.AddHostedService<WalletTransactionExecuter>();
+            services.AddHostedService<BetSettlementWorker>();
         }
     }
 }

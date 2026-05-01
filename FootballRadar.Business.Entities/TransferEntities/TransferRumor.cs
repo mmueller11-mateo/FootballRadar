@@ -9,7 +9,7 @@ namespace FootballRadar.Business.Entities.TransferEntities
         public Guid? SourceTeamId { get; set; }
         public Guid TargetTeamId { get; set; }
         public RumorCredibility Credibility { get; set; }
-        public string Source { get; set; }
+        public required string Source { get; set; }
         public DateTimeOffset CreatedAt { get; set; }
         public RumorStatus Status { get; set; }
     }

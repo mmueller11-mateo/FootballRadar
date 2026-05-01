@@ -14,7 +14,7 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand" href="@Url.Action(nameof(HomeController.Index), "Home")">FootballRadar</a>
+                <a class="navbar-brand" href="@Url.Action(nameof(HomeController.Index), ControllerName.For<HomeController>())">FootballRadar</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
                         aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -24,10 +24,13 @@
                         @if (Context.User.Identity?.IsAuthenticated == true)
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" href="@Url.Action(nameof(LeagueController.LeaguesList), "League")">Leagues</a>
+                                <a class="nav-link text-dark" href="@Url.Action(nameof(LeagueController.LeaguesList), ControllerName.For<LeagueController>())">Leagues</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" href="@Url.Action(nameof(WalletController.Overview), "Wallet")">Wallet</a>
+                                <a class="nav-link text-dark" href="@Url.Action(nameof(WalletController.Overview), ControllerName.For<WalletController>())">Wallet</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" href="@Url.Action(nameof(BetController.MyBets), ControllerName.For<BetController>())">My Bets</a>
                             </li>
                         }
                     </ul>
@@ -38,16 +41,16 @@
                                 <span class="nav-link text-dark">@Context.User.Identity.Name</span>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" href="@Url.Action(nameof(AccountController.Logout), "Account")">Logout</a>
+                                <a class="nav-link text-dark" href="@Url.Action(nameof(AccountController.Logout), ControllerName.For<AccountController>())">Logout</a>
                             </li>
                         }
                         else
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" href="@Url.Action(nameof(AccountController.Login), "Account")">Login</a>
+                                <a class="nav-link text-dark" href="@Url.Action(nameof(AccountController.Login), ControllerName.For<AccountController>())">Login</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" href="@Url.Action(nameof(AccountController.Register), "Account")">Register</a>
+                                <a class="nav-link text-dark" href="@Url.Action(nameof(AccountController.Register), ControllerName.For<AccountController>())">Register</a>
                             </li>
                         }
                     </ul>

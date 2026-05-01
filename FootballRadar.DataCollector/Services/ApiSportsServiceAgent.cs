@@ -17,43 +17,49 @@ namespace FootballRadar.DataCollector.ApiSports.Services
             client = apiSportsClient;
         }
 
-        public async Task<IReadOnlyCollection<CountryResponse>> GetCountriesAsync()
+        public async Task<IEnumerable<CountryResponse>> GetCountriesAsync()
         {
             var response = await client.GetCountriesAsync();
             return response.Response;
         }
 
-        public async Task<IReadOnlyCollection<FixtureResponse>> GetFixturesAsync(int leagueId, int season)
+        public async Task<IEnumerable<FixtureResponse>> GetFixturesAsync(int leagueId, int season)
         {
             var response = await client.GetFixturesAsync(leagueId, season);
             return response.Response;
         }
 
-        public async Task<IReadOnlyCollection<LeagueResponse>> GetLeaguesAsync()
+        public async Task<IEnumerable<LeagueResponse>> GetLeaguesAsync()
         {
             var response = await client.GetLeaguesAsync();
             return response.Response;
         }
 
-        public async Task<IReadOnlyCollection<TeamInfo>> GetTeamsByLeagueAsync(int leagueId, int season)
+        public async Task<IEnumerable<TeamInfo>> GetTeamsByLeagueAsync(int leagueId, int season)
         {
             var response = await client.GetTeamsByLeagueAsync(leagueId, season);
             return response.Response.Select(r => r.Team).ToList();
         }
 
-        public async Task<IReadOnlyCollection<Standing>> GetStandingsAsync(int leagueId, int season)
+        public async Task<IEnumerable<Standing>> GetStandingsAsync(int leagueId, int season)
         {
             var response = await client.GetStandingsAsync(leagueId, season);
-            return response.Response.FirstOrDefault()?.League.Standings ?? new List<Standing>();
+
+            return response.Response
+                .FirstOrDefault()?
+                .League
+                .Standings
+                .SelectMany(x => x)
+                ?? Enumerable.Empty<Standing>();
         }
 
-        public async Task<IReadOnlyCollection<TeamResponse>> GetTeamsAsync(int leagueId, int season)
+        public async Task<IEnumerable<TeamResponse>> GetTeamsAsync(int leagueId, int season)
         {
             var response = await client.GetTeamsByLeagueAsync(leagueId, season);
             return response.Response;
         }
 
-        public async Task<IReadOnlyCollection<PlayerResponse>> GetPlayersAsync(int teamId, int season)
+        public async Task<IEnumerable<PlayerResponse>> GetPlayersAsync(int teamId, int season)
         {
             var allPlayers = new List<PlayerResponse>();
             int page = 1;
@@ -61,8 +67,10 @@ namespace FootballRadar.DataCollector.ApiSports.Services
             while (true)
             {
                 var response = await client.GetPlayersAsync(teamId, season, page);
+                if (response.Response == null)
+                    break;
 
-                if (response.Response == null || response.Response.Count == 0)
+                if (response.Paging == null)
                     break;
 
                 allPlayers.AddRange(response.Response);

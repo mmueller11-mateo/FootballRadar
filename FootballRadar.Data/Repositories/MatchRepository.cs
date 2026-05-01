@@ -26,19 +26,13 @@ namespace FootballRadar.Data.Repositories
             await db.SaveChangesAsync();
         }
 
-        public async Task SaveChangesAsync()
-        {
-            using var db = await _dbContextFactory.CreateDbContextAsync();
-            await db.SaveChangesAsync();
-        }
-
-        public async Task<IReadOnlyCollection<Match>> GetUpcomingMatches()
+        public async Task<IEnumerable<Match>> GetUpcomingMatches()
         {
             using var db = await _dbContextFactory.CreateDbContextAsync();
             return await db.Fixtures.ToArrayAsync();
         }
 
-        public async Task<IReadOnlyCollection<Match>> GetByLeagueAsync(int apiLeagueId, int season)
+        public async Task<IEnumerable<Match>> GetByLeagueAsync(int apiLeagueId, int season)
         {
             using var db = await _dbContextFactory.CreateDbContextAsync();
 
@@ -52,7 +46,7 @@ namespace FootballRadar.Data.Repositories
                 .ToListAsync();
         }
 
-        public async Task<IReadOnlyCollection<int>> GetSeasonsByLeagueAsync(int apiLeagueId)
+        public async Task<IEnumerable<int>> GetSeasonsByLeagueAsync(int apiLeagueId)
         {
             using var db = await _dbContextFactory.CreateDbContextAsync();
             var league = await db.Leagues.FirstOrDefaultAsync(l => l.ApiLeagueId == apiLeagueId);
@@ -63,6 +57,19 @@ namespace FootballRadar.Data.Repositories
                 .Select(f => f.Season)
                 .Distinct()
                 .OrderByDescending(s => s)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Match>> GetHeadToHeadAsync(Guid homeTeamId, Guid awayTeamId, int limit = 5)
+        {
+            using var db = await _dbContextFactory.CreateDbContextAsync();
+            return await db.Fixtures
+                .Where(f =>
+                    (f.HomeTeamId == homeTeamId && f.AwayTeamId == awayTeamId) ||
+                    (f.HomeTeamId == awayTeamId && f.AwayTeamId == homeTeamId))
+                .Where(f => f.HomeGoals.HasValue && f.AwayGoals.HasValue)
+                .OrderByDescending(f => f.Date)
+                .Take(limit)
                 .ToListAsync();
         }
     }

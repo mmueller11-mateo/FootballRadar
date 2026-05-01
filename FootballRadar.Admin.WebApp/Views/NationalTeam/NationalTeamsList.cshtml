@@ -1,12 +1,13 @@
 ﻿@using FootballRadar.Admin.WebApp.Controllers
 @using FootballRadar.Admin.WebApp.Models
-@model IReadOnlyCollection<NationalTeamViewModel>
+@using FootballRadar.Web.Utilities
+@model IEnumerable<NationalTeamViewModel>
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h2 class="mb-0">Nationalteams (@Model.Count())</h2>
 
     <a class="btn btn-primary"
-       href="@Url.Action(nameof(NationalTeamController.CreateNationalTeam), nameof(NationalTeamController).Replace("Controller", ""))">
+       href="@Url.Action(nameof(NationalTeamController.CreateNationalTeam), ControllerName.For<NationalTeamController>())">
         + Create NationalTeam
     </a>
 </div>
@@ -29,7 +30,7 @@
                 <td>@nationalTeam.Country</td>
                 <td>@nationalTeam.Level</td>
             <td class="text-end">
-                <form method="post" action="@Url.Action(nameof(NationalTeamController.Delete), nameof(NationalTeamController).Replace("Controller", ""))" class="d-inline">
+                    <form method="post" action="@Url.Action(nameof(NationalTeamController.Delete), ControllerName.For<NationalTeamController>())" class="d-inline">
                     @Html.AntiForgeryToken()
                     <input type="hidden" name="id" value="@nationalTeam.Id" />
                     <button type="submit" class="btn btn-sm btn-outline-danger">

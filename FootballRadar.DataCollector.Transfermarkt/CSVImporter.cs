@@ -96,16 +96,27 @@ namespace FootballRadar.DataCollector.Kaggle
             return decimal.TryParse(val, NumberStyles.Any, CultureInfo.InvariantCulture, out var result) ? result : 0;
         }
 
-        private static DateTime ParseDate(string[] cols, int index)
+        private static DateTimeOffset ParseDate(string[] cols, int index)
         {
             var val = Get(cols, index);
 
-            if (DateTime.TryParseExact(val, "dd.MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out var date))
+            var formats = new[]
             {
-                return date;
+        "dd.MM.yyyy",
+        "yyyy-MM-dd"
+    };
+
+            if (DateTime.TryParseExact(
+                    val,
+                    formats,
+                    CultureInfo.InvariantCulture,
+                    DateTimeStyles.None,
+                    out var date))
+            {
+                return new DateTimeOffset(date);
             }
 
-            return DateTime.MinValue;
+            throw new Exception($"Invalid date: {val}");
         }
     }
 }

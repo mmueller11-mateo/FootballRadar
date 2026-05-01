@@ -5,7 +5,7 @@ using MediatR;
 
 namespace FootballRadar.Business.Services.QueryHandlers
 {
-    internal sealed class GetUpcomingMatchesQueryHandler : IRequestHandler<GetUpcomingMatchesQuery, IReadOnlyCollection<Match>>
+    internal sealed class GetUpcomingMatchesQueryHandler : IRequestHandler<GetUpcomingMatchesQuery, IEnumerable<Match>>
     {
         private readonly IMatchRepository _matchRepository;
 
@@ -14,7 +14,7 @@ namespace FootballRadar.Business.Services.QueryHandlers
             this._matchRepository = matchRepository;
         }
 
-        public async Task<IReadOnlyCollection<Match>> Handle(GetUpcomingMatchesQuery request, CancellationToken cancellationToken)
+        public async Task<IEnumerable<Match>> Handle(GetUpcomingMatchesQuery request, CancellationToken cancellationToken)
         {
             return await _matchRepository.GetUpcomingMatches();
         }

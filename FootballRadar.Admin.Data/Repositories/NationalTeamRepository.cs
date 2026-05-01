@@ -21,7 +21,7 @@ namespace FootballRadar.Admin.Data.Repositories
             await dbContext.SaveChangesAsync();
         }
 
-        public async Task<IReadOnlyCollection<NationalTeam>> GetAllAsync()
+        public async Task<IEnumerable<NationalTeam>> GetAllAsync()
         {
             using var dbContext = await _dbContextFactory.CreateDbContextAsync();
             return await dbContext.NationalTeams.ToListAsync();
@@ -51,12 +51,6 @@ namespace FootballRadar.Admin.Data.Repositories
             using var dbContext = _dbContextFactory.CreateDbContext();
             dbContext.NationalTeams.Remove(nationalTeam);
             dbContext.SaveChanges();
-        }
-
-        public async Task SaveChangesAsync()
-        {
-            using var dbContext = await _dbContextFactory.CreateDbContextAsync();
-            await dbContext.SaveChangesAsync();
         }
     }
 }

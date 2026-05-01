@@ -42,7 +42,7 @@ namespace FootballRadar.Data.Repositories
                     .SetProperty(w => w.LastUpdated, wallet.LastUpdated));
         }
 
-        public async Task<IReadOnlyCollection<WalletTransaction>> GetTransactionsByWalletIdAsync(Guid walletId)
+        public async Task<IEnumerable<WalletTransaction>> GetTransactionsByWalletIdAsync(Guid walletId)
         {
             using var dbContext = await _dbContextFactory.CreateDbContextAsync();
             return await dbContext.WalletTransactions

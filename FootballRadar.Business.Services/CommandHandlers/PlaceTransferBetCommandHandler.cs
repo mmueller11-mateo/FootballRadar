@@ -66,13 +66,14 @@ namespace FootballRadar.Business.Services.CommandHandlers
                 }
             }
 
-            var bet = new Bet
+            var bet = new TransferBet
             {
                 Id = Guid.NewGuid(),
-                Amount = request.Amount,
+                Credits = request.Credits,
                 PlacedAt = DateTimeOffset.UtcNow,
                 UserId = request.UserId,
                 PredictionMarketId = predictionMarket.Id,
+                Prediction = request.Prediction
             };
 
             await _betRepository.AddBetAsync(bet);

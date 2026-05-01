@@ -21,6 +21,7 @@
   <ItemGroup>
     <ProjectReference Include="..\FootballRadar.Admin.Business.Services\FootballRadar.Admin.Business.Services.csproj" />
     <ProjectReference Include="..\FootballRadar.Admin.Data\FootballRadar.Admin.Data.csproj" />
+    <ProjectReference Include="..\FootballRadar.Web.Utilities\FootballRadar.Web.Utilities.csproj" />
   </ItemGroup>
 
 </Project>

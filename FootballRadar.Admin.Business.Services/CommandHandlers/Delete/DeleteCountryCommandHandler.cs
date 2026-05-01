@@ -23,7 +23,6 @@ namespace FootballRadar.Admin.Business.Services.CommandHandlers.Delete
             }
 
             _countryRepository.Delete(country);
-            await _countryRepository.SaveChangesAsync();
             return true;
         }
     }

@@ -5,6 +5,6 @@ namespace FootballRadar.Abstractions
     public interface ICurrencyConverter
     {
         Task<decimal> ConvertToCredits(Money amount);
-        IReadOnlyCollection<string> SupportedCurrencies { get; }
+        IEnumerable<string> SupportedCurrencies { get; }
     }
 }

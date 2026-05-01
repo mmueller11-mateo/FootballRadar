@@ -13,13 +13,15 @@ namespace FootballRadar.Business.Services.CommandHandlers
         private readonly IPredictionMarketRepository _predictionMarketRepository;
         private readonly IMatchRepository _matchRepository;
         private readonly IMatchPredictionRewardCalculator _rewardCalculator;
+        private readonly IWalletRepository _walletRepository;
 
-        public PlaceMatchBetCommandHandler(IBetRepository betRepository, IPredictionMarketRepository predictionMarketRepository, IMatchRepository matchRepository, IMatchPredictionRewardCalculator rewardCalculator)
+        public PlaceMatchBetCommandHandler(IBetRepository betRepository, IPredictionMarketRepository predictionMarketRepository, IMatchRepository matchRepository, IMatchPredictionRewardCalculator rewardCalculator, IWalletRepository walletRepository)
         {
             _betRepository = betRepository;
             _predictionMarketRepository = predictionMarketRepository;
             _matchRepository = matchRepository;
             _rewardCalculator = rewardCalculator;
+            _walletRepository = walletRepository;
         }
 
         public async Task<BetStatus> Handle(PlaceMatchBetCommand request, CancellationToken cancellationToken)
@@ -34,7 +36,6 @@ namespace FootballRadar.Business.Services.CommandHandlers
             if (predictionMarket == null)
             {
                 var reward = await _rewardCalculator.CalculateReward(match);
-
                 predictionMarket = new MatchPredictionMarket
                 {
                     Id = Guid.NewGuid(),
@@ -46,10 +47,18 @@ namespace FootballRadar.Business.Services.CommandHandlers
                     Rules = [
                         new CannotBetAfterMatchStart(match),
                         new CannotBetAfterMatchEnd(match),
-                        new CanOnlyBetOncePerMatch(match, request.UserId, _betRepository)]
+                        new CanOnlyBetOncePerMatch(match, request.UserId, _betRepository)
+                    ]
                 };
-
                 await _predictionMarketRepository.AddAsync(predictionMarket);
+            }
+            else
+            {
+                predictionMarket.Rules = [
+                    new CannotBetAfterMatchStart(match),
+                    new CannotBetAfterMatchEnd(match),
+                    new CanOnlyBetOncePerMatch(match, request.UserId, _betRepository)
+                ];
             }
 
             foreach (var rule in predictionMarket.Rules)
@@ -64,15 +73,37 @@ namespace FootballRadar.Business.Services.CommandHandlers
                 }
             }
 
-            var bet = new Bet
+            var wallet = await _walletRepository.GetByUserIdAsync(request.UserId);
+            if (wallet == null)
+            {
+                return new BetStatus
+                {
+                    Code = BetStatusCode.Rejected,
+                    ErrorMessage = "Wallet not found."
+                };
+            }
+
+            if (wallet.Credits < request.Credits)
+            {
+                return new BetStatus
+                {
+                    Code = BetStatusCode.Rejected,
+                    ErrorMessage = "Insufficient credits."
+                };
+            }
+
+            wallet.Withdraw(request.Credits);
+            await _walletRepository.UpdateAsync(wallet);
+
+            var bet = new MatchBet
             {
                 Id = Guid.NewGuid(),
-                Amount = request.Amount,
+                Credits = request.Credits,
                 PlacedAt = DateTimeOffset.UtcNow,
                 UserId = request.UserId,
                 PredictionMarketId = predictionMarket.Id,
+                Prediction = request.Prediction
             };
-
             await _betRepository.AddBetAsync(bet);
             return new BetStatus { Code = BetStatusCode.Accepted };
         }

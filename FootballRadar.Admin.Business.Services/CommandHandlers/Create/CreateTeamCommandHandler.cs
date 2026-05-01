@@ -30,6 +30,7 @@ namespace FootballRadar.Admin.Business.Services.CommandHandlers.Create
                 CountryId = request.CountryId,
                 ApiTeamId = request.ApiTeamId,
                 Logo = request.Logo,
+                Code = request.Code
             };
 
             await _teamRepository.AddAsync(team);

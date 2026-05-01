@@ -7,6 +7,6 @@
         public string DepositCurrency { get; set; } = "CHF";
         public decimal WithdrawAmount { get; set; }
         public string WithdrawCurrency { get; set; } = "CHF";
-        public IReadOnlyCollection<string> AvailableCurrencies { get; set; } = ["CHF", "PEN"];
+        public IEnumerable<string> AvailableCurrencies { get; set; } = ["CHF", "PEN"];
     }
 }

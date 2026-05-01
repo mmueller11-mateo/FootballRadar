@@ -21,7 +21,7 @@ namespace FootballRadar.Data.Repositories
             await db.SaveChangesAsync();
         }
 
-        public async Task<IReadOnlyCollection<WalletTransaction>> GetByWalletIdAsync(Guid walletId)
+        public async Task<IEnumerable<WalletTransaction>> GetByWalletIdAsync(Guid walletId)
         {
             using var db = await _dbContextFactory.CreateDbContextAsync();
             return await db.WalletTransactions
@@ -45,7 +45,7 @@ namespace FootballRadar.Data.Repositories
                 .ExecuteUpdateAsync(s => s.SetProperty(t => t.Status, status));
         }
 
-        public async Task<IReadOnlyCollection<WalletTransaction>> GetTransactionsAsync(WalletTransactionStatus status)
+        public async Task<IEnumerable<WalletTransaction>> GetTransactionsAsync(WalletTransactionStatus status)
         {
             using var db = await _dbContextFactory.CreateDbContextAsync();
             return await db.WalletTransactions

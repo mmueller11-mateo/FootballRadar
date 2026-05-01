@@ -20,7 +20,7 @@ namespace FootballRadar.Data.Repositories
             await dbContext.SaveChangesAsync();
         }
 
-        public async Task<IReadOnlyCollection<Team>> GetAllAsync()
+        public async Task<IEnumerable<Team>> GetAllAsync(CancellationToken cancellationToken)
         {
             using var dbContext = await _dbContextFactory.CreateDbContextAsync();
             return await dbContext.Teams.ToListAsync();
@@ -50,6 +50,20 @@ namespace FootballRadar.Data.Repositories
             using var dbContext = _dbContextFactory.CreateDbContext();
             dbContext.Teams.Remove(team);
             dbContext.SaveChanges();
+        }
+        public async Task<IEnumerable<Team>> GetBySeasonAsync(int season, CancellationToken cancellationToken)
+        {
+            using var db = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+
+            return await db.TeamSeasonPlayers
+                .Where(x => x.Season == season)
+                .Select(x => x.ApiTeamId)
+                .Distinct()
+                .Join(db.Teams,
+                    apiId => apiId,
+                    t => t.ApiTeamId,
+                    (apiId, team) => team)
+                .ToListAsync(cancellationToken);
         }
     }
 }

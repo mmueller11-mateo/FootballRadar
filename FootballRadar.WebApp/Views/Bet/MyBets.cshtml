@@ -1,0 +1,146 @@
+﻿@model FootballRadar.WebApp.Models.UserBetsViewModel
+
+<div class="container mt-4">
+    <h2 class="mb-4">My Bets</h2>
+
+    @* Statistics *@
+    <div class="row g-3 mb-5">
+        <div class="col-6 col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h3 class="mb-0">@Model.TotalBets</h3>
+                    <small class="text-muted">Total Bets</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card text-center shadow-sm border-success">
+                <div class="card-body">
+                    <h3 class="mb-0 text-success">@Model.WonBets</h3>
+                    <small class="text-muted">Won</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card text-center shadow-sm border-danger">
+                <div class="card-body">
+                    <h3 class="mb-0 text-danger">@Model.LostBets</h3>
+                    <small class="text-muted">Lost</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card text-center shadow-sm border-info">
+                <div class="card-body">
+                    <h3 class="mb-0 text-info">@Model.TotalWinnings.ToString("N2")</h3>
+                    <small class="text-muted">Total Winnings</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @* Open Bets *@
+    <h4 class="mb-3">Open Bets <span class="badge bg-secondary">@Model.OpenBets.Count()</span></h4>
+    @if (!Model.OpenBets.Any())
+    {
+        <p class="text-muted mb-5">No open bets.</p>
+    }
+    else
+    {
+        <div class="row g-3 mb-5">
+            @foreach (var bet in Model.OpenBets)
+            {
+                <div class="col-12 col-md-6">
+                    <div class="card shadow-sm border-warning">
+                        <div class="card-body">
+                            @* Teams *@
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <div class="d-flex align-items-center gap-2">
+                                    @if (bet.HomeLogo != null)
+                                    {
+                                        <img src="@bet.HomeLogo" height="25" />
+                                    }
+                                    <span class="fw-bold">@bet.HomeTeam</span>
+                                </div>
+                                <small class="text-muted">vs</small>
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="fw-bold">@bet.AwayTeam</span>
+                                    @if (bet.AwayLogo != null)
+                                    {
+                                        <img src="@bet.AwayLogo" height="25" />
+                                    }
+                                </div>
+                            </div>
+                            <small class="text-muted d-block mb-2">@bet.MatchDate.ToString("dd.MM.yyyy HH:mm")</small>
+                            <div class="d-flex justify-content-between">
+                                <span>Prediction: <strong>@bet.Prediction</strong></span>
+                                <span>Stake: <strong>@bet.Credits.ToString("N2")</strong></span>
+                            </div>
+                            <div class="d-flex justify-content-between mt-1">
+                                <small class="text-muted">Placed: @bet.PlacedAt.ToString("dd.MM.yyyy HH:mm")</small>
+                                <small class="text-muted">Reward: @bet.Reward%</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    @* Settled Bets *@
+    <h4 class="mb-3">Settled Bets <span class="badge bg-secondary">@Model.SettledBets.Count()</span></h4>
+    @if (!Model.SettledBets.Any())
+    {
+        <p class="text-muted">No settled bets yet.</p>
+    }
+    else
+    {
+        <div class="row g-3">
+            @foreach (var bet in Model.SettledBets)
+            {
+                var borderClass = bet.IsWon == true ? "border-success" : "border-danger";
+                <div class="col-12 col-md-6">
+                    <div class="card shadow-sm @borderClass">
+                        <div class="card-body">
+                            @* Teams + Score *@
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <div class="d-flex align-items-center gap-2">
+                                    @if (bet.HomeLogo != null)
+                                    {
+                                        <img src="@bet.HomeLogo" height="25" />
+                                    }
+                                    <span class="fw-bold">@bet.HomeTeam</span>
+                                </div>
+                                <span class="fw-bold">@bet.HomeGoals - @bet.AwayGoals</span>
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="fw-bold">@bet.AwayTeam</span>
+                                    @if (bet.AwayLogo != null)
+                                    {
+                                        <img src="@bet.AwayLogo" height="25" />
+                                    }
+                                </div>
+                            </div>
+                            <small class="text-muted d-block mb-2">@bet.MatchDate.ToString("dd.MM.yyyy HH:mm")</small>
+                            <div class="d-flex justify-content-between">
+                                <span>Prediction: <strong>@bet.Prediction</strong></span>
+                                <span>Stake: <strong>@bet.Credits.ToString("N2")</strong></span>
+                            </div>
+                            @if (bet.IsWon == true)
+                            {
+                                <div class="mt-2 text-success fw-bold">
+                                    ✅ Won — Payout: @bet.Payout?.ToString("N2") credits
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="mt-2 text-danger fw-bold">
+                                    ❌ Lost
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

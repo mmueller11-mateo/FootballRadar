@@ -18,7 +18,7 @@ namespace FootballRadar.DataCollector.ApiSports.FootballAPI
         Task<ApiSportsResponse<TeamResponse>> GetTeamsByLeagueAsync([Query] int league, [Query] int season);
 
         [Get("/standings")]
-        Task<ApiSportsResponse<StandingsResponse>> GetStandingsAsync([Query] int league, [Query] int season);
+        Task<ApiSportsResponse<StandingsResponseItem>> GetStandingsAsync([Query] int league, [Query] int season);
 
         [Get("/leagues")]
         Task<ApiSportsResponse<LeagueResponse>> GetLeaguesAsync([Query] string? name = null, [Query] string? country = null);

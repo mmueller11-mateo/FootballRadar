@@ -1,12 +1,13 @@
 ﻿@using FootballRadar.Admin.WebApp.Controllers
 @using FootballRadar.Admin.WebApp.Models
-@model IReadOnlyCollection<LeagueViewModel>
+@using FootballRadar.Web.Utilities
+@model IEnumerable<LeagueViewModel>
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h2 class="mb-0">Leagues (@Model.Count())</h2>
 
     <a class="btn btn-primary"
-       href="@Url.Action(nameof(LeagueController.CreateLeague), nameof(LeagueController).Replace("Controller", ""))">
+       href="@Url.Action(nameof(LeagueController.CreateLeague), ControllerName.For<LeagueController>())">
         + Create League
     </a>
 </div>
@@ -14,6 +15,7 @@
 <table class="table table-striped table-hover align-middle">
     <thead class="table-light">
         <tr>
+            <th>Logo</th>
             <th>Name</th>
             <th>Country</th>
             <th style="width: 120px;"></th>
@@ -24,10 +26,16 @@
         {
             <tr>
                 <td>
+                    @if (leagues.Logo != null)
+                    {
+                        <img src="@leagues.Logo" width="30" />
+                    }
+                </td>
+                <td>
                 <strong>@leagues.Name</strong>
                     <td>@leagues.CountryName</td>
                     <td class="text-end">
-                        <form method="post" action="@Url.Action(nameof(LeagueController.Delete), nameof(LeagueController).Replace("Controller", ""))" class="d-inline">
+                    <form method="post" action="@Url.Action(nameof(LeagueController.Delete), ControllerName.For<LeagueController>())" class="d-inline">
                             @Html.AntiForgeryToken()
                             <input type="hidden" name="id" value="@leagues.Id" />
                             <button type="submit" class="btn btn-sm btn-outline-danger">

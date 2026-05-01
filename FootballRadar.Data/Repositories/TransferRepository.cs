@@ -14,13 +14,18 @@ namespace FootballRadar.Data.Repositories
             this.dbContextFactory = dbContextFactory;
         }
 
+        public Task AddTransferRumor(TransferRumor transferRumor)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<TransferRumor?> GetTransferRumorById(Guid id)
         {
             using var db = await dbContextFactory.CreateDbContextAsync();
             return await db.TransferRumors.SingleOrDefaultAsync(r => r.Id == id);
         }
 
-        public async Task<IReadOnlyCollection<TransferRumor>> GetTransferRumors(RumorStatus rumorStatus)
+        public async Task<IEnumerable<TransferRumor>> GetTransferRumors(RumorStatus rumorStatus)
         {
             using var db = await dbContextFactory.CreateDbContextAsync();
             return await db.TransferRumors.Where(x => x.Status == RumorStatus.Open).ToListAsync();

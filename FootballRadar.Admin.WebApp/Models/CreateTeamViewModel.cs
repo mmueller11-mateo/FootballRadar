@@ -12,9 +12,13 @@ namespace FootballRadar.Admin.WebApp.Models
         [Required]
         public Guid CountryId { get; set; }
 
-        public string? Logo { get; set; }
+        [Required]
+        public string Logo { get; set; } = string.Empty;
 
         public int? ApiTeamId { get; set; }
+
+        [Required]
+        public string Code { get; set; } = string.Empty;
 
         [ValidateNever]
         public List<CountryOption> Countries { get; set; } = new();

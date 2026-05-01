@@ -11,7 +11,7 @@ namespace FootballRadar.Business.Services
             { "PEN", 0.25m },
         };
 
-        public IReadOnlyCollection<string> SupportedCurrencies => _rates.Keys.ToList();
+        public IEnumerable<string> SupportedCurrencies => _rates.Keys.ToList();
 
         public Task<decimal> ConvertToCredits(Money amount)
         {

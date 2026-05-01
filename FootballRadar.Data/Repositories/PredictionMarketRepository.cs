@@ -19,8 +19,6 @@ namespace FootballRadar.Data.Repositories
             return await db.MatchPredictionMarkets.SingleOrDefaultAsync(p => p.MatchId == matchId);
         }
 
-
-
         public async Task AddAsync(PredictionMarket predictionMarket)
         {
             using var db = await _dbContextFactory.CreateDbContextAsync();
@@ -34,6 +32,19 @@ namespace FootballRadar.Data.Repositories
             return await db.PredictionMarkets
                 .OfType<TransferPredictionMarket>()
                 .FirstOrDefaultAsync(p => p.TransferRumorId == transferRumorId);
+        }
+
+        public async Task UpdateAsync(PredictionMarket predictionMarket)
+        {
+            using var db = await _dbContextFactory.CreateDbContextAsync();
+            db.PredictionMarkets.Update(predictionMarket);
+            await db.SaveChangesAsync();
+        }
+
+        public async Task<PredictionMarket?> GetByIdAsync(Guid id)
+        {
+            using var db = await _dbContextFactory.CreateDbContextAsync();
+            return await db.PredictionMarkets.FirstOrDefaultAsync(p => p.Id == id);
         }
     }
 }

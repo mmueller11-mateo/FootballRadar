@@ -2,6 +2,6 @@
 {
     public class PlayerResponse
     {
-        public PlayerInfo Player { get; set; }
+        public required PlayerInfo Player { get; set; }
     }
 }

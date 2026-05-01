@@ -45,5 +45,10 @@ namespace FootballRadar.Data.Repositories
             dbContext.Users.Remove(user);
             dbContext.SaveChanges();
         }
+
+        public Task<UserProfile> GetCurrentUserProfile()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

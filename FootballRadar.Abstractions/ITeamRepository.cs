@@ -5,9 +5,12 @@ namespace FootballRadar.Abstractions
     public interface ITeamRepository
     {
         Task AddAsync(Team team);
-        Task<IReadOnlyCollection<Team>> GetAllAsync();
+        Task<IEnumerable<Team>> GetAllAsync(CancellationToken cancellationToken);
         Task<Team?> GetByIdAsync(Guid id);
         Task<Team?> GetByNameAsync(string name);
+
+        Task<IEnumerable<Team>> GetBySeasonAsync(int season, CancellationToken cancellationToken);
+
         void Update(Team team);
         void Delete(Team team);
     }

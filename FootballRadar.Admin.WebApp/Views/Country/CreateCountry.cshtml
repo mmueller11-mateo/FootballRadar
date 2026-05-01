@@ -1,18 +1,25 @@
 ﻿@using FootballRadar.Admin.WebApp.Controllers
 @using FootballRadar.Admin.WebApp.Models
+@using FootballRadar.Web.Utilities
 @model CreateCountryViewModel
-
 <h2>Create new country</h2>
-
-<form method="post" action="@Url.Action(nameof(CountryController.CreateCountry), "Country")">
+<form method="post" action="@Url.Action(nameof(CountryController.CreateCountry), ControllerName.For<CountryController>())">
     @Html.AntiForgeryToken()
-
     <div class="form-group mb-3">
         <label>Name</label>
         <input type="text" name="Name" class="form-control" value="@Model?.Name" />
         @Html.ValidationMessageFor(m => m.Name, "", new { @class = "text-danger" })
     </div>
-
+    <div class="form-group mb-3">
+        <label>Code</label>
+        <input type="text" name="Code" class="form-control" value="@Model?.Code" />
+        @Html.ValidationMessageFor(m => m.Code, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group mb-3">
+        <label>Flag URL</label>
+        <input type="text" name="Flag" class="form-control" value="@Model?.Flag" />
+        @Html.ValidationMessageFor(m => m.Flag, "", new { @class = "text-danger" })
+    </div>
     <button type="submit" class="btn btn-success">Create</button>
-    <a class="btn btn-secondary" href="@Url.Action(nameof(CountryController.CountriesList), "Country")">Back to list</a>
+    <a class="btn btn-secondary" href="@Url.Action(nameof(CountryController.CountriesList), ControllerName.For<CountryController>())">Back to list</a>
 </form>

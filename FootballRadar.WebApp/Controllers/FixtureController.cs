@@ -24,7 +24,7 @@ namespace FootballRadar.WebApp.Controllers
                 var selectedSeason = season ?? seasons.FirstOrDefault();
 
                 var fixtures = await _mediator.Send(new GetMatchesBySeasonQuery { ApiLeagueId = leagueId, Season = selectedSeason });
-                var teams = await _mediator.Send(new GetTeamsQuery());
+                var teams = await _mediator.Send(new GetAllTeamsQuery());
                 var leagues = await _mediator.Send(new GetLeaguesQuery());
                 var league = leagues.FirstOrDefault(l => l.ApiLeagueId == leagueId);
                 var now = DateTime.UtcNow;
@@ -51,8 +51,8 @@ namespace FootballRadar.WebApp.Controllers
                 var vm = new FixturesViewModel
                 {
                     LeagueId = leagueId,
-                    LeagueName = league?.Name ?? "Unknown",
-                    LeagueLogo = league?.Logo,
+                    LeagueName = league!.Name ?? "Unknown",
+                    LeagueLogo = league.Logo,
                     Seasons = seasons,
                     SelectedSeason = selectedSeason,
                     UpcomingFixtures = fixtures.Where(f => f.Date > now).Select(MapFixture).ToList(),

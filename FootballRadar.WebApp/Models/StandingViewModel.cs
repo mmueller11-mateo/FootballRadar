@@ -6,7 +6,7 @@
         public int Points { get; set; }
         public int GoalsDiff { get; set; }
         public string? Description { get; set; }
-        public StandingTeamViewModel Team { get; set; }
-        public StandingStatsViewModel All { get; set; }
+        public required StandingTeamViewModel Team { get; set; }
+        public required StandingStatsViewModel All { get; set; }
     }
 }

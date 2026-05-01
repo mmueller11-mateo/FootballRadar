@@ -13,7 +13,7 @@ namespace FootballRadar.Data.Repositories
             this.dbFactory = dbFactory;
         }
 
-        public async Task<IReadOnlyCollection<PublicLeague>> GetLeaguesAsync()
+        public async Task<IEnumerable<PublicLeague>> GetLeaguesAsync()
         {
             using var db = await dbFactory.CreateDbContextAsync();
             return await db.Leagues
@@ -21,7 +21,7 @@ namespace FootballRadar.Data.Repositories
                 .ToListAsync();
         }
 
-        public async Task<IReadOnlyCollection<Standing>> GetStandingsAsync(int apiLeagueId, int season)
+        public async Task<IEnumerable<Standing>> GetStandingsAsync(int apiLeagueId, int season)
         {
             using var db = await dbFactory.CreateDbContextAsync();
 
@@ -34,7 +34,7 @@ namespace FootballRadar.Data.Repositories
                 .ToListAsync();
         }
 
-        public async Task<IReadOnlyCollection<StandingWithDetails>> GetStandingsWithDetailsAsync(int apiLeagueId, int season)
+        public async Task<IEnumerable<StandingWithDetails>> GetStandingsWithDetailsAsync(int apiLeagueId, int season)
         {
             using var db = await dbFactory.CreateDbContextAsync();
 
@@ -53,7 +53,7 @@ namespace FootballRadar.Data.Repositories
                 .ToListAsync();
         }
 
-        public async Task<IReadOnlyCollection<League>> GetTopLeaguesAsync()
+        public async Task<IEnumerable<League>> GetTopLeaguesAsync()
         {
             using var db = await dbFactory.CreateDbContextAsync();
 

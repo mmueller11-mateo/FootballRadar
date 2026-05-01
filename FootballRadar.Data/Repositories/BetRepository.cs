@@ -36,5 +36,20 @@ namespace FootballRadar.Data.Repositories
             await db.Bets.AddAsync(bet);
             await db.SaveChangesAsync();
         }
+        public async Task<IEnumerable<MatchBet>> GetMatchBetsByMarketIdAsync(Guid marketId)
+        {
+            using var db = await _dbContextFactory.CreateDbContextAsync();
+            return await db.MatchBets
+                .Where(b => b.PredictionMarketId == marketId)
+                .ToListAsync();
+        }
+        public async Task<IEnumerable<MatchBet>> GetMatchBetsByUserIdAsync(Guid userId)
+        {
+            using var db = await _dbContextFactory.CreateDbContextAsync();
+            return await db.MatchBets
+                .Where(b => b.UserId == userId)
+                .OrderByDescending(b => b.PlacedAt)
+                .ToListAsync();
+        }
     }
 }

@@ -1,0 +1,8 @@
+﻿@using FootballRadar.WebApp.Controllers.FootballRadar.WebApp.Controllers
+<div class="container mt-4 text-center">
+    <div class="alert alert-success">
+        <h4>Bet placed successfully!</h4>
+        <p>Your bet has been accepted.</p>
+    </div>
+    <a href="@Url.Action(nameof(FixtureController.Fixtures), ControllerName.For<FixtureController>())">Back to Fixtures</a>
+</div>

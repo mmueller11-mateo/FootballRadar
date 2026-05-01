@@ -7,5 +7,7 @@ namespace FootballRadar.Abstractions
         Task<PredictionMarket?> FindForMatchAsync(Guid matchId);
         Task<PredictionMarket?> FindForTransferRumorAsync(Guid transferRumorId);
         Task AddAsync(PredictionMarket predictionMarket);
+        Task UpdateAsync(PredictionMarket predictionMarket);
+        Task<PredictionMarket?> GetByIdAsync(Guid id);
     }
 }
