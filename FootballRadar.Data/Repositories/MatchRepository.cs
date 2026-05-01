@@ -13,43 +13,43 @@ namespace FootballRadar.Data.Repositories
             _dbContextFactory = dbContextFactory;
         }
 
-        public async Task<Match?> GetByIdAsync(Guid id)
+        public async Task<Match?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            using var db = await _dbContextFactory.CreateDbContextAsync();
-            return await db.Fixtures.FirstOrDefaultAsync(m => m.Id == id);
+            using var db = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            return await db.Fixtures.FirstOrDefaultAsync(m => m.Id == id, cancellationToken);
         }
 
-        public async Task AddAsync(Match match)
+        public async Task AddAsync(Match match, CancellationToken cancellationToken = default)
         {
-            using var db = await _dbContextFactory.CreateDbContextAsync();
-            await db.Fixtures.AddAsync(match);
-            await db.SaveChangesAsync();
+            using var db = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            await db.Fixtures.AddAsync(match, cancellationToken);
+            await db.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task<IEnumerable<Match>> GetUpcomingMatches()
+        public async Task<IEnumerable<Match>> GetUpcomingMatches(CancellationToken cancellationToken = default)
         {
-            using var db = await _dbContextFactory.CreateDbContextAsync();
-            return await db.Fixtures.ToArrayAsync();
+            using var db = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            return await db.Fixtures.ToArrayAsync(cancellationToken);
         }
 
-        public async Task<IEnumerable<Match>> GetByLeagueAsync(int apiLeagueId, int season)
+        public async Task<IEnumerable<Match>> GetByLeagueAsync(int apiLeagueId, int season, CancellationToken cancellationToken = default)
         {
-            using var db = await _dbContextFactory.CreateDbContextAsync();
+            using var db = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
 
-            var league = await db.Leagues.FirstOrDefaultAsync(l => l.ApiLeagueId == apiLeagueId);
+            var league = await db.Leagues.FirstOrDefaultAsync(l => l.ApiLeagueId == apiLeagueId, cancellationToken);
             if (league == null)
                 return Array.Empty<Match>();
 
             return await db.Fixtures
                 .Where(f => f.LeagueId == league.Id && f.Season == season)
                 .OrderBy(f => f.Date)
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
         }
 
-        public async Task<IEnumerable<int>> GetSeasonsByLeagueAsync(int apiLeagueId)
+        public async Task<IEnumerable<int>> GetSeasonsByLeagueAsync(int apiLeagueId, CancellationToken cancellationToken = default)
         {
-            using var db = await _dbContextFactory.CreateDbContextAsync();
-            var league = await db.Leagues.FirstOrDefaultAsync(l => l.ApiLeagueId == apiLeagueId);
+            using var db = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            var league = await db.Leagues.FirstOrDefaultAsync(l => l.ApiLeagueId == apiLeagueId, cancellationToken);
             if (league == null)
                 return Array.Empty<int>();
             return await db.Fixtures
@@ -57,12 +57,12 @@ namespace FootballRadar.Data.Repositories
                 .Select(f => f.Season)
                 .Distinct()
                 .OrderByDescending(s => s)
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
         }
 
-        public async Task<IEnumerable<Match>> GetHeadToHeadAsync(Guid homeTeamId, Guid awayTeamId, int limit = 5)
+        public async Task<IEnumerable<Match>> GetHeadToHeadAsync(Guid homeTeamId, Guid awayTeamId, int limit = 5, CancellationToken cancellationToken = default)
         {
-            using var db = await _dbContextFactory.CreateDbContextAsync();
+            using var db = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
             return await db.Fixtures
                 .Where(f =>
                     (f.HomeTeamId == homeTeamId && f.AwayTeamId == awayTeamId) ||
@@ -70,7 +70,7 @@ namespace FootballRadar.Data.Repositories
                 .Where(f => f.HomeGoals.HasValue && f.AwayGoals.HasValue)
                 .OrderByDescending(f => f.Date)
                 .Take(limit)
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
         }
     }
 }

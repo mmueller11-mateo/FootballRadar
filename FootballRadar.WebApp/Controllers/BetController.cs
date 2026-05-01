@@ -35,18 +35,18 @@ namespace FootballRadar.WebApp.Controllers
         public async Task<IActionResult> PlaceBet(Guid matchId, CancellationToken cancellationToken)
         {
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            var match = await mediator.Send(new GetMatchByIdQuery { MatchId = matchId });
+            var match = await mediator.Send(new GetMatchByIdQuery { MatchId = matchId }, cancellationToken);
             if (match == null)
                 return NotFound();
 
-            var wallet = await walletRepository.GetByUserIdAsync(userId);
-            var homeTeam = await teamRepository.GetByIdAsync(match.HomeTeamId);
-            var awayTeam = await teamRepository.GetByIdAsync(match.AwayTeamId);
+            var wallet = await walletRepository.GetByUserIdAsync(userId, cancellationToken);
+            var homeTeam = await teamRepository.GetByIdAsync(match.HomeTeamId, cancellationToken);
+            var awayTeam = await teamRepository.GetByIdAsync(match.AwayTeamId, cancellationToken);
             var h2hMatches = await mediator.Send(new GetHeadToHeadQuery
             {
                 HomeTeamId = match.HomeTeamId,
                 AwayTeamId = match.AwayTeamId
-            });
+            }, cancellationToken);
             var allTeams = await teamRepository.GetAllAsync(cancellationToken);
             var h2h = h2hMatches.Select(m => new HeadToHeadViewModel
             {
@@ -73,7 +73,7 @@ namespace FootballRadar.WebApp.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> PlaceBet(PlaceBetViewModel vm)
+        public async Task<IActionResult> PlaceBet(PlaceBetViewModel vm, CancellationToken cancellationToken)
         {
             if (!ModelState.IsValid)
                 return View(vm);
@@ -85,7 +85,7 @@ namespace FootballRadar.WebApp.Controllers
                 MatchId = vm.MatchId,
                 Credits = vm.Credits,
                 Prediction = vm.Prediction
-            });
+            }, cancellationToken);
 
             if (status.Code == BetStatusCode.Rejected)
             {
@@ -99,16 +99,16 @@ namespace FootballRadar.WebApp.Controllers
         public async Task<IActionResult> MyBets(CancellationToken cancellationToken)
         {
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            var bets = await mediator.Send(new GetUserBetsQuery { UserId = userId });
+            var bets = await mediator.Send(new GetUserBetsQuery { UserId = userId }, cancellationToken);
             var allTeams = await teamRepository.GetAllAsync(cancellationToken);
 
             var items = new List<UserBetItemViewModel>();
             foreach (var bet in bets)
             {
-                var market = await predictionMarketRepository.GetByIdAsync(bet.PredictionMarketId);
+                var market = await predictionMarketRepository.GetByIdAsync(bet.PredictionMarketId, cancellationToken);
                 if (market is not MatchPredictionMarket matchMarket) continue;
 
-                var match = await matchRepository.GetByIdAsync(matchMarket.MatchId);
+                var match = await matchRepository.GetByIdAsync(matchMarket.MatchId, cancellationToken);
                 if (match == null) continue;
 
                 var homeTeam = allTeams.FirstOrDefault(t => t.Id == match.HomeTeamId);

@@ -13,43 +13,46 @@ namespace FootballRadar.Data.Repositories
             _dbContextFactory = dbContextFactory;
         }
 
-        public async Task<bool> HasUserBetOnMatchAsync(Guid userId, Guid matchId)
+        public async Task<bool> HasUserBetOnMatchAsync(Guid userId, Guid matchId, CancellationToken cancellationToken = default)
         {
-            using var db = await _dbContextFactory.CreateDbContextAsync();
-            return await db.Bets.AnyAsync(b => b.UserId == userId && b.PredictionMarketId == matchId);
+            using var db = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            return await db.Bets.AnyAsync(b => b.UserId == userId && b.PredictionMarketId == matchId, cancellationToken);
         }
 
-        public async Task<bool> HasUserBetOnMarketAsync(Guid userId, Guid marketId)
+        public async Task<bool> HasUserBetOnMarketAsync(Guid userId, Guid marketId, CancellationToken cancellationToken = default)
         {
-            using var db = await _dbContextFactory.CreateDbContextAsync();
-            return await db.Bets.AnyAsync(b => b.UserId == userId && b.PredictionMarketId == marketId);
+            using var db = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            return await db.Bets.AnyAsync(b => b.UserId == userId && b.PredictionMarketId == marketId, cancellationToken);
         }
 
-        public async Task<PredictionMarket?> FindPredictionMarketForMatchAsync(Guid matchId)
+        public async Task<PredictionMarket?> FindPredictionMarketForMatchAsync(Guid matchId, CancellationToken cancellationToken = default)
         {
-            using var db = await _dbContextFactory.CreateDbContextAsync();
-            return await db.MatchPredictionMarkets.FirstOrDefaultAsync(p => p.MatchId == matchId);
+            using var db = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            return await db.MatchPredictionMarkets.FirstOrDefaultAsync(p => p.MatchId == matchId, cancellationToken);
         }
-        public async Task AddBetAsync(Bet bet)
+
+        public async Task AddBetAsync(Bet bet, CancellationToken cancellationToken = default)
         {
-            using var db = await _dbContextFactory.CreateDbContextAsync();
-            await db.Bets.AddAsync(bet);
-            await db.SaveChangesAsync();
+            using var db = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            await db.Bets.AddAsync(bet, cancellationToken);
+            await db.SaveChangesAsync(cancellationToken);
         }
-        public async Task<IEnumerable<MatchBet>> GetMatchBetsByMarketIdAsync(Guid marketId)
+
+        public async Task<IEnumerable<MatchBet>> GetMatchBetsByMarketIdAsync(Guid marketId, CancellationToken cancellationToken = default)
         {
-            using var db = await _dbContextFactory.CreateDbContextAsync();
+            using var db = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
             return await db.MatchBets
                 .Where(b => b.PredictionMarketId == marketId)
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
         }
-        public async Task<IEnumerable<MatchBet>> GetMatchBetsByUserIdAsync(Guid userId)
+
+        public async Task<IEnumerable<MatchBet>> GetMatchBetsByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
         {
-            using var db = await _dbContextFactory.CreateDbContextAsync();
+            using var db = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
             return await db.MatchBets
                 .Where(b => b.UserId == userId)
                 .OrderByDescending(b => b.PlacedAt)
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
         }
     }
 }

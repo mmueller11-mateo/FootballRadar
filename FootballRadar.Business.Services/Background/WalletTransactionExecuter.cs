@@ -37,15 +37,15 @@ namespace FootballRadar.Business.Services.Background
 
         private async Task DoWork(CancellationToken cancellationToken)
         {
-            var pendingTransactions = await _walletTransactionRepository.GetTransactionsAsync(WalletTransactionStatus.Pending);
+            var pendingTransactions = await _walletTransactionRepository.GetTransactionsAsync(WalletTransactionStatus.Pending, cancellationToken);
 
             foreach (var transaction in pendingTransactions)
             {
-                var wallet = await _walletRepository.GetByIdAsync(transaction.WalletId);
+                var wallet = await _walletRepository.GetByIdAsync(transaction.WalletId, cancellationToken);
                 if (wallet is null)
                 {
                     _logger.LogWarning("Wallet not found for transaction {TransactionId}", transaction.Id);
-                    await _walletTransactionRepository.UpdateStatusAsync(transaction.Id, WalletTransactionStatus.Failed);
+                    await _walletTransactionRepository.UpdateStatusAsync(transaction.Id, WalletTransactionStatus.Failed, cancellationToken);
                     continue;
                 }
 
@@ -56,13 +56,13 @@ namespace FootballRadar.Business.Services.Background
                     else
                         wallet.Withdraw(transaction.Credits);
 
-                    await _walletRepository.UpdateAsync(wallet);
-                    await _walletTransactionRepository.UpdateStatusAsync(transaction.Id, WalletTransactionStatus.Completed);
+                    await _walletRepository.UpdateAsync(wallet, cancellationToken);
+                    await _walletTransactionRepository.UpdateStatusAsync(transaction.Id, WalletTransactionStatus.Completed, cancellationToken);
                 }
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "Failed to process transaction {TransactionId}", transaction.Id);
-                    await _walletTransactionRepository.UpdateStatusAsync(transaction.Id, WalletTransactionStatus.Failed);
+                    await _walletTransactionRepository.UpdateStatusAsync(transaction.Id, WalletTransactionStatus.Failed, cancellationToken);
                 }
             }
         }

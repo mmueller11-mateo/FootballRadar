@@ -25,13 +25,13 @@ namespace FootballRadar.Business.Services.CommandHandlers
 
         public async Task<BetStatus> Handle(PlaceTransferBetCommand request, CancellationToken cancellationToken)
         {
-            var rumor = await _transferRepository.GetTransferRumorById(request.TransferRumorId);
+            var rumor = await _transferRepository.GetTransferRumorById(request.TransferRumorId, cancellationToken);
             if (rumor is null)
             {
                 throw new InvalidOperationException("Transfer rumor not found");
             }
 
-            var predictionMarket = await _predictionMarketRepository.FindForTransferRumorAsync(request.TransferRumorId);
+            var predictionMarket = await _predictionMarketRepository.FindForTransferRumorAsync(request.TransferRumorId, cancellationToken);
             if (predictionMarket is null)
             {
                 var reward = await _rewardCalculator.CalculateReward(rumor);
@@ -50,7 +50,7 @@ namespace FootballRadar.Business.Services.CommandHandlers
                     new CannotBetAfterTransferDeadline(transferMarket)
                 ];
                 predictionMarket = transferMarket;
-                await _predictionMarketRepository.AddAsync(predictionMarket);
+                await _predictionMarketRepository.AddAsync(predictionMarket, cancellationToken);
             }
 
 
@@ -76,7 +76,7 @@ namespace FootballRadar.Business.Services.CommandHandlers
                 Prediction = request.Prediction
             };
 
-            await _betRepository.AddBetAsync(bet);
+            await _betRepository.AddBetAsync(bet, cancellationToken);
             return new BetStatus { Code = BetStatusCode.Accepted };
         }
     }

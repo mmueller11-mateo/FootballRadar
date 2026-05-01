@@ -13,9 +13,9 @@ namespace FootballRadar.WebApp.Controllers
             _webleagueService = leagueService;
         }
 
-        public async Task<IActionResult> TeamsList(int leagueId, int season)
+        public async Task<IActionResult> TeamsList(int leagueId, int season, CancellationToken cancellationToken = default)
         {
-            var standings = await _webleagueService.GetStandingsWithDetailsAsync(leagueId, season);
+            var standings = await _webleagueService.GetStandingsWithDetailsAsync(leagueId, season, cancellationToken);
 
             var vm = new StandingsViewModel
             {

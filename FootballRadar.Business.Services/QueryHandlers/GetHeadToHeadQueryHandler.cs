@@ -16,7 +16,7 @@ namespace FootballRadar.Business.Services.QueryHandlers
 
         public async Task<IEnumerable<Match>> Handle(GetHeadToHeadQuery request, CancellationToken cancellationToken)
         {
-            return await _matchRepository.GetHeadToHeadAsync(request.HomeTeamId, request.AwayTeamId, request.Limit);
+            return await _matchRepository.GetHeadToHeadAsync(request.HomeTeamId, request.AwayTeamId, request.Limit, cancellationToken);
         }
     }
 }

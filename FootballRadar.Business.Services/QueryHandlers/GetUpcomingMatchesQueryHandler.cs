@@ -16,7 +16,7 @@ namespace FootballRadar.Business.Services.QueryHandlers
 
         public async Task<IEnumerable<Match>> Handle(GetUpcomingMatchesQuery request, CancellationToken cancellationToken)
         {
-            return await _matchRepository.GetUpcomingMatches();
+            return await _matchRepository.GetUpcomingMatches(cancellationToken);
         }
     }
 }

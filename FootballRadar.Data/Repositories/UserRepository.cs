@@ -13,23 +13,23 @@ namespace FootballRadar.Data.Repositories
             _dbContextFactory = dbContextFactory;
         }
 
-        public async Task AddAsync(User user)
+        public async Task AddAsync(User user, CancellationToken cancellationToken = default)
         {
-            using var dbContext = await _dbContextFactory.CreateDbContextAsync();
-            await dbContext.Users.AddAsync(user);
-            await dbContext.SaveChangesAsync();
+            using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            await dbContext.Users.AddAsync(user, cancellationToken);
+            await dbContext.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task<User?> GetByIdAsync(Guid id)
+        public async Task<User?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            using var dbContext = await _dbContextFactory.CreateDbContextAsync();
-            return await dbContext.Users.FirstOrDefaultAsync(x => x.Id == id);
+            using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            return await dbContext.Users.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         }
 
-        public async Task<User?> GetByEmailAsync(string email)
+        public async Task<User?> GetByEmailAsync(string email, CancellationToken cancellationToken = default)
         {
-            using var dbContext = await _dbContextFactory.CreateDbContextAsync();
-            return await dbContext.Users.FirstOrDefaultAsync(x => x.Email.ToLower() == email.ToLower());
+            using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            return await dbContext.Users.FirstOrDefaultAsync(x => x.Email.ToLower() == email.ToLower(), cancellationToken);
         }
 
         public void Update(User user)
@@ -46,7 +46,7 @@ namespace FootballRadar.Data.Repositories
             dbContext.SaveChanges();
         }
 
-        public Task<UserProfile> GetCurrentUserProfile()
+        public Task<UserProfile> GetCurrentUserProfile(CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }

@@ -19,7 +19,7 @@ namespace FootballRadar.Business.Services.CommandHandlers
 
         public async Task<WalletTransaction> Handle(WithdrawCommand request, CancellationToken cancellationToken)
         {
-            var wallet = await _walletRepository.GetByIdAsync(request.WalletId);
+            var wallet = await _walletRepository.GetByIdAsync(request.WalletId, cancellationToken);
             if (wallet is null)
                 throw new InvalidOperationException("Wallet not found");
 
@@ -33,7 +33,7 @@ namespace FootballRadar.Business.Services.CommandHandlers
                 Status = WalletTransactionStatus.Pending,
                 CreatedAt = DateTimeOffset.UtcNow
             };
-            await _transactionRepository.AddAsync(transaction);
+            await _transactionRepository.AddAsync(transaction, cancellationToken);
             return transaction;
         }
     }

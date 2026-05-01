@@ -3,11 +3,11 @@ namespace FootballRadar.Abstractions
 {
     public interface IBetRepository
     {
-        Task<bool> HasUserBetOnMatchAsync(Guid userId, Guid matchId);
-        Task<bool> HasUserBetOnMarketAsync(Guid userId, Guid marketId);
-        Task AddBetAsync(Bet bet);
-        Task<PredictionMarket?> FindPredictionMarketForMatchAsync(Guid matchId);
-        Task<IEnumerable<MatchBet>> GetMatchBetsByMarketIdAsync(Guid marketId);
-        Task<IEnumerable<MatchBet>> GetMatchBetsByUserIdAsync(Guid userId);
+        Task<bool> HasUserBetOnMatchAsync(Guid userId, Guid matchId, CancellationToken cancellationToken = default);
+        Task<bool> HasUserBetOnMarketAsync(Guid userId, Guid marketId, CancellationToken cancellationToken = default);
+        Task AddBetAsync(Bet bet, CancellationToken cancellationToken = default);
+        Task<PredictionMarket?> FindPredictionMarketForMatchAsync(Guid matchId, CancellationToken cancellationToken = default);
+        Task<IEnumerable<MatchBet>> GetMatchBetsByMarketIdAsync(Guid marketId, CancellationToken cancellationToken = default);
+        Task<IEnumerable<MatchBet>> GetMatchBetsByUserIdAsync(Guid userId, CancellationToken cancellationToken = default);
     }
 }

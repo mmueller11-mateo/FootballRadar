@@ -18,14 +18,14 @@ namespace FootballRadar.WebApp.Controllers
                 _mediator = mediator;
             }
 
-            public async Task<IActionResult> Fixtures(int leagueId, int? season = null)
+            public async Task<IActionResult> Fixtures(int leagueId, int? season = null, CancellationToken cancellationToken = default)
             {
-                var seasons = await _mediator.Send(new GetSeasonsByLeagueQuery { ApiLeagueId = leagueId });
+                var seasons = await _mediator.Send(new GetSeasonsByLeagueQuery { ApiLeagueId = leagueId }, cancellationToken);
                 var selectedSeason = season ?? seasons.FirstOrDefault();
 
-                var fixtures = await _mediator.Send(new GetMatchesBySeasonQuery { ApiLeagueId = leagueId, Season = selectedSeason });
-                var teams = await _mediator.Send(new GetAllTeamsQuery());
-                var leagues = await _mediator.Send(new GetLeaguesQuery());
+                var fixtures = await _mediator.Send(new GetMatchesBySeasonQuery { ApiLeagueId = leagueId, Season = selectedSeason }, cancellationToken);
+                var teams = await _mediator.Send(new GetAllTeamsQuery(), cancellationToken);
+                var leagues = await _mediator.Send(new GetLeaguesQuery(), cancellationToken);
                 var league = leagues.FirstOrDefault(l => l.ApiLeagueId == leagueId);
                 var now = DateTime.UtcNow;
 

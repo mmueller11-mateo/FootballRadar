@@ -13,18 +13,18 @@ namespace FootballRadar.Data.Repositories
             _dbContextFactory = dbContextFactory;
         }
 
-        public async Task<IEnumerable<Player>> GetByApiTeamIdAsync(int apiTeamId)
+        public async Task<IEnumerable<Player>> GetByApiTeamIdAsync(int apiTeamId, CancellationToken cancellationToken = default)
         {
-            using var dbContext = await _dbContextFactory.CreateDbContextAsync();
+            using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
 
             return await dbContext.TeamSeasonPlayers
                 .Where(x => x.ApiTeamId == apiTeamId)
                 .Select(x => x.Player)
                 .OrderBy(p => p.LastName)
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
         }
 
-        public async Task<IEnumerable<Player>> GetByTeamAndSeasonAsync(int apiTeamId, int season, CancellationToken cancellationToken)
+        public async Task<IEnumerable<Player>> GetByTeamAndSeasonAsync(int apiTeamId, int season, CancellationToken cancellationToken = default)
         {
             using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
 
@@ -35,7 +35,7 @@ namespace FootballRadar.Data.Repositories
                 .ToListAsync(cancellationToken);
         }
 
-        public async Task<IEnumerable<int>> GetSeasonsByTeamAsync(int apiTeamId, CancellationToken cancellationToken)
+        public async Task<IEnumerable<int>> GetSeasonsByTeamAsync(int apiTeamId, CancellationToken cancellationToken = default)
         {
             using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
             return await dbContext.TeamSeasonPlayers

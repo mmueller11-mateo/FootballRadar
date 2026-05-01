@@ -16,7 +16,7 @@ namespace FootballRadar.Business.Services.QueryHandlers
 
         public async Task<Wallet?> Handle(GetWalletQuery request, CancellationToken cancellationToken)
         {
-            return await _walletRepository.GetByUserIdAsync(request.UserId);
+            return await _walletRepository.GetByUserIdAsync(request.UserId, cancellationToken);
         }
     }
 }

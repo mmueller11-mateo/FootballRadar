@@ -35,17 +35,17 @@ namespace FootballRadar.Business.Services.BackgroundServices
             var walletRepository = scope.ServiceProvider.GetRequiredService<IWalletRepository>();
             var predictionMarketRepository = scope.ServiceProvider.GetRequiredService<IPredictionMarketRepository>();
 
-            var finishedMatches = (await matchRepository.GetUpcomingMatches())
+            var finishedMatches = (await matchRepository.GetUpcomingMatches(cancellationToken))
                 .Where(m => m.Status == "FT" && m.HomeGoals.HasValue && m.AwayGoals.HasValue);
 
             foreach (var match in finishedMatches)
             {
-                var market = await predictionMarketRepository.FindForMatchAsync(match.Id);
+                var market = await predictionMarketRepository.FindForMatchAsync(match.Id, cancellationToken);
                 if (market == null) continue;
                 if (market is not MatchPredictionMarket matchMarket) continue;
                 if (matchMarket.IsSettled) continue; // bereits ausgezahlt
 
-                var bets = await betRepository.GetMatchBetsByMarketIdAsync(market.Id);
+                var bets = await betRepository.GetMatchBetsByMarketIdAsync(market.Id, cancellationToken);
                 if (!bets.Any()) continue;
 
                 MatchPrediction correctPrediction;
@@ -60,12 +60,12 @@ namespace FootballRadar.Business.Services.BackgroundServices
                 {
                     if (bet.Prediction != correctPrediction) continue;
 
-                    var wallet = await walletRepository.GetByUserIdAsync(bet.UserId);
+                    var wallet = await walletRepository.GetByUserIdAsync(bet.UserId, cancellationToken);
                     if (wallet == null) continue;
 
                     var payout = bet.Credits * (1 + matchMarket.Reward / 100m);
                     wallet.Deposit(payout);
-                    await walletRepository.UpdateAsync(wallet);
+                    await walletRepository.UpdateAsync(wallet, cancellationToken);
 
                     _logger.LogInformation(
                         "Settled bet {BetId} for user {UserId}: +{Payout} credits",
@@ -74,7 +74,7 @@ namespace FootballRadar.Business.Services.BackgroundServices
 
                 // Als settled markieren
                 matchMarket.IsSettled = true;
-                await predictionMarketRepository.UpdateAsync(matchMarket);
+                await predictionMarketRepository.UpdateAsync(matchMarket, cancellationToken);
             }
         }
     }

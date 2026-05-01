@@ -23,10 +23,10 @@ namespace FootballRadar.WebApp.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Overview()
+        public async Task<IActionResult> Overview(CancellationToken cancellationToken = default)
         {
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            var wallet = await _mediator.Send(new GetWalletQuery { UserId = userId });
+            var wallet = await _mediator.Send(new GetWalletQuery { UserId = userId }, cancellationToken);
             var vm = new WalletOverviewViewModel
             {
                 Credits = wallet?.Credits ?? 0,
@@ -36,10 +36,10 @@ namespace FootballRadar.WebApp.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Deposit(WalletOverviewViewModel model)
+        public async Task<IActionResult> Deposit(WalletOverviewViewModel model, CancellationToken cancellationToken = default)
         {
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            var wallet = await _mediator.Send(new GetWalletQuery { UserId = userId });
+            var wallet = await _mediator.Send(new GetWalletQuery { UserId = userId }, cancellationToken);
             if (wallet is null)
                 return Json(new { error = "Wallet not found." });
 
@@ -51,16 +51,16 @@ namespace FootballRadar.WebApp.Controllers
                 WalletId = wallet.Id,
                 Amount = amount,
                 Credits = credits
-            });
+            }, cancellationToken);
 
             return Json(new { transactionId = transaction.Id });
         }
 
         [HttpPost]
-        public async Task<IActionResult> Withdraw(WalletOverviewViewModel model)
+        public async Task<IActionResult> Withdraw(WalletOverviewViewModel model, CancellationToken cancellationToken = default)
         {
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            var wallet = await _mediator.Send(new GetWalletQuery { UserId = userId });
+            var wallet = await _mediator.Send(new GetWalletQuery { UserId = userId }, cancellationToken);
             if (wallet is null)
                 return Json(new { error = "Wallet not found." });
 
@@ -72,25 +72,25 @@ namespace FootballRadar.WebApp.Controllers
                 WalletId = wallet.Id,
                 Amount = amount,
                 Credits = credits
-            });
+            }, cancellationToken);
 
             return Json(new { transactionId = transaction.Id });
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetBalance()
+        public async Task<IActionResult> GetBalance(CancellationToken cancellationToken = default)
         {
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            var wallet = await _mediator.Send(new GetWalletQuery { UserId = userId });
+            var wallet = await _mediator.Send(new GetWalletQuery { UserId = userId }, cancellationToken);
             return Json(new { credits = wallet?.Credits ?? 0 });
         }
 
         [HttpGet]
-        public async Task<IActionResult> TransactionStatus(Guid id)
+        public async Task<IActionResult> TransactionStatus(Guid id, CancellationToken cancellationToken = default)
         {
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            var transaction = await _mediator.Send(new GetTransactionQuery { TransactionId = id });
-            var wallet = await _mediator.Send(new GetWalletQuery { UserId = userId });
+            var transaction = await _mediator.Send(new GetTransactionQuery { TransactionId = id }, cancellationToken);
+            var wallet = await _mediator.Send(new GetWalletQuery { UserId = userId }, cancellationToken);
             return Json(new { status = transaction?.Status.ToString(), credits = wallet?.Credits ?? 0 });
         }
     }

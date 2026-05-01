@@ -19,10 +19,10 @@ namespace FootballRadar.WebApp.Controllers
             return View();
         }
 
-        public async Task<IActionResult> Test()
+        public async Task<IActionResult> Test(CancellationToken cancellationToken)
         {
             var repository = HttpContext.RequestServices.GetRequiredService<IBetRepository>();
-            var result = await repository.HasUserBetOnMarketAsync(Guid.NewGuid(), Guid.NewGuid());
+            var result = await repository.HasUserBetOnMarketAsync(Guid.NewGuid(), Guid.NewGuid(), cancellationToken);
             return Ok();
         }
 

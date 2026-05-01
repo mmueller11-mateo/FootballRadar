@@ -17,7 +17,7 @@ namespace FootballRadar.Business.Services.QueryHandlers
 
         public async Task<IEnumerable<TransferRumor>> Handle(GetTransferRumorsQuery request, CancellationToken cancellationToken)
         {
-            return await transferRepository.GetTransferRumors(request.RumorStatus);
+            return await transferRepository.GetTransferRumors(request.RumorStatus, cancellationToken);
         }
     }
 }

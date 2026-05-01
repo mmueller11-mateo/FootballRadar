@@ -13,9 +13,9 @@ namespace FootballRadar.WebApp.Controllers
             _mediator = mediator;
         }
 
-        public async Task<IActionResult> PlayerList(int apiTeamId, int season)
+        public async Task<IActionResult> PlayerList(int apiTeamId, int season, CancellationToken cancellationToken = default)
         {
-            var seasons = await _mediator.Send(new GetTeamSeasonsQuery { ApiTeamId = apiTeamId });
+            var seasons = await _mediator.Send(new GetTeamSeasonsQuery { ApiTeamId = apiTeamId }, cancellationToken);
 
             if (season == 0 && seasons.Any())
                 season = seasons.Max();
@@ -24,7 +24,7 @@ namespace FootballRadar.WebApp.Controllers
             {
                 ApiTeamId = apiTeamId,
                 Season = season
-            });
+            }, cancellationToken);
 
             var vm = new TeamPlayersViewModel
             {

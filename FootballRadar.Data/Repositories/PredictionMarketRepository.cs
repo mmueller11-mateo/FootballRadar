@@ -13,38 +13,38 @@ namespace FootballRadar.Data.Repositories
             _dbContextFactory = dbContextFactory;
         }
 
-        public async Task<PredictionMarket?> FindForMatchAsync(Guid matchId)
+        public async Task<PredictionMarket?> FindForMatchAsync(Guid matchId, CancellationToken cancellationToken = default)
         {
-            using var db = await _dbContextFactory.CreateDbContextAsync();
-            return await db.MatchPredictionMarkets.SingleOrDefaultAsync(p => p.MatchId == matchId);
+            using var db = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            return await db.MatchPredictionMarkets.SingleOrDefaultAsync(p => p.MatchId == matchId, cancellationToken);
         }
 
-        public async Task AddAsync(PredictionMarket predictionMarket)
+        public async Task AddAsync(PredictionMarket predictionMarket, CancellationToken cancellationToken = default)
         {
-            using var db = await _dbContextFactory.CreateDbContextAsync();
-            await db.PredictionMarkets.AddAsync(predictionMarket);
-            await db.SaveChangesAsync();
+            using var db = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            await db.PredictionMarkets.AddAsync(predictionMarket, cancellationToken);
+            await db.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task<PredictionMarket?> FindForTransferRumorAsync(Guid transferRumorId)
+        public async Task<PredictionMarket?> FindForTransferRumorAsync(Guid transferRumorId, CancellationToken cancellationToken = default)
         {
-            using var db = await _dbContextFactory.CreateDbContextAsync();
+            using var db = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
             return await db.PredictionMarkets
                 .OfType<TransferPredictionMarket>()
-                .FirstOrDefaultAsync(p => p.TransferRumorId == transferRumorId);
+                .FirstOrDefaultAsync(p => p.TransferRumorId == transferRumorId, cancellationToken);
         }
 
-        public async Task UpdateAsync(PredictionMarket predictionMarket)
+        public async Task UpdateAsync(PredictionMarket predictionMarket, CancellationToken cancellationToken = default)
         {
-            using var db = await _dbContextFactory.CreateDbContextAsync();
+            using var db = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
             db.PredictionMarkets.Update(predictionMarket);
-            await db.SaveChangesAsync();
+            await db.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task<PredictionMarket?> GetByIdAsync(Guid id)
+        public async Task<PredictionMarket?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            using var db = await _dbContextFactory.CreateDbContextAsync();
-            return await db.PredictionMarkets.FirstOrDefaultAsync(p => p.Id == id);
+            using var db = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            return await db.PredictionMarkets.FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
         }
     }
 }

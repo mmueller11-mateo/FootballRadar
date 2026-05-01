@@ -26,13 +26,13 @@ namespace FootballRadar.Business.Services.CommandHandlers
 
         public async Task<BetStatus> Handle(PlaceMatchBetCommand request, CancellationToken cancellationToken)
         {
-            var match = await _matchRepository.GetByIdAsync(request.MatchId);
+            var match = await _matchRepository.GetByIdAsync(request.MatchId, cancellationToken);
             if (match == null)
             {
                 throw new InvalidOperationException("Match not found");
             }
 
-            var predictionMarket = await _predictionMarketRepository.FindForMatchAsync(request.MatchId);
+            var predictionMarket = await _predictionMarketRepository.FindForMatchAsync(request.MatchId, cancellationToken);
             if (predictionMarket == null)
             {
                 var reward = await _rewardCalculator.CalculateReward(match);
@@ -50,7 +50,7 @@ namespace FootballRadar.Business.Services.CommandHandlers
                         new CanOnlyBetOncePerMatch(match, request.UserId, _betRepository)
                     ]
                 };
-                await _predictionMarketRepository.AddAsync(predictionMarket);
+                await _predictionMarketRepository.AddAsync(predictionMarket, cancellationToken);
             }
             else
             {
@@ -73,7 +73,7 @@ namespace FootballRadar.Business.Services.CommandHandlers
                 }
             }
 
-            var wallet = await _walletRepository.GetByUserIdAsync(request.UserId);
+            var wallet = await _walletRepository.GetByUserIdAsync(request.UserId, cancellationToken);
             if (wallet == null)
             {
                 return new BetStatus
@@ -93,7 +93,7 @@ namespace FootballRadar.Business.Services.CommandHandlers
             }
 
             wallet.Withdraw(request.Credits);
-            await _walletRepository.UpdateAsync(wallet);
+            await _walletRepository.UpdateAsync(wallet, cancellationToken);
 
             var bet = new MatchBet
             {
@@ -104,7 +104,7 @@ namespace FootballRadar.Business.Services.CommandHandlers
                 PredictionMarketId = predictionMarket.Id,
                 Prediction = request.Prediction
             };
-            await _betRepository.AddBetAsync(bet);
+            await _betRepository.AddBetAsync(bet, cancellationToken);
             return new BetStatus { Code = BetStatusCode.Accepted };
         }
     }

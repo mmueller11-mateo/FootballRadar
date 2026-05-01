@@ -9,9 +9,9 @@ namespace FootballRadar.EventHandling
 {
 	internal sealed class EventDispacher : BackgroundService
 	{
-		private readonly IUserRepository userRepository;
 		private static readonly Guid SystemId = Guid.Empty;
 
+		private readonly IUserRepository userRepository;
 		private readonly IEventRepository eventRepository;
 
 		// see https://learn.microsoft.com/en-us/aspnet/core/signalr/hubcontext?view=aspnetcore-10.0
@@ -44,7 +44,7 @@ namespace FootballRadar.EventHandling
 
 		private async Task DoWork(CancellationToken cancellationToken)
 		{
-			var currentUser = await userRepository.GetCurrentUserProfile();
+			var currentUser = await userRepository.GetCurrentUserProfile(cancellationToken);
 
 			// here we get the list of events (by their type) that the user wants to be notified about
 			var eventsOfInterest = currentUser.EventNotificationPreferences.Where(@event => @event.Value == true).Select(@event => @event.Key).ToArray();

@@ -145,7 +145,7 @@ namespace FootballRadar.DataCollector.ApiSports
         private async Task GetLeaguesJob(CancellationToken cancellationToken)
         {
             var leagues = await serviceAgent.GetLeaguesAsync();
-            using var dbContext = await dbContextFactory.CreateDbContextAsync();
+            using var dbContext = await dbContextFactory.CreateDbContextAsync(cancellationToken);
 
             foreach (var league in leagues)
             {
@@ -154,14 +154,14 @@ namespace FootballRadar.DataCollector.ApiSports
                     break;
                 }
 
-                bool alreadyExists = await dbContext.Leagues.AnyAsync(l => l.ApiLeagueId == league.League.Id);
+                bool alreadyExists = await dbContext.Leagues.AnyAsync(l => l.ApiLeagueId == league.League.Id, cancellationToken);
 
                 if (alreadyExists)
                 {
                     continue;
                 }
 
-                var country = await dbContext.Countries.Where(c => c.Code == league.Country.Code).FirstOrDefaultAsync();
+                var country = await dbContext.Countries.Where(c => c.Code == league.Country.Code).FirstOrDefaultAsync(cancellationToken);
 
                 dbContext.Leagues.Add(new PublicLeague
                 {
@@ -173,13 +173,13 @@ namespace FootballRadar.DataCollector.ApiSports
                 });
             }
 
-            await dbContext.SaveChangesAsync();
+            await dbContext.SaveChangesAsync(cancellationToken);
         }
 
         private async Task GetCountriesJob(CancellationToken cancellationToken)
         {
             var countries = await serviceAgent.GetCountriesAsync();
-            using var dbContext = await dbContextFactory.CreateDbContextAsync();
+            using var dbContext = await dbContextFactory.CreateDbContextAsync(cancellationToken);
             foreach (var country in countries)
             {
                 if (cancellationToken.IsCancellationRequested)
@@ -187,7 +187,7 @@ namespace FootballRadar.DataCollector.ApiSports
                     break;
                 }
 
-                bool alreadyExists = await dbContext.Countries.AnyAsync(c => c.Code == country.Code);
+                bool alreadyExists = await dbContext.Countries.AnyAsync(c => c.Code == country.Code, cancellationToken);
                 if (alreadyExists)
                 {
                     continue;
@@ -200,12 +200,12 @@ namespace FootballRadar.DataCollector.ApiSports
                     Flag = country.Flag
                 });
             }
-            await dbContext.SaveChangesAsync();
+            await dbContext.SaveChangesAsync(cancellationToken);
         }
 
         private async Task GetTeamsJob(CancellationToken cancellationToken)
         {
-            using var dbContext = await dbContextFactory.CreateDbContextAsync();
+            using var dbContext = await dbContextFactory.CreateDbContextAsync(cancellationToken);
 
             foreach (var leagueId in TopLeagueIds)
             {
@@ -214,13 +214,13 @@ namespace FootballRadar.DataCollector.ApiSports
                     break;
                 }
 
-                var league = await dbContext.Leagues.FirstOrDefaultAsync(l => l.ApiLeagueId == leagueId);
-                var country = league?.CountryId != null ? await dbContext.Countries.FirstOrDefaultAsync(c => c.Id == league.CountryId) : null;
+                var league = await dbContext.Leagues.FirstOrDefaultAsync(l => l.ApiLeagueId == leagueId, cancellationToken);
+                var country = league?.CountryId != null ? await dbContext.Countries.FirstOrDefaultAsync(c => c.Id == league.CountryId, cancellationToken) : null;
                 var teams = await serviceAgent.GetTeamsAsync(leagueId, 2023);
 
                 foreach (var team in teams)
                 {
-                    bool alreadyExists = await dbContext.Teams.AnyAsync(t => t.ApiTeamId == team.Team.Id);
+                    bool alreadyExists = await dbContext.Teams.AnyAsync(t => t.ApiTeamId == team.Team.Id, cancellationToken);
                     if (alreadyExists)
                         continue;
 
@@ -234,14 +234,14 @@ namespace FootballRadar.DataCollector.ApiSports
                         CountryId = country?.Id
                     });
                 }
-                await dbContext.SaveChangesAsync();
-                await Task.Delay(TimeSpan.FromSeconds(2));
+                await dbContext.SaveChangesAsync(cancellationToken);
+                await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken);
             }
         }
 
         private async Task GetStandingsJob(CancellationToken cancellationToken)
         {
-            using var dbContext = await dbContextFactory.CreateDbContextAsync();
+            using var dbContext = await dbContextFactory.CreateDbContextAsync(cancellationToken);
 
             foreach (var leagueId in TopLeagueIds)
             {
@@ -254,7 +254,7 @@ namespace FootballRadar.DataCollector.ApiSports
                 {
                     var standings = await serviceAgent.GetStandingsAsync(leagueId, season);
 
-                    var league = await dbContext.Leagues.FirstOrDefaultAsync(l => l.ApiLeagueId == leagueId);
+                    var league = await dbContext.Leagues.FirstOrDefaultAsync(l => l.ApiLeagueId == leagueId, cancellationToken);
                     if (league == null)
                     {
                         logger.LogWarning("Liga nicht gefunden für ApiLeagueId: {LeagueId}", leagueId);
@@ -272,7 +272,7 @@ namespace FootballRadar.DataCollector.ApiSports
 
                     foreach (var standing in standings)
                     {
-                        var team = await dbContext.Teams.FirstOrDefaultAsync(t => t.ApiTeamId == standing.Team.Id);
+                        var team = await dbContext.Teams.FirstOrDefaultAsync(t => t.ApiTeamId == standing.Team.Id, cancellationToken);
                         if (team == null)
                         {
                             logger.LogWarning("Team nicht gefunden für ApiTeamId: {TeamId}", standing.Team.Id);
@@ -302,20 +302,19 @@ namespace FootballRadar.DataCollector.ApiSports
                         });
                     }
 
-                    await dbContext.SaveChangesAsync();
-                    await Task.Delay(TimeSpan.FromSeconds(2));
+                    await dbContext.SaveChangesAsync(cancellationToken);
+                    await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken);
                 }
-                catch (Refit.ApiException ex) when ((int)ex.StatusCode == 429)
+                catch (Exception ex)
                 {
-                    logger.LogWarning("Rate limit erreicht, warte 60 Sekunden...");
-                    await Task.Delay(TimeSpan.FromSeconds(60));
+                    logger.LogError(ex, "Error in GetStandingsJob");
                 }
             }
         }
 
         private async Task GetFixturesJob(CancellationToken cancellationToken)
         {
-            using var dbContext = await dbContextFactory.CreateDbContextAsync();
+            using var dbContext = await dbContextFactory.CreateDbContextAsync(cancellationToken);
 
             var season = 2022;
 
@@ -330,7 +329,7 @@ namespace FootballRadar.DataCollector.ApiSports
                 {
                     var fixtures = await serviceAgent.GetFixturesAsync(leagueId, season);
 
-                    var league = await dbContext.Leagues.FirstOrDefaultAsync(l => l.ApiLeagueId == leagueId);
+                    var league = await dbContext.Leagues.FirstOrDefaultAsync(l => l.ApiLeagueId == leagueId, cancellationToken);
                     if (league == null)
                     {
                         logger.LogWarning("Liga nicht gefunden für ApiLeagueId: {LeagueId}", leagueId);
@@ -344,8 +343,8 @@ namespace FootballRadar.DataCollector.ApiSports
                             break;
                         }
 
-                        var homeTeam = await dbContext.Teams.FirstOrDefaultAsync(t => t.ApiTeamId == fixture.Teams.Home.Id);
-                        var awayTeam = await dbContext.Teams.FirstOrDefaultAsync(t => t.ApiTeamId == fixture.Teams.Away.Id);
+                        var homeTeam = await dbContext.Teams.FirstOrDefaultAsync(t => t.ApiTeamId == fixture.Teams.Home.Id, cancellationToken);
+                        var awayTeam = await dbContext.Teams.FirstOrDefaultAsync(t => t.ApiTeamId == fixture.Teams.Away.Id, cancellationToken);
 
                         if (homeTeam == null || awayTeam == null)
                         {
@@ -353,7 +352,7 @@ namespace FootballRadar.DataCollector.ApiSports
                             continue;
                         }
 
-                        var existing = await dbContext.Fixtures.FirstOrDefaultAsync(f => f.ApiFixtureId == fixture.Fixture.Id);
+                        var existing = await dbContext.Fixtures.FirstOrDefaultAsync(f => f.ApiFixtureId == fixture.Fixture.Id, cancellationToken);
                         if (existing != null)
                         {
                             existing.HomeGoals = fixture.Goals.Home;
@@ -379,13 +378,13 @@ namespace FootballRadar.DataCollector.ApiSports
                         }
                     }
 
-                    await dbContext.SaveChangesAsync();
-                    await Task.Delay(TimeSpan.FromSeconds(2));
+                    await dbContext.SaveChangesAsync(cancellationToken);
+                    await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken);
                 }
                 catch (Refit.ApiException ex) when ((int)ex.StatusCode == 429)
                 {
                     logger.LogWarning("Rate limit erreicht, warte 60 Sekunden...");
-                    await Task.Delay(TimeSpan.FromSeconds(60));
+                    await Task.Delay(TimeSpan.FromSeconds(60), cancellationToken);
                 }
             }
         }

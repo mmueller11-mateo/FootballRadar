@@ -16,12 +16,12 @@ namespace FootballRadar.Business.Services.CommandHandlers
 
         public async Task<Wallet> Handle(CreateWalletCommand request, CancellationToken cancellationToken)
         {
-            var wallet = await _walletRepository.GetByUserIdAsync(request.UserId);
+            var wallet = await _walletRepository.GetByUserIdAsync(request.UserId, cancellationToken);
             if (wallet is null)
             {
                 wallet = new Wallet(request.UserId);
 
-                await _walletRepository.AddAsync(wallet);
+                await _walletRepository.AddAsync(wallet, cancellationToken);
             }
             return wallet;
         }

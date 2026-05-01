@@ -13,7 +13,7 @@ namespace FootballRadar.Business.Services.QueryHandlers
         }
         public async Task<IEnumerable<MatchBet>> Handle(GetUserBetsQuery request, CancellationToken cancellationToken)
         {
-            return await _betRepository.GetMatchBetsByUserIdAsync(request.UserId);
+            return await _betRepository.GetMatchBetsByUserIdAsync(request.UserId, cancellationToken);
         }
     }
 }

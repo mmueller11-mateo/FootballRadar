@@ -16,10 +16,10 @@ namespace FootballRadar.Admin.WebApp.Controllers
             _mediator = mediator;
         }
 
-        public async Task<IActionResult> LeaguesList()
+        public async Task<IActionResult> LeaguesList(CancellationToken cancellationToken = default)
         {
-            var leagues = await _mediator.Send(new GetLeaguesQuery());
-            var countries = await _mediator.Send(new GetCountriesQuery());
+            var leagues = await _mediator.Send(new GetLeaguesQuery(), cancellationToken);
+            var countries = await _mediator.Send(new GetCountriesQuery(), cancellationToken);
 
             var vm = leagues.Select(l => new LeagueViewModel
             {
@@ -32,9 +32,9 @@ namespace FootballRadar.Admin.WebApp.Controllers
             return View(vm);
         }
 
-        public async Task<IActionResult> CreateLeague()
+        public async Task<IActionResult> CreateLeague(CancellationToken cancellationToken = default)
         {
-            var countries = await _mediator.Send(new GetCountriesQuery());
+            var countries = await _mediator.Send(new GetCountriesQuery(), cancellationToken);
             var vm = new CreateLeagueViewModel
             {
                 Countries = countries.Select(c => new CountryViewModel
@@ -49,11 +49,11 @@ namespace FootballRadar.Admin.WebApp.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateLeague(CreateLeagueViewModel vm)
+        public async Task<IActionResult> CreateLeague(CreateLeagueViewModel vm, CancellationToken cancellationToken = default)
         {
             if (!ModelState.IsValid)
             {
-                var countries = await _mediator.Send(new GetCountriesQuery());
+                var countries = await _mediator.Send(new GetCountriesQuery(), cancellationToken);
                 vm.Countries = countries.Select(c => new CountryViewModel
                 {
                     Id = c.Id,
@@ -70,15 +70,15 @@ namespace FootballRadar.Admin.WebApp.Controllers
                 CountryId = vm.CountryId,
                 ApiLeagueId = vm.ApiLeagueId,
                 Logo = vm.Logo
-            });
+            }, cancellationToken);
 
             return RedirectToAction(nameof(LeaguesList));
         }
 
         [HttpPost]
-        public async Task<IActionResult> Delete(Guid id)
+        public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken = default)
         {
-            await _mediator.Send(new DeleteLeagueCommand { Id = id });
+            await _mediator.Send(new DeleteLeagueCommand { Id = id }, cancellationToken);
             return RedirectToAction(nameof(LeaguesList));
         }
     }

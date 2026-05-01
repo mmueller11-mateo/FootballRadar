@@ -13,29 +13,29 @@ namespace FootballRadar.Data.Repositories
             _dbContextFactory = dbContextFactory;
         }
 
-        public async Task AddAsync(Team team)
+        public async Task AddAsync(Team team, CancellationToken cancellationToken = default)
         {
-            using var dbContext = await _dbContextFactory.CreateDbContextAsync();
-            await dbContext.Teams.AddAsync(team);
-            await dbContext.SaveChangesAsync();
+            using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            await dbContext.Teams.AddAsync(team, cancellationToken);
+            await dbContext.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task<IEnumerable<Team>> GetAllAsync(CancellationToken cancellationToken)
+        public async Task<IEnumerable<Team>> GetAllAsync(CancellationToken cancellationToken = default)
         {
-            using var dbContext = await _dbContextFactory.CreateDbContextAsync();
-            return await dbContext.Teams.ToListAsync();
+            using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            return await dbContext.Teams.ToListAsync(cancellationToken);
         }
 
-        public async Task<Team?> GetByIdAsync(Guid id)
+        public async Task<Team?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            using var dbContext = await _dbContextFactory.CreateDbContextAsync();
-            return await dbContext.Teams.FirstOrDefaultAsync(x => x.Id == id);
+            using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            return await dbContext.Teams.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         }
 
-        public async Task<Team?> GetByNameAsync(string name)
+        public async Task<Team?> GetByNameAsync(string name, CancellationToken cancellationToken = default)
         {
-            using var dbContext = await _dbContextFactory.CreateDbContextAsync();
-            return await dbContext.Teams.FirstOrDefaultAsync(x => x.Name.ToLower() == name.ToLower());
+            using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            return await dbContext.Teams.FirstOrDefaultAsync(x => x.Name.ToLower() == name.ToLower(), cancellationToken);
         }
 
         public void Update(Team team)
@@ -51,7 +51,8 @@ namespace FootballRadar.Data.Repositories
             dbContext.Teams.Remove(team);
             dbContext.SaveChanges();
         }
-        public async Task<IEnumerable<Team>> GetBySeasonAsync(int season, CancellationToken cancellationToken)
+
+        public async Task<IEnumerable<Team>> GetBySeasonAsync(int season, CancellationToken cancellationToken = default)
         {
             using var db = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
 

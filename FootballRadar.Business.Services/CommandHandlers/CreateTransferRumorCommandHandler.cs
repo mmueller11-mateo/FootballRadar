@@ -32,7 +32,7 @@ namespace FootballRadar.Business.Services.CommandHandlers
                 Status = request.Status
             };
 
-            await transferRepository.AddTransferRumor(transferRumor);
+            await transferRepository.AddTransferRumor(transferRumor, cancellationToken);
 
 
             await eventPublisher.Publish(new TransferRumorReported

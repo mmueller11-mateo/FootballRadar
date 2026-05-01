@@ -11,9 +11,9 @@ namespace FootballRadar.WebApp.Controllers
         {
             this._webleagueService = webleagueService;
         }
-        public async Task<IActionResult> LeaguesList()
+        public async Task<IActionResult> LeaguesList(CancellationToken cancellationToken = default)
         {
-            var leagues = await _webleagueService.GetLeaguesAsync();
+            var leagues = await _webleagueService.GetLeaguesAsync(cancellationToken);
             return View(leagues);
         }
     }
