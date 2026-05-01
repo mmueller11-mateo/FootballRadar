@@ -10,6 +10,7 @@ namespace FootballRadar.WebApp
             FootballRadar.Business.Services.ComponentConfigurator.ConfigureServices(builder.Services, builder.Configuration, builder.Environment);
             FootballRadar.Data.ComponentConfigurator.ConfigureServices(builder.Services, builder.Configuration, builder.Environment);
             My.Framework.EventHandling.ComponentConfigurator.ConfigureServices(builder.Services, builder.Configuration, builder.Environment);
+            FootballRadar.EventHandling.ComponentConfigurator.ConfigureServices(builder.Services, builder.Configuration, builder.Environment);
 
             var app = builder.Build();
 
