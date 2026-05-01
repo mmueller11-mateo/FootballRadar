@@ -56,7 +56,10 @@ namespace FootballRadar.EventHandling
 			{
 				var eventData = EventSerializer.Deserialize(eventRecord.EventData, eventRecord.EventType);
 
-				await eventHub.Clients.User(currentUser.UserId.ToString()).SendAsync(method: "ReceiveNotification", arg1: SystemId, arg2: eventData, cancellationToken);
+				// here we serialize the actual event data to send it to the client (user's browser).
+				var notificationPayload = EventSerializer.Serialize(eventData);
+
+				await eventHub.Clients.User(currentUser.UserId.ToString()).SendAsync(method: "ReceiveNotification", arg1: SystemId, arg2: notificationPayload, cancellationToken);
 			}
 		}
 	}
