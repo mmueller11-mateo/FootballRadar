@@ -1,4 +1,3 @@
-using FootballRadar.Abstractions;
 using FootballRadar.WebApp.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
@@ -17,13 +16,6 @@ namespace FootballRadar.WebApp.Controllers
         public IActionResult Index()
         {
             return View();
-        }
-
-        public async Task<IActionResult> Test(CancellationToken cancellationToken)
-        {
-            var repository = HttpContext.RequestServices.GetRequiredService<IBetRepository>();
-            var result = await repository.HasUserBetOnMarketAsync(Guid.NewGuid(), Guid.NewGuid(), cancellationToken);
-            return Ok();
         }
 
         public IActionResult Privacy()

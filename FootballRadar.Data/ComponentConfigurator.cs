@@ -35,6 +35,7 @@ namespace FootballRadar.Data
             services.AddTransient<IWalletRepository, WalletRepository>();
             services.AddTransient<IWalletTransactionRepository, WalletTransactionRepository>();
             services.AddTransient<IPlayerRepository, PlayerRepository>();
+            services.AddTransient<IViewModelRepository, ViewModelRepository>();
         }
     }
 }

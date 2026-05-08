@@ -6,17 +6,16 @@ namespace FootballRadar.WebApp.Controllers
 {
     public class TeamController : Controller
     {
-        private readonly ILeagueRepository _webleagueService;
+        private readonly ILeagueRepository leagueService;
 
         public TeamController(ILeagueRepository leagueService)
         {
-            _webleagueService = leagueService;
+            this.leagueService = leagueService;
         }
 
         public async Task<IActionResult> TeamsList(int leagueId, int season, CancellationToken cancellationToken = default)
         {
-            var standings = await _webleagueService.GetStandingsWithDetailsAsync(leagueId, season, cancellationToken);
-
+            var standings = await leagueService.GetStandingsWithDetailsAsync(leagueId, season, cancellationToken);
             var vm = new StandingsViewModel
             {
                 LeagueId = leagueId,
@@ -31,7 +30,6 @@ namespace FootballRadar.WebApp.Controllers
                         Name = s.Team!.Name ?? "Unknown",
                         Logo = s.Team.Logo,
                         ApiTeamId = s.Team?.ApiTeamId
-
                     },
                     All = new StandingStatsViewModel
                     {

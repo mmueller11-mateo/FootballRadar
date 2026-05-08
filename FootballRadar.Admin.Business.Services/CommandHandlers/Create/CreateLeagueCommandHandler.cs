@@ -7,17 +7,17 @@ namespace FootballRadar.Admin.Business.Services.CommandHandlers.Create
 {
     sealed class CreateLeagueCommandHandler : IRequestHandler<CreateLeagueCommand, PublicLeague>
     {
-        private readonly ILeagueRepository _leagueRepository;
+        private readonly ILeagueRepository leagueRepository;
 
         public CreateLeagueCommandHandler(ILeagueRepository leagueRepository)
         {
-            this._leagueRepository = leagueRepository;
+            this.leagueRepository = leagueRepository;
         }
 
         public async Task<PublicLeague> Handle(CreateLeagueCommand request, CancellationToken cancellationToken)
         {
             var trimmedName = request.Name.Trim();
-            var existing = await _leagueRepository.GetByNameAsync(trimmedName);
+            var existing = await leagueRepository.GetByNameAsync(trimmedName);
 
             if (existing != null)
             {
@@ -34,7 +34,7 @@ namespace FootballRadar.Admin.Business.Services.CommandHandlers.Create
             };
 
 
-            await _leagueRepository.AddAsync(league);
+            await leagueRepository.AddAsync(league);
             return league;
         }
     }

@@ -6,16 +6,16 @@ namespace FootballRadar.Data.Repositories
 {
     sealed class PlayerRepository : IPlayerRepository
     {
-        private readonly IDbContextFactory<ApplicationDbContext> _dbContextFactory;
+        private readonly IDbContextFactory<ApplicationDbContext> dbContextFactory;
 
         public PlayerRepository(IDbContextFactory<ApplicationDbContext> dbContextFactory)
         {
-            _dbContextFactory = dbContextFactory;
+            this.dbContextFactory = dbContextFactory;
         }
 
         public async Task<IEnumerable<Player>> GetByApiTeamIdAsync(int apiTeamId, CancellationToken cancellationToken = default)
         {
-            using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            using var dbContext = await dbContextFactory.CreateDbContextAsync(cancellationToken);
 
             return await dbContext.TeamSeasonPlayers
                 .Where(x => x.ApiTeamId == apiTeamId)
@@ -26,7 +26,7 @@ namespace FootballRadar.Data.Repositories
 
         public async Task<IEnumerable<Player>> GetByTeamAndSeasonAsync(int apiTeamId, int season, CancellationToken cancellationToken = default)
         {
-            using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            using var dbContext = await dbContextFactory.CreateDbContextAsync(cancellationToken);
 
             return await dbContext.TeamSeasonPlayers
                 .Where(x => x.ApiTeamId == apiTeamId && x.Season == season)
@@ -37,7 +37,7 @@ namespace FootballRadar.Data.Repositories
 
         public async Task<IEnumerable<int>> GetSeasonsByTeamAsync(int apiTeamId, CancellationToken cancellationToken = default)
         {
-            using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            using var dbContext = await dbContextFactory.CreateDbContextAsync(cancellationToken);
             return await dbContext.TeamSeasonPlayers
                 .Where(x => x.ApiTeamId == apiTeamId)
                 .Select(x => x.Season)

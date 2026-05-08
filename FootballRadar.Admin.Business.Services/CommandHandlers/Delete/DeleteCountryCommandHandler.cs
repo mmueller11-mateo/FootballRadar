@@ -6,23 +6,23 @@ namespace FootballRadar.Admin.Business.Services.CommandHandlers.Delete
 {
     sealed class DeleteCountryCommandHandler : IRequestHandler<DeleteCountryCommand, bool>
     {
-        private readonly ICountryRepository _countryRepository;
+        private readonly ICountryRepository countryRepository;
 
         public DeleteCountryCommandHandler(ICountryRepository countryRepository)
         {
-            this._countryRepository = countryRepository;
+            this.countryRepository = countryRepository;
         }
 
         public async Task<bool> Handle(DeleteCountryCommand request, CancellationToken cancellationToken)
         {
-            var country = await _countryRepository.GetByIdAsync(request.Id);
+            var country = await countryRepository.GetByIdAsync(request.Id);
 
             if (country == null)
             {
                 return false;
             }
 
-            _countryRepository.Delete(country);
+            countryRepository.Delete(country);
             return true;
         }
     }

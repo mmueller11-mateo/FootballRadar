@@ -7,17 +7,17 @@ namespace FootballRadar.Admin.Business.Services.CommandHandlers.Create
 {
     sealed class CreateNationalTeamCommandHandler : IRequestHandler<CreateNationalTeamCommand, NationalTeam>
     {
-        private readonly INationalTeamRepository _nationalTeamRepository;
+        private readonly INationalTeamRepository nationalTeamRepository;
 
         public CreateNationalTeamCommandHandler(INationalTeamRepository nationalTeamRepository)
         {
-            _nationalTeamRepository = nationalTeamRepository;
+            this.nationalTeamRepository = nationalTeamRepository;
         }
 
         public async Task<NationalTeam> Handle(CreateNationalTeamCommand request, CancellationToken cancellationToken)
         {
             var trimmedName = request.Name.Trim();
-            var existing = await _nationalTeamRepository.GetByNameAsync(trimmedName);
+            var existing = await nationalTeamRepository.GetByNameAsync(trimmedName);
             if (existing != null)
             {
                 throw new InvalidOperationException($"A NationalTeam with the name '{request.Name}' already exists.");
@@ -31,7 +31,7 @@ namespace FootballRadar.Admin.Business.Services.CommandHandlers.Create
                 Level = request.Level
             };
 
-            await _nationalTeamRepository.AddAsync(nationalTeam);
+            await nationalTeamRepository.AddAsync(nationalTeam);
             return nationalTeam;
         }
     }

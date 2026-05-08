@@ -1,7 +1,7 @@
 ﻿using FootballRadar.Business.Entities.Betting.Enums;
 using System.ComponentModel.DataAnnotations;
 
-namespace FootballRadar.WebApp.Models
+namespace FootballRadar.Business.ViewModels
 {
     public class PlaceBetViewModel
     {
@@ -29,12 +29,5 @@ namespace FootballRadar.WebApp.Models
         public IEnumerable<HeadToHeadViewModel> HeadToHead { get; set; } = new List<HeadToHeadViewModel>();
     }
 
-    public class HeadToHeadViewModel
-    {
-        public DateTimeOffset Date { get; set; }
-        public string HomeTeam { get; set; } = string.Empty;
-        public string AwayTeam { get; set; } = string.Empty;
-        public int? HomeGoals { get; set; }
-        public int? AwayGoals { get; set; }
-    }
+
 }

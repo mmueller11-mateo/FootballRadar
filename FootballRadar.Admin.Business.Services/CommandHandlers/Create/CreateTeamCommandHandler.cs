@@ -7,17 +7,17 @@ namespace FootballRadar.Admin.Business.Services.CommandHandlers.Create
 {
     sealed class CreateTeamCommandHandler : IRequestHandler<CreateTeamCommand, Team>
     {
-        private readonly ITeamRepository _teamRepository;
+        private readonly ITeamRepository teamRepository;
 
         public CreateTeamCommandHandler(ITeamRepository teamRepository)
         {
-            _teamRepository = teamRepository;
+            this.teamRepository = teamRepository;
         }
 
         public async Task<Team> Handle(CreateTeamCommand request, CancellationToken cancellationToken)
         {
             var trimmedName = request.Name.Trim();
-            var existing = await _teamRepository.GetByNameAsync(trimmedName);
+            var existing = await teamRepository.GetByNameAsync(trimmedName);
             if (existing != null)
             {
                 throw new InvalidOperationException($"A Team with the name '{request.Name}' already exists.");
@@ -33,7 +33,7 @@ namespace FootballRadar.Admin.Business.Services.CommandHandlers.Create
                 Code = request.Code
             };
 
-            await _teamRepository.AddAsync(team);
+            await teamRepository.AddAsync(team);
             return team;
         }
     }

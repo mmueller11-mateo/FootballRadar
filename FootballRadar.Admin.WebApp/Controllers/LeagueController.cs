@@ -9,17 +9,17 @@ namespace FootballRadar.Admin.WebApp.Controllers
 {
     public class LeagueController : Controller
     {
-        private readonly IMediator _mediator;
+        private readonly IMediator mediator;
 
         public LeagueController(IMediator mediator)
         {
-            _mediator = mediator;
+            this.mediator = mediator;
         }
 
         public async Task<IActionResult> LeaguesList(CancellationToken cancellationToken = default)
         {
-            var leagues = await _mediator.Send(new GetLeaguesQuery(), cancellationToken);
-            var countries = await _mediator.Send(new GetCountriesQuery(), cancellationToken);
+            var leagues = await mediator.Send(new GetLeaguesQuery(), cancellationToken);
+            var countries = await mediator.Send(new GetCountriesQuery(), cancellationToken);
 
             var vm = leagues.Select(l => new LeagueViewModel
             {
@@ -34,7 +34,7 @@ namespace FootballRadar.Admin.WebApp.Controllers
 
         public async Task<IActionResult> CreateLeague(CancellationToken cancellationToken = default)
         {
-            var countries = await _mediator.Send(new GetCountriesQuery(), cancellationToken);
+            var countries = await mediator.Send(new GetCountriesQuery(), cancellationToken);
             var vm = new CreateLeagueViewModel
             {
                 Countries = countries.Select(c => new CountryViewModel
@@ -53,7 +53,7 @@ namespace FootballRadar.Admin.WebApp.Controllers
         {
             if (!ModelState.IsValid)
             {
-                var countries = await _mediator.Send(new GetCountriesQuery(), cancellationToken);
+                var countries = await mediator.Send(new GetCountriesQuery(), cancellationToken);
                 vm.Countries = countries.Select(c => new CountryViewModel
                 {
                     Id = c.Id,
@@ -64,7 +64,7 @@ namespace FootballRadar.Admin.WebApp.Controllers
                 return View(vm);
             }
 
-            await _mediator.Send(new CreateLeagueCommand
+            await mediator.Send(new CreateLeagueCommand
             {
                 Name = vm.Name,
                 CountryId = vm.CountryId,
@@ -78,7 +78,7 @@ namespace FootballRadar.Admin.WebApp.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken = default)
         {
-            await _mediator.Send(new DeleteLeagueCommand { Id = id }, cancellationToken);
+            await mediator.Send(new DeleteLeagueCommand { Id = id }, cancellationToken);
             return RedirectToAction(nameof(LeaguesList));
         }
     }

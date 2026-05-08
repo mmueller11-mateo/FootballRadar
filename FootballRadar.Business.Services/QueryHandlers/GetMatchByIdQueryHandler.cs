@@ -7,16 +7,16 @@ namespace FootballRadar.Business.Services.QueryHandlers
 {
     internal sealed class GetMatchByIdQueryHandler : IRequestHandler<GetMatchByIdQuery, Match?>
     {
-        private readonly IMatchRepository _matchRepository;
+        private readonly IMatchRepository matchRepository;
 
         public GetMatchByIdQueryHandler(IMatchRepository matchRepository)
         {
-            _matchRepository = matchRepository;
+            this.matchRepository = matchRepository;
         }
 
         public async Task<Match?> Handle(GetMatchByIdQuery request, CancellationToken cancellationToken)
         {
-            return await _matchRepository.GetByIdAsync(request.MatchId, cancellationToken);
+            return await matchRepository.GetByIdAsync(request.MatchId, cancellationToken);
         }
     }
 }

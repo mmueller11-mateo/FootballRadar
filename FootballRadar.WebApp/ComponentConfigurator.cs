@@ -13,6 +13,7 @@ namespace FootballRadar.WebApp
             {
                 options.LoginPath = "/Account/Login";
                 options.LogoutPath = "/Account/Logout";
+                options.ReturnUrlParameter = "returnUrl";
             });
 
             if (environment.IsDevelopment())

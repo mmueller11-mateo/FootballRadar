@@ -6,35 +6,35 @@ namespace FootballRadar.Data.Repositories
 {
     sealed class MatchRepository : IMatchRepository
     {
-        private readonly IDbContextFactory<ApplicationDbContext> _dbContextFactory;
+        private readonly IDbContextFactory<ApplicationDbContext> dbContextFactory;
 
         public MatchRepository(IDbContextFactory<ApplicationDbContext> dbContextFactory)
         {
-            _dbContextFactory = dbContextFactory;
+            this.dbContextFactory = dbContextFactory;
         }
 
         public async Task<Match?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            using var db = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            using var db = await dbContextFactory.CreateDbContextAsync(cancellationToken);
             return await db.Fixtures.FirstOrDefaultAsync(m => m.Id == id, cancellationToken);
         }
 
         public async Task AddAsync(Match match, CancellationToken cancellationToken = default)
         {
-            using var db = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            using var db = await dbContextFactory.CreateDbContextAsync(cancellationToken);
             await db.Fixtures.AddAsync(match, cancellationToken);
             await db.SaveChangesAsync(cancellationToken);
         }
 
         public async Task<IEnumerable<Match>> GetUpcomingMatches(CancellationToken cancellationToken = default)
         {
-            using var db = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            using var db = await dbContextFactory.CreateDbContextAsync(cancellationToken);
             return await db.Fixtures.ToArrayAsync(cancellationToken);
         }
 
         public async Task<IEnumerable<Match>> GetByLeagueAsync(int apiLeagueId, int season, CancellationToken cancellationToken = default)
         {
-            using var db = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            using var db = await dbContextFactory.CreateDbContextAsync(cancellationToken);
 
             var league = await db.Leagues.FirstOrDefaultAsync(l => l.ApiLeagueId == apiLeagueId, cancellationToken);
             if (league == null)
@@ -48,7 +48,7 @@ namespace FootballRadar.Data.Repositories
 
         public async Task<IEnumerable<int>> GetSeasonsByLeagueAsync(int apiLeagueId, CancellationToken cancellationToken = default)
         {
-            using var db = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            using var db = await dbContextFactory.CreateDbContextAsync(cancellationToken);
             var league = await db.Leagues.FirstOrDefaultAsync(l => l.ApiLeagueId == apiLeagueId, cancellationToken);
             if (league == null)
                 return Array.Empty<int>();
@@ -62,7 +62,7 @@ namespace FootballRadar.Data.Repositories
 
         public async Task<IEnumerable<Match>> GetHeadToHeadAsync(Guid homeTeamId, Guid awayTeamId, int limit = 5, CancellationToken cancellationToken = default)
         {
-            using var db = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            using var db = await dbContextFactory.CreateDbContextAsync(cancellationToken);
             return await db.Fixtures
                 .Where(f =>
                     (f.HomeTeamId == homeTeamId && f.AwayTeamId == awayTeamId) ||

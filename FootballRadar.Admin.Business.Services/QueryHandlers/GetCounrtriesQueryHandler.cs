@@ -7,16 +7,16 @@ namespace FootballRadar.Admin.Business.Services.QueryHandlers
 {
     sealed class GetCountriesQueryHandler : IRequestHandler<GetCountriesQuery, IEnumerable<Country>>
     {
-        private readonly ICountryRepository _repository;
+        private readonly ICountryRepository countryRepository;
 
-        public GetCountriesQueryHandler(ICountryRepository repository)
+        public GetCountriesQueryHandler(ICountryRepository countryRepository)
         {
-            _repository = repository;
+            this.countryRepository = countryRepository;
         }
 
         public async Task<IEnumerable<Country>> Handle(GetCountriesQuery request, CancellationToken cancellationToken)
         {
-            return await _repository.GetAllAsync();
+            return await countryRepository.GetAllAsync();
         }
     }
 }

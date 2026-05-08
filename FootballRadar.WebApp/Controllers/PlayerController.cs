@@ -7,20 +7,20 @@ namespace FootballRadar.WebApp.Controllers
 {
     public class PlayerController : Controller
     {
-        private readonly IMediator _mediator;
+        private readonly IMediator mediator;
         public PlayerController(IMediator mediator)
         {
-            _mediator = mediator;
+            this.mediator = mediator;
         }
 
         public async Task<IActionResult> PlayerList(int apiTeamId, int season, CancellationToken cancellationToken = default)
         {
-            var seasons = await _mediator.Send(new GetTeamSeasonsQuery { ApiTeamId = apiTeamId }, cancellationToken);
+            var seasons = await mediator.Send(new GetTeamSeasonsQuery { ApiTeamId = apiTeamId }, cancellationToken);
 
             if (season == 0 && seasons.Any())
                 season = seasons.Max();
 
-            var players = await _mediator.Send(new GetTeamPlayersQuery
+            var players = await mediator.Send(new GetTeamPlayersQuery
             {
                 ApiTeamId = apiTeamId,
                 Season = season

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace FootballRadar.WebApp.Models
+namespace FootballRadar.Business.ViewModels
 {
     public class FixtureViewModel
     {

@@ -1,5 +1,6 @@
 ﻿using FootballRadar.Abstractions;
 using FootballRadar.Business.Entities.Betting;
+using FootballRadar.Web.Utilities;
 using FootballRadar.WebApp.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -20,10 +21,17 @@ namespace FootballRadar.WebApp.Controllers
         }
 
         [HttpGet]
-        public IActionResult Login() => View();
+        public IActionResult Login(string? returnUrl = null)
+        {
+            if (User.Identity?.IsAuthenticated == true)
+                return RedirectToAction(nameof(HomeController.Index), ControllerName.For<HomeController>());
+
+            ViewData["ReturnUrl"] = returnUrl;
+            return View();
+        }
 
         [HttpPost]
-        public async Task<IActionResult> Login(LoginViewModel model)
+        public async Task<IActionResult> Login(LoginViewModel model, string? returnUrl = null)
         {
             var user = await _userRepository.GetByEmailAsync(model.Email);
             if (user is null || !_passwordHasher.Verify(model.Password, user.PasswordHash))
@@ -31,15 +39,25 @@ namespace FootballRadar.WebApp.Controllers
                 ModelState.AddModelError(string.Empty, "Invalid email or password");
                 return View(model);
             }
+
             await SignInAsync(user);
-            return RedirectToAction(nameof(LeagueController.LeaguesList), "League");
+
+            if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+                return Redirect(returnUrl);
+
+            return RedirectToAction(nameof(LeagueController.LeaguesList), ControllerName.For<LeagueController>());
         }
 
         [HttpGet]
-        public IActionResult Register() => View();
+        public IActionResult Register(string? returnUrl = null)
+        {
+            ViewData["ReturnUrl"] = returnUrl;
+            return View();
+        }
+
 
         [HttpPost]
-        public async Task<IActionResult> Register(RegisterViewModel model)
+        public async Task<IActionResult> Register(RegisterViewModel model, string? returnUrl = null)
         {
             if (model.Password != model.ConfirmPassword)
             {
@@ -61,13 +79,17 @@ namespace FootballRadar.WebApp.Controllers
             };
             await _userRepository.AddAsync(user);
             await SignInAsync(user);
-            return RedirectToAction(nameof(LeagueController.LeaguesList), "League");
+
+            if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+                return Redirect(returnUrl);
+
+            return RedirectToAction(nameof(LeagueController.LeaguesList), ControllerName.For<LeagueController>());
         }
 
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            return RedirectToAction(nameof(HomeController.Index), "Home");
+            return RedirectToAction(nameof(HomeController.Index), ControllerName.For<HomeController>());
         }
 
         private async Task SignInAsync(User user)

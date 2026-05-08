@@ -5,17 +5,17 @@ using MediatR;
 
 sealed class CreateCountryCommandHandler : IRequestHandler<CreateCountryCommand, Country>
 {
-    private readonly ICountryRepository _countryRepository;
+    private readonly ICountryRepository countryRepository;
 
     public CreateCountryCommandHandler(ICountryRepository countryRepository)
     {
-        this._countryRepository = countryRepository;
+        this.countryRepository = countryRepository;
     }
 
     public async Task<Country> Handle(CreateCountryCommand request, CancellationToken cancellationToken)
     {
         var trimmedName = request.Name.Trim();
-        var existing = await _countryRepository.GetByNameAsync(trimmedName);
+        var existing = await countryRepository.GetByNameAsync(trimmedName);
 
         if (existing != null)
         {
@@ -30,7 +30,7 @@ sealed class CreateCountryCommandHandler : IRequestHandler<CreateCountryCommand,
             Flag = request.Flag
         };
 
-        await _countryRepository.AddAsync(country);
+        await countryRepository.AddAsync(country);
         return country;
     }
 }
