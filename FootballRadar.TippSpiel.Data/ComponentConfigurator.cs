@@ -12,7 +12,7 @@ namespace FootballRadar.TippSpiel.Data
     {
         public static void ConfigureServices(IServiceCollection services, IConfiguration configuration, IHostEnvironment environment)
         {
-            services.AddDbContextFactory<TippspielDbContext>((sp, options) =>
+            services.AddDbContextFactory<TippSpielDbContext>((sp, options) =>
             {
                 var connectionStringBuilder = new SqlConnectionStringBuilder(configuration.GetConnectionString("ApplicationDB"));
                 options.UseSqlServer(connectionStringBuilder.ToString(), sqlServer =>

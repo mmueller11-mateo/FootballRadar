@@ -2,49 +2,69 @@
 @using FootballRadar.Web.Utilities
 @model FootballRadar.TippSpiel.WebApp.Models.TippMatchIndexViewModel
 @{
-    ViewData["Title"] = "Tippspiel";
+    ViewData["Title"] = "Tippspiel – Gruppen";
 }
 
 <div class="container mt-4">
-    <h2>⚽ Kommende Spiele</h2>
+    <h2>⚽ WM 2026 – Gruppenübersicht</h2>
 
     @if (Model.TipperName != null)
     {
-        <p class="text-muted">Eingeloggt als: <strong>@Model.TipperName</strong></p>
+        <p class="text-muted mb-4">Eingeloggt als: <strong>@Model.TipperName</strong></p>
     }
 
-    @foreach (var match in Model.Matches)
+    @if (!Model.Groups.Any())
     {
-        var existingTip = Model.ExistingTips.FirstOrDefault(t => t.MatchId == match.Id);
-
-        <div class="card mb-3 shadow-sm">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <span class="badge bg-secondary">@match.Phase</span>
-                        <small class="text-muted ms-2">@match.KickoffUtc.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</small>
+        <p class="text-muted">Keine Gruppenspiele vorhanden.</p>
+    }
+    else
+    {
+        <div class="row row-cols-1 row-cols-md-2 g-4">
+            @foreach (var group in Model.Groups)
+            {
+                <div class="col">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <strong>@group.GroupName</strong>
+                            <a href="@Url.Action(nameof(TippMatchController.Group), ControllerName.For<TippMatchController>(), new { groupName = group.GroupName })"
+                               class="btn btn-sm btn-outline-primary">
+                                Zur Gruppe →
+                            </a>
+                        </div>
+                        <div class="card-body p-0">
+                            <table class="table table-sm table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Team</th>
+                                        <th class="text-center">Sp</th>
+                                        <th class="text-center">S</th>
+                                        <th class="text-center">U</th>
+                                        <th class="text-center">N</th>
+                                        <th class="text-center">Tore</th>
+                                        <th class="text-center">Diff</th>
+                                        <th class="text-center fw-bold">Pkt</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var row in group.Standings)
+                                    {
+                                        <tr>
+                                            <td>@row.Team</td>
+                                            <td class="text-center">@row.Played</td>
+                                            <td class="text-center">@row.Won</td>
+                                            <td class="text-center">@row.Drawn</td>
+                                            <td class="text-center">@row.Lost</td>
+                                            <td class="text-center">@row.GoalsFor:@row.GoalsAgainst</td>
+                                            <td class="text-center">@row.GoalDifference</td>
+                                            <td class="text-center fw-bold">@row.Points</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
-                <div class="text-center my-3">
-                    <h4>@match.HomeTeam <span class="text-muted">vs</span> @match.AwayTeam</h4>
-                </div>
-                <div class="text-center">
-                    @if (existingTip != null)
-                    {
-                        <span class="badge bg-success me-2">Dein Tipp: @existingTip.PredictedHome : @existingTip.PredictedAway</span>
-                        <a href="@Url.Action(nameof(TippMatchController.Tip), ControllerName.For<TippMatchController>(), new { matchId = match.Id })" class="btn btn-sm btn-outline-primary">Ändern</a>
-                    }
-                    else
-                    {
-                        <a href="@Url.Action(nameof(TippMatchController.Tip), ControllerName.For<TippMatchController>(), new { matchId = match.Id })" class="btn btn-primary">Jetzt tippen</a>
-                    }
-                </div>
-            </div>
+            }
         </div>
-    }
-
-    @if (!Model.Matches.Any())
-    {
-        <p class="text-muted">Keine kommenden Spiele vorhanden.</p>
     }
 </div>

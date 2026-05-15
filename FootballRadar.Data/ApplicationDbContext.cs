@@ -26,7 +26,7 @@ namespace FootballRadar.Data
 		public DbSet<Standing> Standings { get; set; }
 		public DbSet<StandingStats> StandingStats { get; set; }
 		public DbSet<Bet> Bets { get; set; }
-		public DbSet<MatchBet> MatchBets { get; set; }
+		public DbSet<WinnerBet> MatchBets { get; set; }
 		public DbSet<TransferBet> TransferBets { get; set; }
 		public DbSet<PredictionMarket> PredictionMarkets { get; set; }
 		public DbSet<MatchPredictionMarket> MatchPredictionMarkets { get; set; }
@@ -65,11 +65,11 @@ namespace FootballRadar.Data
 				entity.HasKey(e => e.Id);
 				entity.HasDiscriminator<string>("Discriminator")
 					.HasValue<Bet>("Bet")
-					.HasValue<MatchBet>("MatchBet")
+					.HasValue<WinnerBet>("MatchBet")
 					.HasValue<TransferBet>("TransferBet");
 			});
 
-			builder.Entity<MatchBet>(entity =>
+			builder.Entity<WinnerBet>(entity =>
 			{
 				entity.Property(e => e.Prediction).HasConversion<string>();
 			});

@@ -3,8 +3,9 @@ using MediatR;
 
 namespace FootballRadar.TippSpiel.Business.Queries
 {
-    public class GetTipperByNameQuery : IRequest<Tipper?>
+    public class GetTippUserByNameQuery : IRequest<TippUser?>
     {
         public string Name { get; set; } = string.Empty;
     }
+
 }

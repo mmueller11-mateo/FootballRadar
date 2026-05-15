@@ -38,7 +38,7 @@ namespace FootballRadar.Data.Repositories
             await db.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task<IEnumerable<MatchBet>> GetMatchBetsByMarketIdAsync(Guid marketId, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<WinnerBet>> GetMatchBetsByMarketIdAsync(Guid marketId, CancellationToken cancellationToken = default)
         {
             using var db = await dbContextFactory.CreateDbContextAsync(cancellationToken);
             return await db.MatchBets
@@ -46,7 +46,7 @@ namespace FootballRadar.Data.Repositories
                 .ToListAsync(cancellationToken);
         }
 
-        public async Task<IEnumerable<MatchBet>> GetMatchBetsByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<WinnerBet>> GetMatchBetsByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
         {
             using var db = await dbContextFactory.CreateDbContextAsync(cancellationToken);
             return await db.MatchBets

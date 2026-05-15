@@ -32,6 +32,12 @@ namespace FootballRadar.Business.Services.CommandHandlers
                 throw new InvalidOperationException("Match not found");
             }
 
+            var wallet = await _walletRepository.GetByUserIdAsync(request.UserId, cancellationToken);
+            if (wallet == null)
+            {
+                throw new InvalidOperationException("Wallet not found for user");
+            }
+
             var predictionMarket = await _predictionMarketRepository.FindForMatchAsync(request.MatchId, cancellationToken);
             if (predictionMarket == null)
             {
@@ -47,18 +53,11 @@ namespace FootballRadar.Business.Services.CommandHandlers
                     Rules = [
                         new CannotBetAfterMatchStart(match),
                         new CannotBetAfterMatchEnd(match),
-                        new CanOnlyBetOncePerMatch(match, request.UserId, _betRepository)
+                        new CanOnlyBetOncePerMatch(match, request.UserId, _betRepository),
+                        new CannotBetIfInsufficientCredit(wallet, request.Credits, match)
                     ]
                 };
                 await _predictionMarketRepository.AddAsync(predictionMarket, cancellationToken);
-            }
-            else
-            {
-                predictionMarket.Rules = [
-                    new CannotBetAfterMatchStart(match),
-                    new CannotBetAfterMatchEnd(match),
-                    new CanOnlyBetOncePerMatch(match, request.UserId, _betRepository)
-                ];
             }
 
             foreach (var rule in predictionMarket.Rules)
@@ -73,29 +72,10 @@ namespace FootballRadar.Business.Services.CommandHandlers
                 }
             }
 
-            var wallet = await _walletRepository.GetByUserIdAsync(request.UserId, cancellationToken);
-            if (wallet == null)
-            {
-                return new BetStatus
-                {
-                    Code = BetStatusCode.Rejected,
-                    ErrorMessage = "Wallet not found."
-                };
-            }
-
-            if (wallet.Credits < request.Credits)
-            {
-                return new BetStatus
-                {
-                    Code = BetStatusCode.Rejected,
-                    ErrorMessage = "Insufficient credits."
-                };
-            }
-
             wallet.Withdraw(request.Credits);
             await _walletRepository.UpdateAsync(wallet, cancellationToken);
 
-            var bet = new MatchBet
+            var bet = new WinnerBet
             {
                 Id = Guid.NewGuid(),
                 Credits = request.Credits,

@@ -2,7 +2,7 @@
 using MediatR;
 namespace FootballRadar.Business.Services.Queries
 {
-    public sealed class GetUserBetsQuery : IRequest<IEnumerable<MatchBet>>
+    public sealed class GetUserBetsQuery : IRequest<IEnumerable<WinnerBet>>
     {
         public required Guid UserId { get; init; }
     }

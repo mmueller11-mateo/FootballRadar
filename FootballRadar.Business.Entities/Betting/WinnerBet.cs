@@ -2,7 +2,7 @@
 
 namespace FootballRadar.Business.Entities.Betting
 {
-    public class MatchBet : Bet
+    public class WinnerBet : Bet
     {
         public MatchPrediction Prediction { get; set; }
     }

@@ -7,36 +7,36 @@ namespace FootballRadar.Tippspiel.Data.Repositories
 {
     internal class TipperRepository : ITipperRepository
     {
-        private readonly IDbContextFactory<TippspielDbContext> dbContextFactory;
+        private readonly IDbContextFactory<TippSpielDbContext> dbContextFactory;
 
-        public TipperRepository(IDbContextFactory<TippspielDbContext> dbContextFactory)
+        public TipperRepository(IDbContextFactory<TippSpielDbContext> dbContextFactory)
         {
             this.dbContextFactory = dbContextFactory;
         }
 
-        public async Task<Tipper?> GetByNameAsync(string name)
+        public async Task<TippUser?> GetByNameAsync(string name)
         {
             using var context = await dbContextFactory.CreateDbContextAsync();
-            return await context.Tippers.FirstOrDefaultAsync(t => t.Name == name);
+            return await context.TippUsers.FirstOrDefaultAsync(t => t.Name == name);
         }
 
-        public async Task<Tipper?> GetByIdAsync(Guid id)
+        public async Task<TippUser?> GetByIdAsync(Guid id)
         {
             using var context = await dbContextFactory.CreateDbContextAsync();
-            return await context.Tippers.FindAsync(id);
+            return await context.TippUsers.FindAsync(id);
         }
 
-        public async Task AddAsync(Tipper tipper)
+        public async Task AddAsync(TippUser tipper)
         {
             using var context = await dbContextFactory.CreateDbContextAsync();
-            context.Tippers.Add(tipper);
+            context.TippUsers.Add(tipper);
             await context.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<Tipper>> GetAllAsync()
+        public async Task<IEnumerable<TippUser>> GetAllAsync()
         {
             using var context = await dbContextFactory.CreateDbContextAsync();
-            return await context.Tippers.ToListAsync();
+            return await context.TippUsers.ToListAsync();
         }
     }
 }

@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FootballRadar.TippSpiel.Data
 {
-    public class TippspielDbContext : DbContext
+    public class TippSpielDbContext : DbContext
     {
-        public TippspielDbContext(DbContextOptions<TippspielDbContext> options) : base(options)
+        public TippSpielDbContext(DbContextOptions<TippSpielDbContext> options) : base(options)
         {
             ChangeTracker.LazyLoadingEnabled = false;
             ChangeTracker.AutoDetectChangesEnabled = false;
@@ -13,7 +13,7 @@ namespace FootballRadar.TippSpiel.Data
         }
 
         public DbSet<TippMatch> TippMatches { get; set; }
-        public DbSet<Tipper> Tippers { get; set; }
+        public DbSet<TippUser> TippUsers { get; set; }
         public DbSet<Tip> Tips { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -27,12 +27,12 @@ namespace FootballRadar.TippSpiel.Data
                 entity.Property(e => e.Phase).IsRequired().HasMaxLength(50);
             });
 
-            modelBuilder.Entity<Tipper>(entity =>
+            modelBuilder.Entity<TippUser>(entity =>
             {
-                entity.ToTable("Tippers");
+                entity.ToTable("TippUsers");
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
-                entity.HasIndex(e => e.Name).IsUnique();
+                entity.Property(e => e.PasswordHash).IsRequired().HasMaxLength(200);
             });
 
             modelBuilder.Entity<Tip>(entity =>

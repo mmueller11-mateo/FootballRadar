@@ -7,9 +7,9 @@ namespace FootballRadar.Tippspiel.Data.Repositories
 {
     public class TippMatchRepository : ITippMatchRepository
     {
-        private readonly IDbContextFactory<TippspielDbContext> dbContextFactory;
+        private readonly IDbContextFactory<TippSpielDbContext> dbContextFactory;
 
-        public TippMatchRepository(IDbContextFactory<TippspielDbContext> dbContextFactory)
+        public TippMatchRepository(IDbContextFactory<TippSpielDbContext> dbContextFactory)
         {
             this.dbContextFactory = dbContextFactory;
         }

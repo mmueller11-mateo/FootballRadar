@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using FootballRadar.TippSpiel.Abstractions;
+using FootballRadar.TippSpiel.Business.Services;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -12,6 +14,8 @@ namespace FootballRadar.TippSpiel.Business
             {
                 cfg.RegisterServicesFromAssembly(typeof(ComponentConfigurator).Assembly);
             });
+
+            services.AddTransient<IPasswordHasher, PasswordHasher>();
         }
     }
 }

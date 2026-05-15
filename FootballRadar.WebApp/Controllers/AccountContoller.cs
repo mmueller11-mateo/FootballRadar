@@ -11,13 +11,13 @@ namespace FootballRadar.WebApp.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly IUserRepository _userRepository;
-        private readonly IPasswordHasher _passwordHasher;
+        private readonly IUserRepository userRepository;
+        private readonly IPasswordHasher passwordHasher;
 
         public AccountController(IUserRepository userRepository, IPasswordHasher passwordHasher)
         {
-            _userRepository = userRepository;
-            _passwordHasher = passwordHasher;
+            this.userRepository = userRepository;
+            this.passwordHasher = passwordHasher;
         }
 
         [HttpGet]
@@ -33,8 +33,8 @@ namespace FootballRadar.WebApp.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(LoginViewModel model, string? returnUrl = null)
         {
-            var user = await _userRepository.GetByEmailAsync(model.Email);
-            if (user is null || !_passwordHasher.Verify(model.Password, user.PasswordHash))
+            var user = await userRepository.GetByEmailAsync(model.Email);
+            if (user is null || !passwordHasher.Verify(model.Password, user.PasswordHash))
             {
                 ModelState.AddModelError(string.Empty, "Invalid email or password");
                 return View(model);
@@ -64,7 +64,7 @@ namespace FootballRadar.WebApp.Controllers
                 ModelState.AddModelError(string.Empty, "Passwords do not match");
                 return View(model);
             }
-            var existing = await _userRepository.GetByEmailAsync(model.Email);
+            var existing = await userRepository.GetByEmailAsync(model.Email);
             if (existing is not null)
             {
                 ModelState.AddModelError(string.Empty, "Email already in use");
@@ -75,9 +75,9 @@ namespace FootballRadar.WebApp.Controllers
                 Id = Guid.NewGuid(),
                 Name = model.Name,
                 Email = model.Email,
-                PasswordHash = _passwordHasher.Hash(model.Password)
+                PasswordHash = passwordHasher.Hash(model.Password)
             };
-            await _userRepository.AddAsync(user);
+            await userRepository.AddAsync(user);
             await SignInAsync(user);
 
             if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
