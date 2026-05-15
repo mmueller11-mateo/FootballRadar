@@ -69,7 +69,5 @@ namespace FootballRadar.UnitTests
         {
 
         }
-
-        []
     }
 }

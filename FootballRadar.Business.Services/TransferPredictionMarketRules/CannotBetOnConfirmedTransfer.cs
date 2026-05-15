@@ -6,7 +6,7 @@ namespace FootballRadar.Business.Services.TransferPredictionMarketRules
     {
         public CannotBetOnConfirmedTransfer(TransferPredictionMarket market) : base(market) { }
 
-        public override Task<bool> Evaluate()
+        public override Task<bool> Evaluate(CancellationToken cancellationToken)
         {
             return Task.FromResult(!this.Market.IsConfirmed);
         }

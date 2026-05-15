@@ -2,7 +2,7 @@
 {
     public interface IPredictionMarketRule
     {
-        Task<bool> Evaluate();
+        Task<bool> Evaluate(CancellationToken cancellationToken);
         string ErrorMessage { get; }
     }
 }

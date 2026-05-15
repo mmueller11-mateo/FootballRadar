@@ -1,27 +1,23 @@
 ﻿
-using FootballRadar.Business.Entities.Betting;
-using FootballRadar.Business.Entities.LeagueEntities;
+using FootballRadar.Abstractions;
 
 namespace FootballRadar.Business.Services.MatchPredictionMarketRules
 {
     internal sealed class CannotBetIfInsufficientCredit : MatchPredictionMarketRule
     {
-        private readonly Wallet wallet;
-        private readonly decimal betAmount;
-        private readonly Match match;
+        private readonly IWalletRepository walletRepository;
 
-        public CannotBetIfInsufficientCredit(Wallet wallet, decimal betAmount, Match match) : base(match)
+        public CannotBetIfInsufficientCredit(MatchPredictionContext context, IWalletRepository walletRepository) : base(context)
         {
-            this.wallet = wallet;
-            this.betAmount = betAmount;
-            this.match = match;
+            this.walletRepository = walletRepository;
         }
 
         public override string ErrorMessage => "Insufficient credits.";
 
-        public override Task<bool> Evaluate()
+        public override async Task<bool> Evaluate(CancellationToken cancellationToken)
         {
-            return Task.FromResult(wallet.Credits >= betAmount);
+            var wallet = await this.walletRepository.GetByUserIdAsync(Context.UserId, cancellationToken);
+            return wallet.Credits >= Context.Credits;
         }
     }
 }

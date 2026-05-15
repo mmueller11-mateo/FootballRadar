@@ -14,7 +14,7 @@ namespace FootballRadar.Business.Services.TransferPredictionMarketRules
             _betRepository = betRepository;
         }
 
-        public override async Task<bool> Evaluate()
+        public override async Task<bool> Evaluate(CancellationToken cancellationToken)
         {
             return !await _betRepository.HasUserBetOnMarketAsync(_userId, this.Market.Id);
         }

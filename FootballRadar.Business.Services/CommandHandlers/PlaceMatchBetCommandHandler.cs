@@ -38,6 +38,14 @@ namespace FootballRadar.Business.Services.CommandHandlers
                 throw new InvalidOperationException("Wallet not found for user");
             }
 
+            var context = new MatchPredictionContext
+            {
+                Credits = request.Credits,
+                MatchId = request.MatchId,
+                Prediction = request.Prediction,
+                UserId = request.UserId
+            };
+
             var predictionMarket = await _predictionMarketRepository.FindForMatchAsync(request.MatchId, cancellationToken);
             if (predictionMarket == null)
             {
@@ -51,18 +59,19 @@ namespace FootballRadar.Business.Services.CommandHandlers
                     Reward = reward,
                     MatchId = request.MatchId,
                     Rules = [
-                        new CannotBetAfterMatchStart(match),
-                        new CannotBetAfterMatchEnd(match),
-                        new CanOnlyBetOncePerMatch(match, request.UserId, _betRepository),
-                        new CannotBetIfInsufficientCredit(wallet, request.Credits, match)
+                        new CannotBetAfterMatchStart(context, _matchRepository),
+                        new CannotBetAfterMatchEnd(context, _matchRepository),
+                        new CanOnlyBetOncePerMatch(context, _betRepository),
+                        new CannotBetIfInsufficientCredit(context, _walletRepository)
                     ]
                 };
                 await _predictionMarketRepository.AddAsync(predictionMarket, cancellationToken);
             }
 
+
             foreach (var rule in predictionMarket.Rules)
             {
-                if (!await rule.Evaluate())
+                if (!await rule.Evaluate(cancellationToken))
                 {
                     return new BetStatus
                     {

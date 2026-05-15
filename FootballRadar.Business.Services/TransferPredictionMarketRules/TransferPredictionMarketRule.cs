@@ -11,6 +11,6 @@ namespace FootballRadar.Business.Services.TransferPredictionMarketRules
 
         public TransferPredictionMarket Market { get; }
         public abstract string ErrorMessage { get; }
-        public abstract Task<bool> Evaluate();
+        public abstract Task<bool> Evaluate(CancellationToken cancellationToken);
     }
 }

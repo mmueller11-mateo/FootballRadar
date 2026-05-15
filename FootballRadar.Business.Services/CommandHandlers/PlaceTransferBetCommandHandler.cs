@@ -56,7 +56,7 @@ namespace FootballRadar.Business.Services.CommandHandlers
 
             foreach (var rule in predictionMarket.Rules)
             {
-                if (!await rule.Evaluate())
+                if (!await rule.Evaluate(cancellationToken))
                 {
                     return new BetStatus
                     {

@@ -1,22 +1,19 @@
 ﻿using FootballRadar.Abstractions;
-using FootballRadar.Business.Entities.LeagueEntities;
 
 namespace FootballRadar.Business.Services.MatchPredictionMarketRules
 {
     sealed class CanOnlyBetOncePerMatch : MatchPredictionMarketRule
     {
-        private readonly Guid _userId;
         private readonly IBetRepository _betRepository;
 
-        public CanOnlyBetOncePerMatch(Match match, Guid userId, IBetRepository betRepository) : base(match)
+        public CanOnlyBetOncePerMatch(MatchPredictionContext context, IBetRepository betRepository) : base(context)
         {
-            _userId = userId;
             _betRepository = betRepository;
         }
 
-        public override async Task<bool> Evaluate()
+        public override async Task<bool> Evaluate(CancellationToken cancellationToken)
         {
-            return !await _betRepository.HasUserBetOnMatchAsync(_userId, this.Match.Id);
+            return !await _betRepository.HasUserBetOnMatchAsync(Context.UserId, Context.MatchId);
         }
 
         public override string ErrorMessage { get; } = "You can only place one bet per match";
