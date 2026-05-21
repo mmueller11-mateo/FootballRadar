@@ -27,7 +27,8 @@ namespace FootballRadar.Admin.WebApp.Controllers
                 Id = nt.Id,
                 Name = nt.Name,
                 Level = nt.Level.ToString(),
-                Country = countries.FirstOrDefault(c => c.Id == nt.CountryId)?.Name ?? "Unknown"
+                Country = countries.FirstOrDefault(c => c.Id == nt.CountryId)?.Name ?? "Unknown",
+                Logo = nt.Logo
             });
 
             return View(vm);
@@ -59,7 +60,8 @@ namespace FootballRadar.Admin.WebApp.Controllers
             {
                 Name = vm.Name,
                 CountryId = vm.CountryId,
-                Level = vm.Level
+                Level = vm.Level,
+                Logo = vm.LogoUrl ?? string.Empty
             }, cancellationToken);
 
             return RedirectToAction(nameof(NationalTeamsList));

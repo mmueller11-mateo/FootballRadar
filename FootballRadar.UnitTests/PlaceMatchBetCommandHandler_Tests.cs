@@ -3,6 +3,7 @@ using FootballRadar.Business.Entities.Betting.Enums;
 using FootballRadar.Business.Services;
 using FootballRadar.Business.Services.CommandHandlers;
 using FootballRadar.Business.Services.Commands;
+using FootballRadar.Business.Services.MatchPredictionMarketRules;
 using Moq;
 
 namespace FootballRadar.UnitTests
@@ -15,11 +16,13 @@ namespace FootballRadar.UnitTests
         public async Task ShouldThrowExceptionIfMatchNotFound()
         {
             // Arrange
-            var mockBetrepository = new Mock<IBetRepository>();
+            var mockBetRepository = new Mock<IBetRepository>();
             var mockPredictionMarketRepository = new Mock<IPredictionMarketRepository>();
             var mockMatchRepository = new Mock<IMatchRepository>();
             var mockMatchPredictionRewardCalculator = new Mock<IMatchPredictionRewardCalculator>();
             var mockWalletRepository = new Mock<IWalletRepository>();
+            var mockRuleFactory = new Mock<IBetRuleFactory>();
+
             var command = new PlaceMatchBetCommand
             {
                 UserId = Guid.NewGuid(),
@@ -27,20 +30,22 @@ namespace FootballRadar.UnitTests
                 Credits = 100,
                 Prediction = MatchPrediction.HomeWin
             };
+
             mockMatchRepository
             .Setup(x => x.GetByIdAsync(command.MatchId, It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<FootballRadar.Business.Entities.LeagueEntities.Match?>(null));
+            .ReturnsAsync((FootballRadar.Business.Entities.LeagueEntities.Match?)null);
 
             // Act & Assert
             var commandHandler = new PlaceMatchBetCommandHandler(
-                mockBetrepository.Object,
                 mockPredictionMarketRepository.Object,
                 mockMatchRepository.Object,
                 mockMatchPredictionRewardCalculator.Object,
-                mockWalletRepository.Object);
+                mockWalletRepository.Object,
+                mockBetRepository.Object,
+                mockRuleFactory.Object);
 
             await Assert.ThrowsAsync<InvalidOperationException>(() =>
-            commandHandler.Handle(command, CancellationToken.None));
+                commandHandler.Handle(command, CancellationToken.None));
         }
 
         [TestMethod]

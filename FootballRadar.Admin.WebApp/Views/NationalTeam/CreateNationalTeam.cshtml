@@ -49,6 +49,11 @@
         </select>
         @Html.ValidationMessageFor(m => m.Level, "", new { @class = "text-danger" })
     </div>
+    <div class="form-group mb-3">
+        <label>Logo</label>
+        <input type="text" name="LogoUrl" class="form-control" value="@Model?.LogoUrl" />
+        @Html.ValidationMessageFor(m => m.LogoUrl, "", new { @class = "text-danger" })
+    </div>    
     <button type="submit" class="btn btn-success">Create</button>
     <a class="btn btn-secondary" href="@Url.Action(nameof(NationalTeamController.NationalTeamsList), ControllerName.For<NationalTeamController>())">
         Back to list

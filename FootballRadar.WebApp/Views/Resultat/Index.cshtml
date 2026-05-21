@@ -1,0 +1,78 @@
+﻿@using FootballRadar.WebApp.Controllers
+@using FootballRadar.Web.Utilities
+@model FootballRadar.WebApp.Models.ResultatIndexViewModel
+@{
+    ViewData["Title"] = "Resultate";
+}
+
+<div class="container mt-4">
+    <h2>📊 Resultate</h2>
+
+    @if (!Model.Matches.Any())
+    {
+        <p class="text-muted">Noch keine Spiele gespielt.</p>
+    }
+
+    @foreach (var match in Model.Matches)
+    {
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header">
+                <span class="badge bg-secondary">@match.WmGroup ?? @match.WmPhase.ToString()</span>
+                <small class="text-muted ms-2">@match.KickoffUtc.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</small>
+            </div>
+            <div class="card-body">
+                <h4 class="text-center">
+                    @match.HomeTeam <span class="text-primary fw-bold">@match.HomeScore : @match.AwayScore</span> @match.AwayTeam
+                </h4>
+
+                @if (match.Tips.Any())
+                {
+                    <table class="table table-sm mt-3">
+                        <thead>
+                            <tr>
+                                <th>Tipper</th>
+                                <th class="text-center">Tipp</th>
+                                <th class="text-center">Punkte</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var tip in match.Tips)
+                            {
+                                <tr>
+                                    <td>@tip.TipperName</td>
+                                    <td class="text-center">@tip.PredictedHome : @tip.PredictedAway</td>
+                                    <td class="text-center">
+                                        @if (tip.Points == 3)
+                                        {
+                                            <span class="badge bg-success">3</span>
+                                        }
+                                        else if (tip.Points == 2)
+                                        {
+                                            <span class="badge bg-primary">2</span>
+                                        }
+                                        else if (tip.Points == 1)
+                                        {
+                                            <span class="badge bg-warning text-dark">1</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-danger">0</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <p class="text-muted text-center mt-2">Keine Tipps für dieses Spiel.</p>
+                }
+            </div>
+        </div>
+    }
+
+    <div class="mt-3">
+        <a href="@Url.Action(nameof(TippSpielHomeController.Index), ControllerName.For<TippSpielHomeController>())">Zurück zur Startseite</a>
+    </div>
+</div>

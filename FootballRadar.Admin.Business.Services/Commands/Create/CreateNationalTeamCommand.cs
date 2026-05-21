@@ -9,5 +9,6 @@ namespace FootballRadar.Admin.Business.Services.Commands.Create
         public required string Name { get; init; }
         public required Guid CountryId { get; init; }
         public required NationalTeamLevel Level { get; init; }
+        public required string Logo { get; init; }
     }
 }

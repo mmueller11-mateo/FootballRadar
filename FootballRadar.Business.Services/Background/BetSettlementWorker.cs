@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace FootballRadar.Business.Services.BackgroundServices
+namespace FootballRadar.Business.Services.Background
 {
     public sealed class BetSettlementWorker : BackgroundService
     {

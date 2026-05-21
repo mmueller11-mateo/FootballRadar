@@ -1,0 +1,54 @@
+﻿@using FootballRadar.WebApp.Controllers
+@using FootballRadar.Web.Utilities
+@{
+    ViewData["Title"] = "WM 2026 Tippspiel";
+}
+
+<div class="container mt-5">
+    <div class="text-center mb-5">
+        <h1 class="display-3">⚽ WM 2026</h1>
+        <p class="lead text-muted">Tippe die Spiele der Weltmeisterschaft 2026</p>
+    </div>
+
+    <div class="row justify-content-center g-4">
+        <div class="col-md-5">
+            <a href="@Url.Action(nameof(TippMatchController.Index), ControllerName.For<TippMatchController>())" class="text-decoration-none">
+                <div class="card text-center p-4 h-100 shadow-sm">
+                    <div class="display-1">🎯</div>
+                    <h3 class="mt-3">Tippspiel</h3>
+                    <p class="text-muted">Alle Spiele tippen</p>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-5">
+            <a href="@Url.Action(nameof(RanglisteController.Index), ControllerName.For<RanglisteController>())" class="text-decoration-none">
+                <div class="card text-center p-4 h-100 shadow-sm">
+                    <div class="display-1">🏆</div>
+                    <h3 class="mt-3">Rangliste</h3>
+                    <p class="text-muted">Wer führt aktuell?</p>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-5">
+            <a href="@Url.Action(nameof(MeineTippsController.Index), ControllerName.For<MeineTippsController>())" class="text-decoration-none">
+                <div class="card text-center p-4 h-100 shadow-sm">
+                    <div class="display-1">📋</div>
+                    <h3 class="mt-3">Meine Tipps</h3>
+                    <p class="text-muted">Deine abgegebenen Tipps</p>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-5">
+            <a href="@Url.Action(nameof(ResultatController.Index), ControllerName.For<ResultatController>())" class="text-decoration-none">
+                <div class="card text-center p-4 h-100 shadow-sm">
+                    <div class="display-1">📊</div>
+                    <h3 class="mt-3">Resultate</h3>
+                    <p class="text-muted">Gespielte Matches und Ergebnisse</p>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>

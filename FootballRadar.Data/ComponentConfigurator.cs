@@ -29,6 +29,7 @@ namespace FootballRadar.Data
             services.AddTransient<ILeagueRepository, LeagueRepository>();
             services.AddTransient<IPredictionMarketRepository, PredictionMarketRepository>();
             services.AddTransient<IMatchRepository, MatchRepository>();
+            services.AddTransient<INationalTeamRepository, NationalTeamRepository>();
             services.AddTransient<ITeamRepository, TeamRepository>();
             services.AddTransient<ITransferRepository, TransferRepository>();
             services.AddTransient<IUserRepository, UserRepository>();
@@ -36,6 +37,7 @@ namespace FootballRadar.Data
             services.AddTransient<IWalletTransactionRepository, WalletTransactionRepository>();
             services.AddTransient<IPlayerRepository, PlayerRepository>();
             services.AddTransient<IViewModelRepository, ViewModelRepository>();
+            services.AddTransient<IWmTipRepository, WmTipRepository>();
         }
     }
 }

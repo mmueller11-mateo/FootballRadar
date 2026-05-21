@@ -1,0 +1,173 @@
+﻿@using FootballRadar.WebApp.Controllers
+@model FootballRadar.WebApp.Models.WmGroupDetailViewModel
+
+@{
+    ViewData["Title"] = "Group " + Model.GroupName;
+}
+
+<div class="container mt-4">
+
+    <div class="mb-3">
+        <a class="btn btn-outline-secondary"
+           href="@Url.Action(nameof(TippMatchController.Index), ControllerName.For<TippMatchController>())">
+            ← Back
+        </a>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Group @Model.GroupName</h2>
+    </div>
+
+    <!-- ===================== STANDINGS ===================== -->
+    <div class="card shadow-sm mb-4 border-0">
+        <div class="card-body p-0">
+            <div id="standingsContainer">
+                @Html.Partial("_GroupStandings", Model.GroupStandings)
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== UPCOMING ===================== -->
+    <h4 class="mb-3">Upcoming Matches</h4>
+
+    @if (!Model.UpcomingMatches.Any())
+    {
+        <div class="alert alert-secondary">No upcoming matches</div>
+    }
+
+    <div class="row g-3">
+
+        @foreach (var match in Model.UpcomingMatches.OrderBy(m => m.KickoffUtc))
+        {
+            var tip = Model.ExistingTips.FirstOrDefault(t => t.WmMatchId == match.Id);
+
+            <div class="col-12 col-md-6 col-lg-4">
+
+                <div class="card shadow-sm h-100 border-0">
+                    <div class="card-body">
+
+                        <div class="d-flex justify-content-between mb-2">
+                            <small class="text-muted">
+                                @match.KickoffUtc.ToLocalTime().ToString("dd.MM HH:mm")
+                            </small>
+                        </div>
+
+                        <!-- TEAMS -->
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+
+                            <div class="text-center" style="width:40%;">
+                                <img src="@match.HomeLogoUrl"
+                                     style="width:34px;height:34px;object-fit:contain;" />
+                                <div class="small fw-semibold">@match.HomeTeam</div>
+                            </div>
+
+                            <div class="fw-bold text-muted">VS</div>
+
+                            <div class="text-center" style="width:40%;">
+                                <img src="@match.AwayLogoUrl"
+                                     style="width:34px;height:34px;object-fit:contain;" />
+                                <div class="small fw-semibold">@match.AwayTeam</div>
+                            </div>
+
+                        </div>
+
+                        <!-- TIP FORM (ONLY ONE FORM!) -->
+                        <form id="tipForm-@match.Id"
+                              method="post"
+                              action="@Url.Action(nameof(TippMatchController.Tip), ControllerName.For<TippMatchController>)"
+                              onsubmit="submitTip(event, '@Model.GroupName')">
+
+                            <input type="hidden" name="MatchId" value="@match.Id" />
+
+                            <div class="d-flex justify-content-center align-items-center gap-2 mb-3">
+
+                                <input type="number"
+                                       class="form-control text-center"
+                                       style="width:70px;"
+                                       name="PredictedHome"
+                                       value="@(tip?.HomeGoals ?? 0)"
+                                       min="0" />
+
+                                <span class="fw-bold">:</span>
+
+                                <input type="number"
+                                       class="form-control text-center"
+                                       style="width:70px;"
+                                       name="PredictedAway"
+                                       value="@(tip?.AwayGoals ?? 0)"
+                                       min="0" />
+
+                            </div>
+
+                            <button class="btn btn-success w-100">
+                                Save Tip
+                            </button>
+
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        }
+
+    </div>
+
+    <hr class="my-5" />
+
+    <!-- ===================== PAST ===================== -->
+    <h4 class="mb-3">Past Matches</h4>
+
+    @if (!Model.PastMatches.Any())
+    {
+        <div class="alert alert-secondary">No finished matches yet</div>
+    }
+
+    <div class="list-group shadow-sm">
+
+        @foreach (var match in Model.PastMatches.OrderByDescending(m => m.KickoffUtc))
+        {
+            <div class="list-group-item d-flex justify-content-between align-items-center">
+
+                <div>
+                    <div class="fw-semibold">
+                        @match.HomeTeam <span class="text-muted">vs</span> @match.AwayTeam
+                    </div>
+
+                    <small class="text-muted">
+                        @match.KickoffUtc.ToLocalTime().ToString("dd.MM.yyyy HH:mm")
+                    </small>
+                </div>
+
+                <div class="fs-5 fw-bold">
+                    @match.HomeGoals - @match.AwayGoals
+                </div>
+
+            </div>
+        }
+
+    </div>
+</div>
+
+<script>
+    async function submitTip(event, groupName) {
+        event.preventDefault();
+
+        const form = event.target;
+        const formData = new FormData(form);
+
+        const res = await fetch(form.action, {
+            method: "POST",
+            body: formData
+        });
+
+        if (res.ok) {
+            await refreshStandings(groupName);
+        }
+    }
+
+    async function refreshStandings(groupName) {
+        const res = await fetch(`/TippMatch/GroupStandings?groupName=${groupName}`);
+        const html = await res.text();
+        document.getElementById("standingsContainer").innerHTML = html;
+    }
+</script>

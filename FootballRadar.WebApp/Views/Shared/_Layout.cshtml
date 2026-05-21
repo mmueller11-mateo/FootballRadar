@@ -24,6 +24,9 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" href="@Url.Action(nameof(LeagueController.LeaguesList), ControllerName.For<LeagueController>())">Leagues</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" href="@Url.Action(nameof(TippSpielHomeController.Index), ControllerName.For<TippSpielHomeController>())">TippSpiel WM 2026</a>
+                        </li>
                         @if (Context.User.Identity?.IsAuthenticated == true)
                         {
                             <li class="nav-item">

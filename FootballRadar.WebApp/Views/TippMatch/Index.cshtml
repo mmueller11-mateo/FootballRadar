@@ -1,0 +1,120 @@
+﻿@using FootballRadar.WebApp.Controllers
+@using FootballRadar.Web.Utilities
+@model FootballRadar.WebApp.Models.WmIndexViewModel
+
+@{
+    ViewData["Title"] = "Tippspiel – Gruppen";
+}
+
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold">WM 2026 – Gruppenübersicht</h2>
+
+        @if (Model.TipperName != null)
+        {
+            <span class="text-muted">
+                @Model.TipperName
+            </span>
+        }
+    </div>
+
+    @if (!Model.Groups.Any())
+    {
+        <div class="alert alert-secondary">
+            Keine Gruppenspiele vorhanden.
+        </div>
+    }
+    else
+    {
+        <div class="row row-cols-1 row-cols-md-2 g-4">
+
+            @foreach (var group in Model.Groups)
+            {
+                <div class="col">
+
+                    <div class="card shadow-sm border-0 h-100">
+
+                        <!-- HEADER -->
+                        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                            <strong>Gruppe @group.GroupName</strong>
+
+                            <a href="@Url.Action(nameof(TippMatchController.Group), ControllerName.For<TippMatchController>(), new { groupName = group.GroupName })"
+                               class="btn btn-sm btn-outline-primary">
+                                Öffnen
+                            </a>
+                        </div>
+
+                        <!-- TABLE -->
+                        <div class="card-body p-0">
+
+                            <table class="table table-sm table-hover mb-0 align-middle">
+
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Team</th>
+                                        <th class="text-center">Sp</th>
+                                        <th class="text-center">S</th>
+                                        <th class="text-center">U</th>
+                                        <th class="text-center">N</th>
+                                        <th class="text-center">Tore</th>
+                                        <th class="text-center">Diff</th>
+                                        <th class="text-center fw-bold">Pkt</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+
+                                    @foreach (var row in group.Standings)
+                                    {
+                                        <tr>
+
+                                            <!-- TEAM + LOGO -->
+                                            <td>
+                                                <div class="d-flex align-items-center gap-2">
+
+                                                    <img src="@(string.IsNullOrEmpty(row.Logo) ? "/images/placeholder.png" : row.Logo)"
+                                                         style="width:24px;height:24px;object-fit:contain;" />
+
+                                                    <span class="fw-semibold">
+                                                        @row.Team
+                                                    </span>
+
+                                                </div>
+                                            </td>
+
+                                            <td class="text-center">@row.Played</td>
+                                            <td class="text-center">@row.Won</td>
+                                            <td class="text-center">@row.Drawn</td>
+                                            <td class="text-center">@row.Lost</td>
+
+                                            <td class="text-center">
+                                                @row.GoalsFor:@row.GoalsAgainst
+                                            </td>
+
+                                            <td class="text-center">
+                                                @row.GoalDifference
+                                            </td>
+
+                                            <td class="text-center fw-bold">
+                                                @row.Points
+                                            </td>
+
+                                        </tr>
+                                    }
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+    }
+
+</div>

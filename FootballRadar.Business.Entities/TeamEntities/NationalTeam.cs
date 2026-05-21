@@ -8,5 +8,6 @@ namespace FootballRadar.Business.Entities.TeamEntities
         public required string Name { get; set; }
         public Guid CountryId { get; set; }
         public NationalTeamLevel Level { get; set; }
+        public required string Logo { get; set; }
     }
 }

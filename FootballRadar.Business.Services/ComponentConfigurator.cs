@@ -1,6 +1,6 @@
 ﻿using FootballRadar.Abstractions;
 using FootballRadar.Business.Services.Background;
-using FootballRadar.Business.Services.BackgroundServices;
+using FootballRadar.Business.Services.MatchPredictionMarketRules;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -16,6 +16,7 @@ namespace FootballRadar.Business.Services
 
             services.AddTransient<IMatchPredictionRewardCalculator, MatchPredictionRewardCalculator>();
             services.AddTransient<ITransferPredictionRewardCalculator, TransferPredictionRewardCalculator>();
+            services.AddTransient<IBetRuleFactory, BetRuleFactory>();
             services.AddTransient<IPasswordHasher, PasswordHasher>();
             services.AddTransient<ICurrencyConverter, CurrencyConverter>();
             services.AddHostedService<WalletTransactionExecuter>();

@@ -13,6 +13,12 @@ namespace FootballRadar.Data.Repositories
             this.dbContextFactory = dbContextFactory;
         }
 
+        public async Task<IEnumerable<Match>> GetAllAsync(CancellationToken cancellationToken = default)
+        {
+            using var db = await dbContextFactory.CreateDbContextAsync(cancellationToken);
+            return await db.Fixtures.ToArrayAsync(cancellationToken);
+        }
+
         public async Task<Match?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
             using var db = await dbContextFactory.CreateDbContextAsync(cancellationToken);

@@ -28,7 +28,8 @@ namespace FootballRadar.Admin.Business.Services.CommandHandlers.Create
                 Id = Guid.NewGuid(),
                 Name = trimmedName,
                 CountryId = request.CountryId,
-                Level = request.Level
+                Level = request.Level,
+                Logo = request.Logo
             };
 
             await nationalTeamRepository.AddAsync(nationalTeam);

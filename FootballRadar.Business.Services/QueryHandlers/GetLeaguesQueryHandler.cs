@@ -5,7 +5,7 @@ using MediatR;
 
 namespace FootballRadar.Business.Services.QueryHandlers
 {
-    sealed class GetLeaguesQueryHandler : IRequestHandler<GetLeaguesQuery, IEnumerable<PublicLeague>>
+    internal sealed class GetLeaguesQueryHandler : IRequestHandler<GetLeaguesQuery, IEnumerable<PublicLeague>>
     {
         private readonly ILeagueRepository _leagueRepository;
 

@@ -1,10 +1,10 @@
 ﻿using FootballRadar.Business.Entities.LeagueEntities;
-using System.Threading;
 
 namespace FootballRadar.Abstractions
 {
     public interface IMatchRepository
     {
+        Task<IEnumerable<Match>> GetAllAsync(CancellationToken cancellationToken = default);
         Task<Match?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
         Task AddAsync(Match match, CancellationToken cancellationToken = default);
         Task<IEnumerable<Match>> GetUpcomingMatches(CancellationToken cancellationToken = default);

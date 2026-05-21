@@ -1,6 +1,6 @@
 ﻿using My.Framework.EventHandling;
 
-namespace FootballRadar.Business.Entities.Events
+namespace FootballRadar.Abstractions.Events
 {
     [EventHandler(DispatchType = EventDispatchType.PushNotification)]
     public sealed class TransferConfirmed : IEvent

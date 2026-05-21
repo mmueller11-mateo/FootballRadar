@@ -13,6 +13,8 @@ namespace FootballRadar.Admin.WebApp.Models
         public NationalTeamLevel Level { get; set; }
         [ValidateNever]
         public List<Country> Countries { get; set; } = new();
+
+        public string? LogoUrl { get; set; }
         [ValidateNever]
         public List<NationalTeamLevel> Levels { get; set; } = Enum.GetValues<NationalTeamLevel>().ToList();
     }

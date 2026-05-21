@@ -1,0 +1,41 @@
+﻿@using FootballRadar.WebApp.Models.FootballRadar.WebApp.Models
+@model List<WmTeamStandingRow>
+
+<div class="table-responsive">
+    <table class="table table-sm table-hover mb-0 align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>Team</th>
+                <th class="text-center">Sp</th>
+                <th class="text-center">S</th>
+                <th class="text-center">U</th>
+                <th class="text-center">N</th>
+                <th class="text-center">Tore</th>
+                <th class="text-center">Diff</th>
+                <th class="text-center fw-bold">Pkt</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var team in Model)
+            {
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <img src="@team.Logo" style="width:22px;height:22px;object-fit:contain;" />
+                            <span>@team.Team</span>
+                        </div>
+                    </td>
+
+                    <td class="text-center">@team.Played</td>
+                    <td class="text-center">@team.Won</td>
+                    <td class="text-center">@team.Drawn</td>
+                    <td class="text-center">@team.Lost</td>
+                    <td class="text-center">@team.GoalsFor:@team.GoalsAgainst</td>
+                    <td class="text-center">@team.GoalDifference</td>
+                    <td class="text-center fw-bold">@team.Points</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

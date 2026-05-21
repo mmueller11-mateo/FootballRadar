@@ -45,16 +45,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FootballRadar.EventHandling
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FootballRadar.Business.ViewModels", "FootballRadar.Business.ViewModels\FootballRadar.Business.ViewModels.csproj", "{71BAF2F3-709F-4AAD-98B1-26AD06C70E80}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FootballRadar.TippSpiel.WebApp", "FootballRadar.TippSpiel.WebApp\FootballRadar.TippSpiel.WebApp.csproj", "{780DB745-BA5E-432B-87B6-9BDDF635C884}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TippSpiel", "TippSpiel", "{252DFABA-536A-461D-9ACC-9BA0674BB5B2}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FootballRadar.TippSpiel.Data", "FootballRadar.Tippspiel.Data\FootballRadar.TippSpiel.Data.csproj", "{BC8F8464-AD34-4A61-B909-ECFB26047099}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FootballRadar.TippSpiel.Business", "FootballRadar.Tippspiel.Business\FootballRadar.TippSpiel.Business.csproj", "{87AAC3F5-3BD9-4DB0-A678-268D8F9AA962}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FootballRadar.TippSpiel.Abstractions", "FootballRadar.TippSpiel.Abstractions\FootballRadar.TippSpiel.Abstractions.csproj", "{2273D0EA-84BC-4E28-8609-85730EB22D0E}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -129,22 +119,6 @@ Global
 		{71BAF2F3-709F-4AAD-98B1-26AD06C70E80}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{71BAF2F3-709F-4AAD-98B1-26AD06C70E80}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{71BAF2F3-709F-4AAD-98B1-26AD06C70E80}.Release|Any CPU.Build.0 = Release|Any CPU
-		{780DB745-BA5E-432B-87B6-9BDDF635C884}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{780DB745-BA5E-432B-87B6-9BDDF635C884}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{780DB745-BA5E-432B-87B6-9BDDF635C884}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{780DB745-BA5E-432B-87B6-9BDDF635C884}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BC8F8464-AD34-4A61-B909-ECFB26047099}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BC8F8464-AD34-4A61-B909-ECFB26047099}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BC8F8464-AD34-4A61-B909-ECFB26047099}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BC8F8464-AD34-4A61-B909-ECFB26047099}.Release|Any CPU.Build.0 = Release|Any CPU
-		{87AAC3F5-3BD9-4DB0-A678-268D8F9AA962}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{87AAC3F5-3BD9-4DB0-A678-268D8F9AA962}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{87AAC3F5-3BD9-4DB0-A678-268D8F9AA962}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{87AAC3F5-3BD9-4DB0-A678-268D8F9AA962}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2273D0EA-84BC-4E28-8609-85730EB22D0E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2273D0EA-84BC-4E28-8609-85730EB22D0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2273D0EA-84BC-4E28-8609-85730EB22D0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2273D0EA-84BC-4E28-8609-85730EB22D0E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -166,10 +140,6 @@ Global
 		{36190385-CCD2-49F9-90FC-25AB4D47F7D1} = {73F864D3-E764-471F-AD98-3A4A5062DD43}
 		{FE862BCC-F6EA-4E22-96F4-0B5F8D0CF140} = {4CC03FBA-ADFA-4975-AEEB-40FE05423084}
 		{71BAF2F3-709F-4AAD-98B1-26AD06C70E80} = {4CC03FBA-ADFA-4975-AEEB-40FE05423084}
-		{780DB745-BA5E-432B-87B6-9BDDF635C884} = {252DFABA-536A-461D-9ACC-9BA0674BB5B2}
-		{BC8F8464-AD34-4A61-B909-ECFB26047099} = {252DFABA-536A-461D-9ACC-9BA0674BB5B2}
-		{87AAC3F5-3BD9-4DB0-A678-268D8F9AA962} = {252DFABA-536A-461D-9ACC-9BA0674BB5B2}
-		{2273D0EA-84BC-4E28-8609-85730EB22D0E} = {252DFABA-536A-461D-9ACC-9BA0674BB5B2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FD9C6AED-E047-4039-800F-486A7669CE72}

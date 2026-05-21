@@ -5,7 +5,7 @@ using MediatR;
 
 namespace FootballRadar.Business.Services.QueryHandlers
 {
-    sealed class GetMatchesBySeasonQueryHandler : IRequestHandler<GetMatchesBySeasonQuery, IEnumerable<Match>>
+    internal sealed class GetMatchesBySeasonQueryHandler : IRequestHandler<GetMatchesBySeasonQuery, IEnumerable<Match>>
     {
         private readonly IMatchRepository _matchRepository;
 

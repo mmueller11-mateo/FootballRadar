@@ -15,9 +15,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FootballRadar.Tippspiel.Business\FootballRadar.TippSpiel.Business.csproj" />
+    <ProjectReference Include="..\FootballRadar.Abstractions\FootballRadar.Abstractions.csproj" />
     <ProjectReference Include="..\FootballRadar.Tippspiel.Data\FootballRadar.TippSpiel.Data.csproj" />
     <ProjectReference Include="..\FootballRadar.Web.Utilities\FootballRadar.Web.Utilities.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Controllers\" />
   </ItemGroup>
 
 </Project>

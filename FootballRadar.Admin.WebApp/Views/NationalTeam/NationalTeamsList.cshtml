@@ -18,6 +18,7 @@
         <th>Name</th>
         <th>Country</th>
         <th>Level</th>
+        <th>Logo</th>
         <th style="width: 120px;"></th>
     </tr>
 </thead>
@@ -29,6 +30,7 @@
                 <strong>@nationalTeam.Name</strong>
                 <td>@nationalTeam.Country</td>
                 <td>@nationalTeam.Level</td>
+                <td>@nationalTeam.Logo</td>
             <td class="text-end">
                     <form method="post" action="@Url.Action(nameof(NationalTeamController.Delete), ControllerName.For<NationalTeamController>())" class="d-inline">
                     @Html.AntiForgeryToken()
