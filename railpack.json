@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.railpack.com",
-  "provider": "dotnet",
+  "provider": "Dotnet",
   "deploy": {
     "startCommand": "dotnet FootballRadar.WebApp.dll"
   }
