@@ -1,5 +1,3 @@
-using Microsoft.AspNetCore.HttpOverrides;
-
 namespace FootballRadar.WebApp
 {
     public class Program
@@ -14,9 +12,6 @@ namespace FootballRadar.WebApp
             My.Framework.EventHandling.ComponentConfigurator.ConfigureServices(builder.Services, builder.Configuration, builder.Environment);
             FootballRadar.EventHandling.ComponentConfigurator.ConfigureServices(builder.Services, builder.Configuration, builder.Environment);
 
-            var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
-            builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
-
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -30,11 +25,8 @@ namespace FootballRadar.WebApp
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
-            app.UseForwardedHeaders(new ForwardedHeadersOptions
-            {
-                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-            });
 
+            app.UseHttpsRedirection();
             app.UseRouting();
 
             app.UseAuthentication();

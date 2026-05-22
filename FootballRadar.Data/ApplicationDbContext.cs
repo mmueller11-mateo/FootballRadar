@@ -74,7 +74,9 @@ namespace FootballRadar.Data
 
             builder.Entity<WinnerBet>(entity =>
             {
-                entity.Property(e => e.Prediction).HasConversion<string>();
+                entity.Property(e => e.Prediction)
+                  .HasConversion<string>()
+                  .HasColumnName("Prediction");
             });
 
             builder.Entity<TransferBet>(entity =>

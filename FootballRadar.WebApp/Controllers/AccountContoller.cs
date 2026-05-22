@@ -13,11 +13,13 @@ namespace FootballRadar.WebApp.Controllers
     {
         private readonly IUserRepository userRepository;
         private readonly IPasswordHasher passwordHasher;
+        private readonly IWalletRepository walletRepository;
 
-        public AccountController(IUserRepository userRepository, IPasswordHasher passwordHasher)
+        public AccountController(IUserRepository userRepository, IPasswordHasher passwordHasher, IWalletRepository walletRepository)
         {
             this.userRepository = userRepository;
             this.passwordHasher = passwordHasher;
+            this.walletRepository = walletRepository;
         }
 
         [HttpGet]
@@ -64,12 +66,14 @@ namespace FootballRadar.WebApp.Controllers
                 ModelState.AddModelError(string.Empty, "Passwords do not match");
                 return View(model);
             }
+
             var existing = await userRepository.GetByEmailAsync(model.Email);
             if (existing is not null)
             {
                 ModelState.AddModelError(string.Empty, "Email already in use");
                 return View(model);
             }
+
             var user = new User
             {
                 Id = Guid.NewGuid(),
@@ -77,7 +81,10 @@ namespace FootballRadar.WebApp.Controllers
                 Email = model.Email,
                 PasswordHash = passwordHasher.Hash(model.Password)
             };
+
             await userRepository.AddAsync(user);
+            var wallet = new Wallet(user.Id);
+            await walletRepository.AddAsync(wallet);
             await SignInAsync(user);
 
             if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
