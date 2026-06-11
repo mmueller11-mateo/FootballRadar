@@ -2,6 +2,7 @@
 using FootballRadar.Business.Entities.Betting;
 using FootballRadar.Business.Services.Queries;
 using FootballRadar.Business.Services.QueryHandlers;
+using FootballRadar.Data.Repositories;
 using Moq;
 
 namespace FootballRadar.UnitTests
@@ -75,6 +76,7 @@ namespace FootballRadar.UnitTests
             var tipRepo = new Mock<IWmTipRepository>();
             var matchRepo = new Mock<IMatchRepository>();
             var userRepo = new Mock<IUserRepository>();
+            var bonustipRepo = new Mock<IBonusTipRepository>();
 
             tipRepo
                 .Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
@@ -91,7 +93,9 @@ namespace FootballRadar.UnitTests
             return new GetRanglisteQueryHandler(
                 tipRepo.Object,
                 userRepo.Object,
-                matchRepo.Object);
+                matchRepo.Object,
+                bonustipRepo.Object
+                );
         }
 
         [TestMethod]
@@ -388,7 +392,7 @@ namespace FootballRadar.UnitTests
             var tipRepo = new Mock<IWmTipRepository>();
             var matchRepo = new Mock<IMatchRepository>();
             var userRepo = new Mock<IUserRepository>();
-
+            var bonustipRepo = new Mock<IBonusTipRepository>();
             tipRepo
                 .Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
                 .ReturnsAsync(tips);
@@ -404,7 +408,8 @@ namespace FootballRadar.UnitTests
             var handler = new GetRanglisteQueryHandler(
                 tipRepo.Object,
                 userRepo.Object,
-                matchRepo.Object);
+                matchRepo.Object,
+                bonustipRepo.Object);
 
             var result = (await handler.Handle(
                 new GetRanglisteQuery(),

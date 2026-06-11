@@ -19,7 +19,6 @@ namespace FootballRadar.WebApp.Controllers
     {
         private Guid CurrentUserId => Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
         private string CurrentUserName => User.FindFirstValue(ClaimTypes.Name)!;
-
         public async Task<IActionResult> Index(CancellationToken cancellationToken)
         {
             var mediator = HttpContext.RequestServices.GetRequiredService<IMediator>();
