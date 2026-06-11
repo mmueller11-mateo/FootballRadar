@@ -17,8 +17,10 @@ namespace FootballRadar.Business.Entities.LeagueEntities
         public Guid? AwayNationalTeamId { get; set; }
         public int? HomeGoals { get; set; }
         public int? AwayGoals { get; set; }
-
         public WmPhase? WmPhase { get; set; }
         public string? WmGroup { get; set; }
+        public string? HomeQualificationCode { get; set; }
+        public string? AwayQualificationCode { get; set; }
+        public Guid? KoWinnerTeamId { get; set; }
     }
 }

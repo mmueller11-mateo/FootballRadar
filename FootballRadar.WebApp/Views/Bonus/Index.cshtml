@@ -1,0 +1,135 @@
+﻿@model FootballRadar.WebApp.Models.BonusIndexViewModel
+@{
+    ViewData["Title"] = "Bonusfragen";
+    var now = DateTimeOffset.UtcNow;
+}
+
+<h2>Bonusfragen</h2>
+<p class="text-muted">Für jede richtige Antwort erhältst du <strong>4 Punkte</strong>. Tipps sind bis zur Deadline möglich.</p>
+
+<div class="bonus-list">
+    @foreach (var item in Model.QuestionsWithTips)
+    {
+        var q = item.Question;
+        var tip = item.ExistingTip;
+        var isOpen = now < q.Deadline;
+        var selectedTeamId = tip?.AnswerTeamId.ToString() ?? "";
+        var resolvedTeamName = q.IsResolved
+            ? Model.Teams.FirstOrDefault(t => t.Id == q.CorrectAnswerTeamId)?.Name ?? "–"
+            : null;
+
+        <div class="card mb-3 @(q.IsResolved ? "border-success" : "")">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <h6 class="card-title mb-1">@q.QuestionText</h6>
+                    @if (q.IsResolved)
+                    {
+                        <span class="badge bg-success">Aufgelöst</span>
+                    }
+                    else if (!isOpen)
+                    {
+                        <span class="badge bg-secondary">Tippzeit abgelaufen</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-primary">Offen</span>
+                    }
+                </div>
+
+                <small class="text-muted">Deadline: @q.Deadline.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</small>
+
+                @if (q.IsResolved)
+                {
+                    <div class="mt-2">
+                        <span class="text-success fw-bold">✓ Richtige Antwort: @resolvedTeamName</span>
+                        @if (tip != null)
+                        {
+                            var tipTeam = Model.Teams.FirstOrDefault(t => t.Id == tip.AnswerTeamId)?.Name ?? "–";
+                            <span class="ms-3">Dein Tipp: @tipTeam</span>
+                            if (tip.Points > 0)
+                            {
+                                <span class="ms-2 badge bg-success">+@tip.Points Punkte</span>
+                            }
+                            else
+                            {
+                                <span class="ms-2 badge bg-danger">0 Punkte</span>
+                            }
+                        }
+                        else
+                        {
+                            <span class="ms-3 text-muted">Kein Tipp abgegeben</span>
+                        }
+                    </div>
+                }
+                else if (isOpen)
+                {
+                    <div class="mt-2 d-flex gap-2 align-items-center">
+                        <select class="form-select form-select-sm w-auto bonus-select"
+                                data-question-id="@q.Id">
+                            <option value="">– Mannschaft wählen –</option>
+                            @foreach (var team in Model.Teams)
+                            {
+                                if (team.Id.ToString() == selectedTeamId)
+                                {
+                                    <option value="@team.Id" selected>@team.Name</option>
+                                }
+                                else
+                                {
+                                    <option value="@team.Id">@team.Name</option>
+                                }
+                            }
+                        </select>
+                        <button class="btn btn-sm btn-primary bonus-save-btn"
+                                data-question-id="@q.Id">
+                            Speichern
+                        </button>
+                        <span class="bonus-feedback-@q.Id text-success d-none">✓ Gespeichert</span>
+                    </div>
+                }
+                else
+                {
+                    @if (tip != null)
+                    {
+                        var tipTeam = Model.Teams.FirstOrDefault(t => t.Id == tip.AnswerTeamId)?.Name ?? "–";
+                        <div class="mt-2 text-muted">Dein Tipp: @tipTeam (wird noch aufgelöst)</div>
+                    }
+                    else
+                    {
+                        <div class="mt-2 text-muted">Kein Tipp abgegeben</div>
+                    }
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        document.querySelectorAll('.bonus-save-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const questionId = btn.dataset.questionId;
+                const select = document.querySelector(`.bonus-select[data-question-id="${questionId}"]`);
+                const teamId = select.value;
+
+                if (!teamId) {
+                    alert('Bitte eine Mannschaft auswählen.');
+                    return;
+                }
+
+                const response = await fetch('/Bonus/SaveTip', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ bonusQuestionId: questionId, answerTeamId: teamId })
+                });
+
+                if (response.ok) {
+                    const feedback = document.querySelector(`.bonus-feedback-${questionId}`);
+                    feedback.classList.remove('d-none');
+                    setTimeout(() => feedback.classList.add('d-none'), 2000);
+                } else {
+                    alert('Fehler beim Speichern.');
+                }
+            });
+        });
+    </script>
+}

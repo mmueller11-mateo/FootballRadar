@@ -9,5 +9,6 @@ namespace FootballRadar.Abstractions
         Task<PredictionMarket?> FindPredictionMarketForMatchAsync(Guid matchId, CancellationToken cancellationToken = default);
         Task<IEnumerable<WinnerBet>> GetMatchBetsByMarketIdAsync(Guid marketId, CancellationToken cancellationToken = default);
         Task<IEnumerable<WinnerBet>> GetMatchBetsByUserIdAsync(Guid userId, CancellationToken cancellationToken = default);
+        Task<IReadOnlyList<Bet>> GetActiveByUserIdAsync(Guid userId, CancellationToken cancellationToken);
     }
 }

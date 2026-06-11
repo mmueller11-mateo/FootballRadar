@@ -16,7 +16,7 @@ namespace FootballRadar.Admin.Business.Services.QueryHandlers
 
         public async Task<IEnumerable<Team>> Handle(GetTeamsQuery request, CancellationToken cancellationToken)
         {
-            return await teamRepository.GetAllAsync();
+            return await teamRepository.GetAllAsync(cancellationToken);
         }
     }
 }

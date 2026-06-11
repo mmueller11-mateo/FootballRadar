@@ -16,7 +16,7 @@ namespace FootballRadar.Admin.Business.Services.QueryHandlers
 
         public async Task<IEnumerable<Country>> Handle(GetCountriesQuery request, CancellationToken cancellationToken)
         {
-            return await countryRepository.GetAllAsync();
+            return await countryRepository.GetAllAsync(cancellationToken);
         }
     }
 }

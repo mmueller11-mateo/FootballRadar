@@ -19,6 +19,8 @@ namespace FootballRadar.Admin.Data.ORM
         public DbSet<PublicLeague> Leagues { get; set; }
         public DbSet<Team> Teams { get; set; }
         public DbSet<NationalTeam> NationalTeams { get; set; }
+        public DbSet<Match> Fixtures { get; set; }
+        public DbSet<WmTip> WmTips { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -54,6 +56,18 @@ namespace FootballRadar.Admin.Data.ORM
                 entity.Property(nt => nt.Name).IsRequired().HasMaxLength(100);
                 entity.Property(nt => nt.Level).IsRequired();
                 entity.Property(nt => nt.CountryId).IsRequired();
+            });
+            modelBuilder.Entity<Match>(entity =>
+            {
+                entity.ToTable("Fixtures", t => t.ExcludeFromMigrations());
+                entity.HasKey(m => m.Id);
+                entity.Property(m => m.WmPhase).HasConversion<string>();
+            });
+
+            modelBuilder.Entity<WmTip>(entity =>
+            {
+                entity.ToTable("WmTips", t => t.ExcludeFromMigrations());
+                entity.HasKey(t => t.Id);
             });
         }
     }

@@ -42,6 +42,8 @@ namespace FootballRadar.Data
         public DbSet<UserProfile> UserProfiles { get; set; }
         public DbSet<WmTip> WmTips { get; set; }
         public DbSet<NationalTeam> NationalTeams { get; set; }
+        public DbSet<BonusQuestion> BonusQuestions { get; set; }
+        public DbSet<BonusTip> BonusTips { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -81,7 +83,9 @@ namespace FootballRadar.Data
 
             builder.Entity<TransferBet>(entity =>
             {
-                entity.Property(e => e.Prediction).HasConversion<string>();
+                entity.Property(e => e.Prediction)
+                       .HasConversion<string>()
+                       .HasColumnName("Prediction");
             });
 
             builder.Entity<Wallet>(entity =>
@@ -97,7 +101,6 @@ namespace FootballRadar.Data
                 entity.Property(e => e.Amount).HasConversion(x => JsonSerializer.Serialize(x), x => JsonSerializer.Deserialize<Money>(x));
                 entity.Property(e => e.Type).HasConversion<string>();
                 entity.Property(e => e.Status).HasConversion<string>();
-
             });
 
             builder.Entity<PredictionMarket>(entity =>

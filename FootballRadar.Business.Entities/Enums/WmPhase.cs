@@ -3,8 +3,8 @@
     public enum WmPhase
     {
         Group,
-        R32,
-        R16,
+        RoundOf32,
+        RoundOf16,
         QuarterFinal,
         SemiFinal,
         ThirdPlace,

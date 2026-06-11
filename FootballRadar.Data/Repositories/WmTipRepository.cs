@@ -1,5 +1,4 @@
 ﻿using FootballRadar.Abstractions;
-using FootballRadar.Business.Entities.TippSpiel;
 using Microsoft.EntityFrameworkCore;
 
 namespace FootballRadar.Data.Repositories
@@ -16,9 +15,7 @@ namespace FootballRadar.Data.Repositories
         public async Task<IEnumerable<WmTip>> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken)
         {
             await using var context = await dbFactory.CreateDbContextAsync(cancellationToken);
-            return await context.WmTips
-                .Where(t => t.UserId == userId)
-                .ToListAsync(cancellationToken);
+            return await context.WmTips.Where(t => t.UserId == userId).ToListAsync(cancellationToken);
         }
 
         public async Task UpsertAsync(WmTip tip, CancellationToken cancellationToken)
@@ -57,6 +54,26 @@ namespace FootballRadar.Data.Repositories
         {
             await using var context = await dbFactory.CreateDbContextAsync(cancellationToken);
             return await context.WmTips.ToListAsync(cancellationToken);
+        }
+
+        public async Task<WmTip?> GetByUserAndMatchAsync(Guid userId, Guid matchId, CancellationToken ct)
+        {
+            await using var context = await dbFactory.CreateDbContextAsync(ct);
+            return await context.WmTips.FirstOrDefaultAsync(t => t.UserId == userId && t.WmMatchId == matchId, ct);
+        }
+
+        public async Task UpdateAsync(WmTip tip, CancellationToken ct)
+        {
+            await using var context = await dbFactory.CreateDbContextAsync(ct);
+            context.WmTips.Update(tip);
+            await context.SaveChangesAsync(ct);
+        }
+
+        public async Task AddAsync(WmTip tip, CancellationToken ct)
+        {
+            await using var context = await dbFactory.CreateDbContextAsync(ct);
+            context.WmTips.Add(tip);
+            await context.SaveChangesAsync(ct);
         }
     }
 }

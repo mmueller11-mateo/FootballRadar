@@ -5,7 +5,7 @@ namespace FootballRadar.WebApp
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
+            builder.Services.AddHttpContextAccessor();
             FootballRadar.WebApp.ComponentConfigurator.ConfigureServices(builder.Services, builder.Configuration, builder.Environment);
             FootballRadar.Business.Services.ComponentConfigurator.ConfigureServices(builder.Services, builder.Configuration, builder.Environment);
             FootballRadar.Data.ComponentConfigurator.ConfigureServices(builder.Services, builder.Configuration, builder.Environment);

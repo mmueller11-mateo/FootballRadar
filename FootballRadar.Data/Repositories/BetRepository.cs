@@ -54,5 +54,13 @@ namespace FootballRadar.Data.Repositories
                 .OrderByDescending(b => b.PlacedAt)
                 .ToListAsync(cancellationToken);
         }
+
+        public async Task<IReadOnlyList<Bet>> GetActiveByUserIdAsync(Guid userId, CancellationToken cancellationToken)
+        {
+            using var db = await dbContextFactory.CreateDbContextAsync(cancellationToken);
+            return await db.Bets
+                .Where(b => b.UserId == userId)
+                .ToListAsync(cancellationToken);
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿@using FootballRadar.WebApp.Controllers
+﻿@using System.Security.Claims
+@using FootballRadar.WebApp.Controllers
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,23 +10,27 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/FootballRadar.WebApp.styles.css" asp-append-version="true" />
+    @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" href="@Url.Action(nameof(HomeController.Index), ControllerName.For<HomeController>())">FootballRadar</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
+        <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom shadow-sm mb-3">
+            <div class="container-fluid px-4">
+
+                <a class="navbar-brand fw-bold" href="@Url.Action(nameof(HomeController.Index), ControllerName.For<HomeController>())">
+                    FootballRadar
+                </a>
+
+                <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
                         aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
+
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between align-items-center">
+
+                    <ul class="navbar-nav flex-grow-1 align-items-center gap-2">
                         <li class="nav-item">
                             <a class="nav-link text-dark" href="@Url.Action(nameof(LeagueController.LeaguesList), ControllerName.For<LeagueController>())">Leagues</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" href="@Url.Action(nameof(TippSpielHomeController.Index), ControllerName.For<TippSpielHomeController>())">TippSpiel WM 2026</a>
                         </li>
                         @if (Context.User.Identity?.IsAuthenticated == true)
                         {
@@ -36,15 +41,24 @@
                                 <a class="nav-link text-dark" href="@Url.Action(nameof(BetController.MyBets), ControllerName.For<BetController>())">My Bets</a>
                             </li>
                         }
+                        <li class="nav-item ms-2">
+                            <a class="btn btn-primary btn-sm fw-semibold px-3"
+                               href="@Url.Action(nameof(TippSpielHomeController.Index), ControllerName.For<TippSpielHomeController>())">
+                                ⚽ WM Tippspiel 2026
+                            </a>
+                        </li>
                     </ul>
-                    <ul class="navbar-nav">
+
+                    <ul class="navbar-nav align-items-center gap-1">
                         @if (Context.User.Identity?.IsAuthenticated == true)
                         {
                             <li class="nav-item">
-                                <span class="nav-link text-dark">@Context.User.Identity.Name</span>
+                                <a class="nav-link fw-semibold text-dark" href="@Url.Action(nameof(ProfileController.Index), ControllerName.For<ProfileController>(), new { userId = Context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value })">
+                                    👤 @Context.User.Identity.Name
+                                </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" href="@Url.Action(nameof(AccountController.Logout), ControllerName.For<AccountController>())">Logout</a>
+                                <a class="nav-link text-danger" href="@Url.Action(nameof(AccountController.Logout), ControllerName.For<AccountController>())">Ausloggen</a>
                             </li>
                         }
                         else
@@ -53,24 +67,28 @@
                                 <a class="nav-link text-dark" href="@Url.Action(nameof(AccountController.Login), ControllerName.For<AccountController>())">Login</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" href="@Url.Action(nameof(AccountController.Register), ControllerName.For<AccountController>())">Register</a>
+                                <a class="btn btn-outline-primary btn-sm px-3" href="@Url.Action(nameof(AccountController.Register), ControllerName.For<AccountController>())">Registrieren</a>
                             </li>
                         }
                     </ul>
+
                 </div>
             </div>
         </nav>
     </header>
+
     <div class="container">
-        <main role="main" class="pb-3">
+        <main role="main" class="pb-5">
             @RenderBody()
         </main>
     </div>
-    <footer class="border-top footer text-muted">
-        <div class="container">
+
+    <footer class="border-top footer text-muted mt-4">
+        <div class="container py-3">
             &copy; 2026 - FootballRadar
         </div>
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

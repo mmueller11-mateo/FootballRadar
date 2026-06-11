@@ -17,7 +17,7 @@ namespace FootballRadar.Admin.Business.Services.CommandHandlers.Create
         public async Task<Team> Handle(CreateTeamCommand request, CancellationToken cancellationToken)
         {
             var trimmedName = request.Name.Trim();
-            var existing = await teamRepository.GetByNameAsync(trimmedName);
+            var existing = await teamRepository.GetByNameAsync(trimmedName, cancellationToken);
             if (existing != null)
             {
                 throw new InvalidOperationException($"A Team with the name '{request.Name}' already exists.");
@@ -33,7 +33,7 @@ namespace FootballRadar.Admin.Business.Services.CommandHandlers.Create
                 Code = request.Code
             };
 
-            await teamRepository.AddAsync(team);
+            await teamRepository.AddAsync(team, cancellationToken);
             return team;
         }
     }

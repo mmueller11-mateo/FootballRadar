@@ -35,6 +35,7 @@ namespace FootballRadar.EventHandling
 
             services.AddKeyedTransient<IEventHandler, PushNotificationService>(EventDispatchType.PushNotification);
             services.AddKeyedTransient<IEventHandler, EmailNotificationService>(EventDispatchType.Email);
+            services.AddTransient<ICurrentUserService, CurrentUserService>();
         }
     }
 }

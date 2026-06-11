@@ -14,39 +14,39 @@ namespace FootballRadar.Admin.Data.Repositories
             this.dbContextFactory = dbContextFactory;
         }
 
-        public async Task AddAsync(Team team)
+        public async Task AddAsync(Team team, CancellationToken cancellationToken)
         {
             using var dbContext = await dbContextFactory.CreateDbContextAsync();
             await dbContext.Teams.AddAsync(team);
             await dbContext.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<Team>> GetAllAsync()
+        public async Task<IEnumerable<Team>> GetAllAsync(CancellationToken cancellationToken)
         {
             using var dbContext = await dbContextFactory.CreateDbContextAsync();
             return await dbContext.Teams.ToListAsync();
         }
 
-        public async Task<Team?> GetByIdAsync(Guid id)
+        public async Task<Team?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
         {
             using var dbContext = await dbContextFactory.CreateDbContextAsync();
             return await dbContext.Teams.FirstOrDefaultAsync(x => x.Id == id);
         }
 
-        public async Task<Team?> GetByNameAsync(string name)
+        public async Task<Team?> GetByNameAsync(string name, CancellationToken cancellationToken)
         {
             using var dbContext = await dbContextFactory.CreateDbContextAsync();
             return await dbContext.Teams.FirstOrDefaultAsync(x => x.Name.ToLower() == name.ToLower());
         }
 
-        public void Update(Team team)
+        public void Update(Team team, CancellationToken cancellationToken)
         {
             using var dbContext = dbContextFactory.CreateDbContext();
             dbContext.Teams.Update(team);
             dbContext.SaveChanges();
         }
 
-        public void Delete(Team team)
+        public void Delete(Team team, CancellationToken cancellationToken)
         {
             using var dbContext = dbContextFactory.CreateDbContext();
             dbContext.Teams.Remove(team);

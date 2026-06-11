@@ -21,6 +21,8 @@ namespace FootballRadar.Business.ViewModels
         public string? AwayLogo { get; set; }
         public DateTimeOffset MatchDate { get; set; }
         public string? Round { get; set; }
+        public string? WmPhase { get; set; }
+        public bool IsKnockout { get; set; }
 
         // User Info
         public decimal AvailableCredits { get; set; }

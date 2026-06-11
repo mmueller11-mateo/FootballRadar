@@ -4,11 +4,11 @@ namespace FootballRadar.Admin.Abstractions
 {
     public interface ICountryRepository
     {
-        Task AddAsync(Country country);
-        Task<IEnumerable<Country>> GetAllAsync();
-        Task<Country?> GetByIdAsync(Guid id);
-        Task<Country?> GetByNameAsync(string name);
-        void Update(Country country);
-        void Delete(Country country);
+        Task AddAsync(Country country, CancellationToken cancellationToken);
+        Task<IEnumerable<Country>> GetAllAsync(CancellationToken cancellationToken);
+        Task<Country?> GetByIdAsync(Guid id, CancellationToken cancellationToken);
+        Task<Country?> GetByNameAsync(string name, CancellationToken cancellationToken);
+        void Update(Country country, CancellationToken cancellationToken);
+        void Delete(Country country, CancellationToken cancellationToken);
     }
 }

@@ -14,39 +14,39 @@ namespace FootballRadar.Admin.Data.Repositories
             this.dbContextFactory = dbContextFactory;
         }
 
-        public async Task AddAsync(NationalTeam nationalTeam)
+        public async Task AddAsync(NationalTeam nationalTeam, CancellationToken cancellationToken)
         {
             using var dbContext = await dbContextFactory.CreateDbContextAsync();
             await dbContext.NationalTeams.AddAsync(nationalTeam);
             await dbContext.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<NationalTeam>> GetAllAsync()
+        public async Task<IEnumerable<NationalTeam>> GetAllAsync(CancellationToken cancellationToken)
         {
             using var dbContext = await dbContextFactory.CreateDbContextAsync();
             return await dbContext.NationalTeams.ToListAsync();
         }
 
-        public async Task<NationalTeam?> GetByIdAsync(Guid id)
+        public async Task<NationalTeam?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
         {
             using var dbContext = await dbContextFactory.CreateDbContextAsync();
             return await dbContext.NationalTeams.FirstOrDefaultAsync(x => x.Id == id);
         }
 
-        public async Task<NationalTeam?> GetByNameAsync(string name)
+        public async Task<NationalTeam?> GetByNameAsync(string name, CancellationToken cancellationToken)
         {
             using var dbContext = await dbContextFactory.CreateDbContextAsync();
             return await dbContext.NationalTeams.FirstOrDefaultAsync(x => x.Name.ToLower() == name.ToLower());
         }
 
-        public void Update(NationalTeam nationalTeam)
+        public void Update(NationalTeam nationalTeam, CancellationToken cancellationToken)
         {
             using var dbContext = dbContextFactory.CreateDbContext();
             dbContext.NationalTeams.Update(nationalTeam);
             dbContext.SaveChanges();
         }
 
-        public void Delete(NationalTeam nationalTeam)
+        public void Delete(NationalTeam nationalTeam, CancellationToken cancellationToken)
         {
             using var dbContext = dbContextFactory.CreateDbContext();
             dbContext.NationalTeams.Remove(nationalTeam);

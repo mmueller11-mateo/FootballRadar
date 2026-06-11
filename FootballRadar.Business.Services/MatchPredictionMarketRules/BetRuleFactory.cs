@@ -24,14 +24,14 @@ namespace FootballRadar.Business.Services.MatchPredictionMarketRules
 
             var wallet = await _walletRepository.GetByUserIdAsync(context.UserId, cancellationToken)
                 ?? throw new InvalidOperationException("Wallet not found for user");
-
             var hasAlreadyBet = await _betRepository.HasUserBetOnMatchAsync(context.UserId, context.MatchId, cancellationToken);
 
             return [
      new CannotBetAfterMatchStart(context, match.Date),
     new CannotBetAfterMatchEnd(context, match.Status),
     new CanOnlyBetOncePerMatch(context, hasAlreadyBet),
-    new CannotBetIfInsufficientCredit(context, wallet.Credits)
+    new CannotBetIfInsufficientCredit(context, wallet.Credits),
+    new CannotBetDrawInKnockout(context, match.WmPhase)
  ];
         }
     }

@@ -4,7 +4,6 @@ namespace FootballRadar.Business.Entities.Betting
 {
     public class Wallet
     {
-        private Wallet() { }
 
         public Wallet(Guid userId)
         {

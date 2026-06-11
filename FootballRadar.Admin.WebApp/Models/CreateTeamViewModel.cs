@@ -15,7 +15,8 @@ namespace FootballRadar.Admin.WebApp.Models
         [Required]
         public string Logo { get; set; } = string.Empty;
 
-        public int? ApiTeamId { get; set; }
+        [Required]
+        public int ApiTeamId { get; set; }
 
         [Required]
         public string Code { get; set; } = string.Empty;

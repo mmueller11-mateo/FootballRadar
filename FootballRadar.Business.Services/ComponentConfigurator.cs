@@ -21,6 +21,7 @@ namespace FootballRadar.Business.Services
             services.AddTransient<ICurrencyConverter, CurrencyConverter>();
             services.AddHostedService<WalletTransactionExecuter>();
             services.AddHostedService<BetSettlementWorker>();
+            services.AddScoped<WmBracketResolverService>();
         }
     }
 }

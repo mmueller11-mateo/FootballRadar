@@ -17,7 +17,7 @@ namespace FootballRadar.Admin.Business.Services.CommandHandlers.Create
         public async Task<PublicLeague> Handle(CreateLeagueCommand request, CancellationToken cancellationToken)
         {
             var trimmedName = request.Name.Trim();
-            var existing = await leagueRepository.GetByNameAsync(trimmedName);
+            var existing = await leagueRepository.GetByNameAsync(trimmedName, cancellationToken);
 
             if (existing != null)
             {
@@ -34,7 +34,7 @@ namespace FootballRadar.Admin.Business.Services.CommandHandlers.Create
             };
 
 
-            await leagueRepository.AddAsync(league);
+            await leagueRepository.AddAsync(league, cancellationToken);
             return league;
         }
     }

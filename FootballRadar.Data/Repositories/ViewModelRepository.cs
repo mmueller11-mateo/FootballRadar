@@ -1,6 +1,9 @@
 ﻿using FootballRadar.Abstractions;
 using FootballRadar.Business.Entities.Betting.Enums;
+using FootballRadar.Business.Entities.Enums;
+using FootballRadar.Business.Services.Queries;
 using FootballRadar.Business.ViewModels;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace FootballRadar.Data.Repositories
@@ -8,10 +11,18 @@ namespace FootballRadar.Data.Repositories
     internal sealed class ViewModelRepository : IViewModelRepository
     {
         private readonly IDbContextFactory<ApplicationDbContext> dbContextFactory;
+        private readonly IMediator mediator;
+        private readonly INationalTeamRepository nationalTeamRepository;
+        private readonly IUserRepository userRepository;
+        private readonly ILeagueRepository leagueRepository;
 
-        public ViewModelRepository(IDbContextFactory<ApplicationDbContext> dbContextFactory)
+        public ViewModelRepository(IDbContextFactory<ApplicationDbContext> dbContextFactory, IMediator mediator, INationalTeamRepository nationalTeamRepository, IUserRepository userRepository, ILeagueRepository leagueRepository)
         {
             this.dbContextFactory = dbContextFactory;
+            this.mediator = mediator;
+            this.nationalTeamRepository = nationalTeamRepository;
+            this.userRepository = userRepository;
+            this.leagueRepository = leagueRepository;
         }
 
         public async Task<PlaceBetViewModel> CreatePlaceBetViewModel(Guid matchId, Guid userId, CancellationToken cancellationToken)
@@ -20,24 +31,27 @@ namespace FootballRadar.Data.Repositories
 
             var matchData = await (
                 from match in db.Fixtures.AsNoTracking()
-                join homeTeam in db.Teams on match.HomeTeamId equals homeTeam.Id
-                join awayTeam in db.Teams on match.AwayTeamId equals awayTeam.Id
+                join homeTeamJoin in db.Teams on match.HomeTeamId equals homeTeamJoin.Id into homeJoin
+                from homeTeam in homeJoin.DefaultIfEmpty()
+                join awayTeamJoin in db.Teams on match.AwayTeamId equals awayTeamJoin.Id into awayJoin
+                from awayTeam in awayJoin.DefaultIfEmpty()
                 where match.Id == matchId
                 select new
                 {
                     MatchId = match.Id,
                     HomeTeamId = match.HomeTeamId,
                     AwayTeamId = match.AwayTeamId,
-                    HomeTeamName = homeTeam.Name,
-                    AwayTeamName = awayTeam.Name,
-                    HomeLogo = homeTeam.Logo,
-                    AwayLogo = awayTeam.Logo,
+                    HomeTeamName = homeTeam != null ? homeTeam.Name : (match.HomeQualificationCode ?? string.Empty),
+                    AwayTeamName = awayTeam != null ? awayTeam.Name : (match.AwayQualificationCode ?? string.Empty),
+                    HomeLogo = homeTeam != null ? homeTeam.Logo : null,
+                    AwayLogo = awayTeam != null ? awayTeam.Logo : null,
                     MatchDate = match.Date,
                     Round = match.Round,
                     Credits = db.Wallets
                         .Where(w => w.UserId == userId)
                         .Select(w => w.Credits)
-                        .FirstOrDefault()
+                        .FirstOrDefault(),
+                    IsKnockout = match.WmPhase != null && match.WmPhase != WmPhase.Group
                 }
             ).FirstOrDefaultAsync(cancellationToken);
 
@@ -75,6 +89,7 @@ namespace FootballRadar.Data.Repositories
                 MatchDate = matchData.MatchDate,
                 Round = matchData.Round,
                 AvailableCredits = matchData.Credits,
+                IsKnockout = matchData.IsKnockout,
                 HeadToHead = h2h
             };
         }
@@ -137,6 +152,152 @@ namespace FootballRadar.Data.Repositories
                 SelectedSeason = selectedSeason,
                 UpcomingFixtures = fixtures.Where(f => f.Date > now).ToList(),
                 PastFixtures = fixtures.Where(f => f.Date <= now).OrderByDescending(f => f.Date).ToList()
+            };
+        }
+
+        public async Task<UserBetsViewModel> CreateUserBetsViewModel(Guid userId, CancellationToken cancellationToken)
+        {
+            var result = await mediator.Send(new GetUserBetsQuery { UserId = userId }, cancellationToken);
+
+            var items = result.Items.Select(r => new UserBetItemViewModel
+            {
+                BetId = r.BetId,
+                HomeTeam = r.HomeTeam,
+                AwayTeam = r.AwayTeam,
+                HomeLogo = r.HomeLogo,
+                AwayLogo = r.AwayLogo,
+                MatchDate = r.MatchDate,
+                Prediction = r.Prediction,
+                Credits = r.Credits,
+                PlacedAt = r.PlacedAt,
+                IsSettled = r.IsSettled,
+                IsWon = r.IsWon,
+                HomeGoals = r.HomeGoals,
+                AwayGoals = r.AwayGoals,
+                Payout = r.Payout,
+                Reward = r.Reward
+            }).ToList();
+
+            var settledBets = items.Where(i => i.IsSettled).ToList();
+
+            return new UserBetsViewModel
+            {
+                OpenBets = items.Where(i => !i.IsSettled).ToList(),
+                SettledBets = settledBets,
+                TotalBets = settledBets.Count,
+                WonBets = settledBets.Count(b => b.IsWon == true),
+                LostBets = settledBets.Count(b => b.IsWon == false),
+                TotalWinnings = settledBets.Where(b => b.IsWon == true).Sum(b => b.Payout ?? 0),
+                TotalStaked = settledBets.Sum(b => b.Credits)
+            };
+        }
+
+        public async Task<TeamPlayersViewModel> CreateTeamPlayersViewModel(int apiTeamId, int season, CancellationToken cancellationToken)
+        {
+            var seasons = await mediator.Send(new GetTeamSeasonsQuery { ApiTeamId = apiTeamId }, cancellationToken);
+
+            if (season == 0 && seasons.Any())
+                season = seasons.Max();
+
+            var players = await mediator.Send(new GetTeamPlayersQuery
+            {
+                ApiTeamId = apiTeamId,
+                Season = season
+            }, cancellationToken);
+
+            return new TeamPlayersViewModel
+            {
+                ApiTeamId = apiTeamId,
+                Season = season,
+                AvailableSeasons = seasons.OrderByDescending(s => s),
+                Players = players.Select(p => new PlayerViewModel
+                {
+                    Name = p.Name,
+                    FirstName = p.FirstName,
+                    LastName = p.LastName,
+                    BirthDate = p.BirthDate,
+                    Photo = p.Photo,
+                    Nationality = p.NationalityCountryId
+                }).ToList()
+            };
+        }
+
+        public async Task<ResultatIndexViewModel> CreateResultatIndexViewModel(CancellationToken cancellationToken)
+        {
+            var matches = await mediator.Send(new GetPlayedMatchesQuery(), cancellationToken);
+            var teams = await nationalTeamRepository.GetAllAsync(cancellationToken);
+
+            var model = new ResultatIndexViewModel
+            {
+                Matches = new List<ResultatMatchViewModel>()
+            };
+
+            foreach (var match in matches.OrderByDescending(m => m.Date))
+            {
+                var tips = await mediator.Send(new GetTipsByMatchQuery { MatchId = match.Id }, cancellationToken);
+                var tipViewModels = new List<ResultatTipViewModel>();
+
+                foreach (var tip in tips)
+                {
+                    var user = await userRepository.GetByIdAsync(tip.UserId, cancellationToken);
+                    tipViewModels.Add(new ResultatTipViewModel
+                    {
+                        TipperName = user?.Name ?? "Unbekannt",
+                        PredictedHome = tip.HomeGoals,
+                        PredictedAway = tip.AwayGoals,
+                        Points = tip.Points ?? 0
+                    });
+                }
+
+                var home = teams.FirstOrDefault(t => t.Id == match.HomeNationalTeamId);
+                var away = teams.FirstOrDefault(t => t.Id == match.AwayNationalTeamId);
+
+                model.Matches.Add(new ResultatMatchViewModel
+                {
+                    HomeTeam = home?.Name ?? "Unknown",
+                    AwayTeam = away?.Name ?? "Unknown",
+                    HomeScore = match.HomeGoals!.Value,
+                    AwayScore = match.AwayGoals!.Value,
+                    KickoffUtc = match.Date,
+                    WmGroup = match.WmGroup,
+                    WmPhase = match.WmPhase!.Value,
+                    Tips = tipViewModels.OrderByDescending(t => t.Points).ToList()
+                });
+            }
+
+            return model;
+        }
+
+        public async Task<StandingsViewModel> CreateStandingsViewModel(int leagueId, int season, CancellationToken cancellationToken)
+        {
+            var standings = await leagueRepository.GetStandingsWithDetailsAsync(leagueId, season, cancellationToken);
+
+            return new StandingsViewModel
+            {
+                LeagueId = leagueId,
+                Season = season,
+                Standings = standings.Select(s => new StandingViewModel
+                {
+                    Rank = s.Standing.Rank,
+                    Points = s.Standing.Points,
+                    GoalsDiff = s.Standing.GoalsDiff,
+                    Team = new StandingTeamViewModel
+                    {
+                        Name = s.Team!.Name ?? "Unknown",
+                        Logo = s.Team.Logo,
+                        ApiTeamId = s.Team?.ApiTeamId
+                    },
+                    All = new StandingStatsViewModel
+                    {
+                        Played = s.Stats?.Played ?? 0,
+                        Win = s.Stats?.Win ?? 0,
+                        Draw = s.Stats?.Draw ?? 0,
+                        Lose = s.Stats?.Lose ?? 0,
+                        Goals = new StandingGoalsViewModel { For = 0, Against = 0 }
+                    }
+                })
+                .OrderBy(s => s.Rank)
+                .ToList()
             };
         }
     }

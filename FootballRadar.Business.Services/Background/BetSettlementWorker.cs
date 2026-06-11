@@ -1,7 +1,6 @@
 ﻿using FootballRadar.Abstractions;
 using FootballRadar.Business.Entities.Betting;
 using FootballRadar.Business.Entities.Betting.Enums;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -9,13 +8,19 @@ namespace FootballRadar.Business.Services.Background
 {
     public sealed class BetSettlementWorker : BackgroundService
     {
-        private readonly IServiceScopeFactory _scopeFactory;
-        private readonly ILogger<BetSettlementWorker> _logger;
+        private readonly ILogger<BetSettlementWorker> logger;
+        private readonly IMatchRepository matchRepository;
+        private readonly IBetRepository betRepository;
+        private readonly IWalletRepository walletRepository;
+        private readonly IPredictionMarketRepository predictionMarketRepository;
 
-        public BetSettlementWorker(IServiceScopeFactory scopeFactory, ILogger<BetSettlementWorker> logger)
+        public BetSettlementWorker(ILogger<BetSettlementWorker> logger, IMatchRepository matchRepository, IBetRepository betRepository, IWalletRepository walletRepository, IPredictionMarketRepository predictionMarketRepository)
         {
-            _scopeFactory = scopeFactory;
-            _logger = logger;
+            this.logger = logger;
+            this.matchRepository = matchRepository;
+            this.betRepository = betRepository;
+            this.walletRepository = walletRepository;
+            this.predictionMarketRepository = predictionMarketRepository;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -29,12 +34,6 @@ namespace FootballRadar.Business.Services.Background
 
         private async Task SettleAsync(CancellationToken cancellationToken)
         {
-            using var scope = _scopeFactory.CreateScope();
-            var matchRepository = scope.ServiceProvider.GetRequiredService<IMatchRepository>();
-            var betRepository = scope.ServiceProvider.GetRequiredService<IBetRepository>();
-            var walletRepository = scope.ServiceProvider.GetRequiredService<IWalletRepository>();
-            var predictionMarketRepository = scope.ServiceProvider.GetRequiredService<IPredictionMarketRepository>();
-
             var finishedMatches = (await matchRepository.GetUpcomingMatches(cancellationToken))
                 .Where(m => m.Status == "FT" && m.HomeGoals.HasValue && m.AwayGoals.HasValue);
 
@@ -43,7 +42,7 @@ namespace FootballRadar.Business.Services.Background
                 var market = await predictionMarketRepository.FindForMatchAsync(match.Id, cancellationToken);
                 if (market == null) continue;
                 if (market is not MatchPredictionMarket matchMarket) continue;
-                if (matchMarket.IsSettled) continue; // bereits ausgezahlt
+                if (matchMarket.IsSettled) continue;
 
                 var bets = await betRepository.GetMatchBetsByMarketIdAsync(market.Id, cancellationToken);
                 if (!bets.Any()) continue;
@@ -67,12 +66,9 @@ namespace FootballRadar.Business.Services.Background
                     wallet.Deposit(payout);
                     await walletRepository.UpdateAsync(wallet, cancellationToken);
 
-                    _logger.LogInformation(
-                        "Settled bet {BetId} for user {UserId}: +{Payout} credits",
-                        bet.Id, bet.UserId, payout);
+                    logger.LogInformation("Settled bet {BetId} for user {UserId}: +{Payout} credits", bet.Id, bet.UserId, payout);
                 }
 
-                // Als settled markieren
                 matchMarket.IsSettled = true;
                 await predictionMarketRepository.UpdateAsync(matchMarket, cancellationToken);
             }

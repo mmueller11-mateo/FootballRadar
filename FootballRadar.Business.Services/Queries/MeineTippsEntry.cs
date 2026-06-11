@@ -11,5 +11,8 @@
         public int? ActualHome { get; set; }
         public int? ActualAway { get; set; }
         public int? Points { get; set; }
+        public bool IsKoMatch { get; set; }
+        public string? PredictedWinnerName { get; set; }
+        public string? ActualWinnerName { get; set; }
     }
 }

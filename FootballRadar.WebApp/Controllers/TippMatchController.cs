@@ -17,29 +17,15 @@ namespace FootballRadar.WebApp.Controllers
     [Authorize]
     public class TippMatchController : Controller
     {
-        private readonly IMediator mediator;
-        private readonly INationalTeamRepository nationalTeamRepository;
-        private readonly IWmTipRepository wmTipRepository;
+        private Guid CurrentUserId => Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        private string CurrentUserName => User.FindFirstValue(ClaimTypes.Name)!;
 
-        private Guid CurrentUserId =>
-            Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-
-        private string CurrentUserName =>
-            User.FindFirstValue(ClaimTypes.Name)!;
-
-        public TippMatchController(
-            IMediator mediator,
-            INationalTeamRepository nationalTeamRepository,
-            IWmTipRepository wmTipRepository)
-        {
-            this.mediator = mediator;
-            this.nationalTeamRepository = nationalTeamRepository;
-            this.wmTipRepository = wmTipRepository;
-        }
-
-        // ========================= INDEX =========================
         public async Task<IActionResult> Index(CancellationToken cancellationToken)
         {
+            var mediator = HttpContext.RequestServices.GetRequiredService<IMediator>();
+            var nationalTeamRepository = HttpContext.RequestServices.GetRequiredService<INationalTeamRepository>();
+            var wmTipRepository = HttpContext.RequestServices.GetRequiredService<IWmTipRepository>();
+
             var matches = await mediator.Send(new GetMatchesQuery(), cancellationToken);
             var teams = await nationalTeamRepository.GetAllAsync(cancellationToken);
             var tips = await wmTipRepository.GetByUserIdAsync(CurrentUserId, cancellationToken);
@@ -52,23 +38,81 @@ namespace FootballRadar.WebApp.Controllers
             var groups = wmMatches
                 .GroupBy(m => m.WmGroup)
                 .OrderBy(g => g.Key)
-                .Select(g => BuildGroupStanding(
-                    g.Key!,
-                    g.ToList(),
-                    tips.ToList(),
-                    teams))
+                .Select(g => BuildGroupStanding(g.Key!, g.ToList(), tips.ToList(), teams))
                 .ToList();
+
+            var allGroupTipped = wmMatches.Count > 0 && wmMatches.All(m =>
+                 tips.Any(t => t.WmMatchId == m.Id) ||
+                 m.KickoffUtc <= DateTimeOffset.UtcNow);
+
+            KoBracketViewModel? bracket = null;
+            if (allGroupTipped)
+            {
+                var bracketResult = await mediator.Send(new GetKoBracketQuery
+                {
+                    UserId = CurrentUserId
+                }, cancellationToken);
+
+                bracket = new KoBracketViewModel
+                {
+                    RoundOf32 = bracketResult.RoundOf32.Select(ToKoViewModel).ToList(),
+                    RoundOf16 = bracketResult.RoundOf16.Select(ToKoViewModel).ToList(),
+                    QuarterFinals = bracketResult.QuarterFinals.Select(ToKoViewModel).ToList(),
+                    SemiFinals = bracketResult.SemiFinals.Select(ToKoViewModel).ToList(),
+                    ThirdPlace = bracketResult.ThirdPlace == null ? null : ToKoViewModel(bracketResult.ThirdPlace),
+                    Final = bracketResult.Final == null ? null : ToKoViewModel(bracketResult.Final),
+                };
+            }
 
             return View(new WmIndexViewModel
             {
                 TipperName = CurrentUserName,
-                Groups = groups
+                Groups = groups,
+                KoBracket = bracket,
+                AllGroupTipped = allGroupTipped,
             });
         }
 
-        // ========================= GROUP =========================
+        private static KoMatchViewModel ToKoViewModel(KoMatchResult r) => new()
+        {
+            FixtureId = r.FixtureId,
+            ApiFixtureId = r.ApiFixtureId,
+            KickoffUtc = r.KickoffUtc,
+            HomeTeam = r.HomeTeam?.Name,
+            AwayTeam = r.AwayTeam?.Name,
+            HomeLogoUrl = r.HomeTeam?.Logo ?? "",
+            AwayLogoUrl = r.AwayTeam?.Logo ?? "",
+            HomeTeamId = r.HomeTeam?.Id,
+            AwayTeamId = r.AwayTeam?.Id,
+            HomeQualificationCode = r.HomeQualificationCode,
+            AwayQualificationCode = r.AwayQualificationCode,
+            PredictedHomeGoals = r.ExistingTip?.HomeGoals,
+            PredictedAwayGoals = r.ExistingTip?.AwayGoals,
+            PredictedWinnerId = r.ExistingTip?.PredictedWinnerId,
+        };
+
+        [HttpPost]
+        public async Task<IActionResult> SaveKoTip([FromBody] SaveKoTipRequest request, CancellationToken cancellationToken)
+        {
+            var mediator = HttpContext.RequestServices.GetRequiredService<IMediator>();
+            await mediator.Send(new SaveKoTipCommand
+            {
+                UserId = CurrentUserId,
+                FixtureId = request.FixtureId,
+                WinnerId = request.WinnerId,
+            }, cancellationToken);
+
+            return Ok();
+        }
+
+        public record SaveKoTipRequest(Guid FixtureId, Guid? WinnerId);
+
         public async Task<IActionResult> Group(string groupName, CancellationToken cancellationToken)
         {
+            var mediator = HttpContext.RequestServices.GetRequiredService<IMediator>();
+            var nationalTeamRepository = HttpContext.RequestServices.GetRequiredService<INationalTeamRepository>();
+            var wmTipRepository = HttpContext.RequestServices.GetRequiredService<IWmTipRepository>();
+
             var matches = await mediator.Send(new GetMatchesQuery(), cancellationToken);
             var teams = await nationalTeamRepository.GetAllAsync(cancellationToken);
             var tips = await wmTipRepository.GetByUserIdAsync(CurrentUserId, cancellationToken);
@@ -81,26 +125,31 @@ namespace FootballRadar.WebApp.Controllers
                 .OrderBy(m => m.KickoffUtc)
                 .ToList();
 
-            var groupStandings = BuildGroupStanding(
-                groupName,
-                groupMatches,
-                tips.ToList(),
-                teams);
+            var groupStandings = BuildGroupStanding(groupName, groupMatches, tips.ToList(), teams);
 
-            return View(new WmGroupDetailViewModel
+            var allGroupMatches = matches.Where(m => m.WmPhase == WmPhase.Group).ToList();
+            bool knockoutUnlocked = allGroupMatches.Count > 0 && allGroupMatches.All(m => tips.Any(t => t.WmMatchId == m.Id) || m.Date <= DateTimeOffset.UtcNow);
+
+            var model = new WmGroupDetailViewModel
             {
                 GroupName = groupName,
                 TipperName = CurrentUserName,
                 PastMatches = groupMatches.Where(m => m.KickoffUtc <= now).ToList(),
                 UpcomingMatches = groupMatches.Where(m => m.KickoffUtc > now).ToList(),
                 ExistingTips = tips.ToList(),
-                GroupStandings = groupStandings.Standings
-            });
+                GroupStandings = groupStandings.Standings,
+            };
+
+            return View(model);
         }
 
         [HttpGet]
         public async Task<IActionResult> GroupStandings(string groupName, CancellationToken ct)
         {
+            var mediator = HttpContext.RequestServices.GetRequiredService<IMediator>();
+            var nationalTeamRepository = HttpContext.RequestServices.GetRequiredService<INationalTeamRepository>();
+            var wmTipRepository = HttpContext.RequestServices.GetRequiredService<IWmTipRepository>();
+
             var matches = await mediator.Send(new GetMatchesQuery(), ct);
             var teams = await nationalTeamRepository.GetAllAsync(ct);
             var tips = await wmTipRepository.GetByUserIdAsync(CurrentUserId, ct);
@@ -118,6 +167,9 @@ namespace FootballRadar.WebApp.Controllers
         [HttpGet]
         public async Task<IActionResult> Tip(Guid matchId, CancellationToken cancellationToken)
         {
+            var mediator = HttpContext.RequestServices.GetRequiredService<IMediator>();
+            var wmTipRepository = HttpContext.RequestServices.GetRequiredService<IWmTipRepository>();
+
             var matches = await mediator.Send(new GetMatchesQuery(), cancellationToken);
             var match = matches.FirstOrDefault(m => m.Id == matchId);
 
@@ -138,6 +190,8 @@ namespace FootballRadar.WebApp.Controllers
         [HttpPost]
         public async Task<IActionResult> Tip(WmTipViewModel model, CancellationToken cancellationToken)
         {
+            var mediator = HttpContext.RequestServices.GetRequiredService<IMediator>();
+
             if (!ModelState.IsValid)
                 return View(model);
 
@@ -178,9 +232,7 @@ namespace FootballRadar.WebApp.Controllers
             };
         }
 
-        // ========================= CORE LOGIC =========================
-        private static (int home, int away, bool isTip, bool isReal)?
-            ResolveResult(WmMatchViewModel match, IEnumerable<WmTip> tips)
+        private static (int home, int away, bool isTip, bool isReal)? ResolveResult(WmMatchViewModel match, IEnumerable<WmTip> tips)
         {
             var tip = tips.FirstOrDefault(t => t.WmMatchId == match.Id);
 
@@ -193,12 +245,7 @@ namespace FootballRadar.WebApp.Controllers
             return null;
         }
 
-        // ========================= INTERACTIVE STANDINGS =========================
-        private static WmGroupStandingViewModel BuildGroupStanding(
-            string groupName,
-            List<WmMatchViewModel> matches,
-            List<WmTip> tips,
-            IEnumerable<NationalTeam> teams)
+        private static WmGroupStandingViewModel BuildGroupStanding(string groupName, List<WmMatchViewModel> matches, List<WmTip> tips, IEnumerable<NationalTeam> teams)
         {
             var teamStats = new Dictionary<string, WmTeamStandingRow>();
 

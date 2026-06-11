@@ -5,15 +5,10 @@ namespace FootballRadar.WebApp.Controllers
 {
     public class LeagueController : Controller
     {
-        private readonly ILeagueRepository leagueService;
-
-        public LeagueController(ILeagueRepository leagueService)
-        {
-            this.leagueService = leagueService;
-        }
         public async Task<IActionResult> LeaguesList(CancellationToken cancellationToken = default)
         {
-            var leagues = await leagueService.GetLeaguesAsync(cancellationToken);
+            var leagueRepository = HttpContext.RequestServices.GetRequiredService<ILeagueRepository>();
+            var leagues = await leagueRepository.GetLeaguesAsync(cancellationToken);
             return View(leagues);
         }
     }

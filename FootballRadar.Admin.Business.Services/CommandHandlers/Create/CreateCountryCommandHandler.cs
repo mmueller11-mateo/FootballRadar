@@ -3,34 +3,37 @@ using FootballRadar.Admin.Business.Services.Commands.Create;
 using FootballRadar.Business.Entities;
 using MediatR;
 
-sealed class CreateCountryCommandHandler : IRequestHandler<CreateCountryCommand, Country>
+namespace FootballRadar.Admin.Business.Services.CommandHandlers.Create
 {
-    private readonly ICountryRepository countryRepository;
-
-    public CreateCountryCommandHandler(ICountryRepository countryRepository)
+    sealed class CreateCountryCommandHandler : IRequestHandler<CreateCountryCommand, Country>
     {
-        this.countryRepository = countryRepository;
-    }
+        private readonly ICountryRepository countryRepository;
 
-    public async Task<Country> Handle(CreateCountryCommand request, CancellationToken cancellationToken)
-    {
-        var trimmedName = request.Name.Trim();
-        var existing = await countryRepository.GetByNameAsync(trimmedName);
-
-        if (existing != null)
+        public CreateCountryCommandHandler(ICountryRepository countryRepository)
         {
-            throw new InvalidOperationException($"A country with this name: '{request.Name}' already exists.");
+            this.countryRepository = countryRepository;
         }
 
-        var country = new Country
+        public async Task<Country> Handle(CreateCountryCommand request, CancellationToken cancellationToken)
         {
-            Id = Guid.NewGuid(),
-            Name = request.Name,
-            Code = request.Code,
-            Flag = request.Flag
-        };
+            var trimmedName = request.Name.Trim();
+            var existing = await countryRepository.GetByNameAsync(trimmedName, cancellationToken);
 
-        await countryRepository.AddAsync(country);
-        return country;
+            if (existing != null)
+            {
+                throw new InvalidOperationException($"A country with this name: '{request.Name}' already exists.");
+            }
+
+            var country = new Country
+            {
+                Id = Guid.NewGuid(),
+                Name = request.Name,
+                Code = request.Code,
+                Flag = request.Flag
+            };
+
+            await countryRepository.AddAsync(country, cancellationToken);
+            return country;
+        }
     }
 }

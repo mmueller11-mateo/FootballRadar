@@ -10,15 +10,10 @@ namespace FootballRadar.Admin.WebApp.Controllers
 {
     public class NationalTeamController : Controller
     {
-        private readonly IMediator mediator;
-
-        public NationalTeamController(IMediator mediator)
-        {
-            this.mediator = mediator;
-        }
-
+        [HttpGet]
         public async Task<IActionResult> NationalTeamsList(CancellationToken cancellationToken = default)
         {
+            var mediator = HttpContext.RequestServices.GetRequiredService<IMediator>();
             var nationalTeams = await mediator.Send(new GetNationalTeamsQuery(), cancellationToken);
             var countries = await mediator.Send(new GetCountriesQuery(), cancellationToken);
 
@@ -34,8 +29,10 @@ namespace FootballRadar.Admin.WebApp.Controllers
             return View(vm);
         }
 
+        [HttpGet]
         public async Task<IActionResult> CreateNationalTeam(CancellationToken cancellationToken = default)
         {
+            var mediator = HttpContext.RequestServices.GetRequiredService<IMediator>();
             var countries = await mediator.Send(new GetCountriesQuery(), cancellationToken);
             var vm = new CreateNationalTeamViewModel
             {
@@ -48,6 +45,7 @@ namespace FootballRadar.Admin.WebApp.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateNationalTeam(CreateNationalTeamViewModel vm, CancellationToken cancellationToken = default)
         {
+            var mediator = HttpContext.RequestServices.GetRequiredService<IMediator>();
             if (!ModelState.IsValid)
             {
                 var countries = await mediator.Send(new GetCountriesQuery(), cancellationToken);
@@ -70,6 +68,7 @@ namespace FootballRadar.Admin.WebApp.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken = default)
         {
+            var mediator = HttpContext.RequestServices.GetRequiredService<IMediator>();
             await mediator.Send(new DeleteNationalTeamCommand { Id = id }, cancellationToken);
             return RedirectToAction(nameof(NationalTeamsList));
         }

@@ -1,14 +1,19 @@
-﻿namespace FootballRadar.Business.Entities.Betting
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace FootballRadar.Business.Entities.Betting
 {
-	public class UserProfile
-	{
-		public Guid UserId { get; set; }
+    public class UserProfile
+    {
+        public Guid UserId { get; set; }
+        public string Nickname { get; set; } = string.Empty;
+        public string? ProfilePictureUrl { get; set; }
+        public Dictionary<string, bool> EventNotificationPreferences { get; set; } = [];
 
-		/// <summary>
-		/// A dictionary of event type names and a boolean indicating whether the user wants to receive notifications for that event type.
-		/// </summary>
-		public Dictionary<string, bool> EventNotificationPreferences { get; set; } = [];
-
-		// todo define reputation and stats
-	}
+        [NotMapped]
+        public IReadOnlyList<Bet> ActiveBets { get; set; } = [];
+        [NotMapped]
+        public IReadOnlyList<WalletTransaction> RecentTransactions { get; set; } = [];
+        [NotMapped]
+        public Wallet? Wallet { get; set; }
+    }
 }

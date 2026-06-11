@@ -1,0 +1,217 @@
+﻿@model FootballRadar.Admin.WebApp.Models.WmMatchListViewModel
+@{
+    ViewData["Title"] = "WM 2026 – Resultatverwaltung";
+}
+
+<div class="container mt-4">
+
+    <h2 class="fw-bold mb-4">WM 2026 – Resultatverwaltung</h2>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- ===== GRUPPENPHASE ===== -->
+    <h4 class="fw-semibold mb-3">Gruppenphase</h4>
+
+    <div class="table-responsive mb-5">
+        <table class="table table-sm table-hover align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Datum</th>
+                    <th>Gruppe</th>
+                    <th>Heim</th>
+                    <th class="text-center">Resultat</th>
+                    <th>Gast</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var m in Model.GroupMatches)
+                {
+                    <tr>
+                        <td class="text-nowrap">@m.Date.ToLocalTime().ToString("dd.MM. HH:mm")</td>
+                        <td><span class="badge bg-secondary">@m.WmGroup</span></td>
+                        <td class="fw-semibold">@m.HomeTeam</td>
+                        <td class="text-center">
+                            @if (m.HasResult)
+                            {
+                                <span class="badge bg-success fs-6">@m.HomeGoals : @m.AwayGoals</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">-:-</span>
+                            }
+                        </td>
+                        <td class="fw-semibold">@m.AwayTeam</td>
+                        <td>
+                            <span class="badge @(m.HasResult ? "bg-success" : "bg-warning text-dark")">
+                                @(m.HasResult ? "FT" : "Offen")
+                            </span>
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#groupModal"
+                                    data-match-id="@m.Id"
+                                    data-home="@m.HomeTeam"
+                                    data-away="@m.AwayTeam"
+                                    data-home-goals="@m.HomeGoals"
+                                    data-away-goals="@m.AwayGoals">
+                                Resultat setzen
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ===== K.O.-PHASE ===== -->
+    <h4 class="fw-semibold mb-3">K.O.-Phase</h4>
+
+    <div class="table-responsive">
+        <table class="table table-sm table-hover align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Datum</th>
+                    <th>Phase</th>
+                    <th>Heim</th>
+                    <th class="text-center">Sieger</th>
+                    <th>Gast</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var m in Model.KnockoutMatches)
+                {
+                    <tr>
+                        <td class="text-nowrap">@m.Date.ToLocalTime().ToString("dd.MM. HH:mm")</td>
+                        <td><span class="badge bg-dark">@m.Phase</span></td>
+                        <td class="fw-semibold">@m.HomeTeam</td>
+                        <td class="text-center">
+                            @if (m.HasResult)
+                            {
+                                var winner = m.HomeGoals > m.AwayGoals ? m.HomeTeam : m.AwayTeam;
+                                <span class="badge bg-success">🏆 @winner</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">-</span>
+                            }
+                        </td>
+                        <td class="fw-semibold">@m.AwayTeam</td>
+                        <td>
+                            <span class="badge @(m.HasResult ? "bg-success" : "bg-warning text-dark")">
+                                @(m.HasResult ? "FT" : "Offen")
+                            </span>
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#knockoutModal"
+                                    data-match-id="@m.Id"
+                                    data-home="@m.HomeTeam"
+                                    data-away="@m.AwayTeam">
+                                Sieger setzen
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<!-- ===== MODAL: Gruppenspiel Resultat ===== -->
+<div class="modal fade" id="groupModal" tabindex="-1">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Resultat setzen</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form asp-controller="TippSpiel" asp-action="SetGroupResult" method="post">
+                <div class="modal-body">
+                    <input type="hidden" name="matchId" id="groupMatchId" />
+                    <div class="d-flex align-items-center justify-content-center gap-3">
+                        <div class="text-center">
+                            <div class="small text-muted mb-1" id="groupHomeLabel"></div>
+                            <input type="number" name="homeGoals" id="groupHomeGoals"
+                                   min="0" max="99" value="0"
+                                   class="form-control form-control-lg text-center"
+                                   style="width:72px;" />
+                        </div>
+                        <div class="fs-4 fw-bold text-muted mt-3">:</div>
+                        <div class="text-center">
+                            <div class="small text-muted mb-1" id="groupAwayLabel"></div>
+                            <input type="number" name="awayGoals" id="groupAwayGoals"
+                                   min="0" max="99" value="0"
+                                   class="form-control form-control-lg text-center"
+                                   style="width:72px;" />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Abbrechen</button>
+                    <button type="submit" class="btn btn-primary">Speichern</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ===== MODAL: K.O. Sieger ===== -->
+<div class="modal fade" id="knockoutModal" tabindex="-1">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Sieger auswählen</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form asp-controller="TippSpiel" asp-action="SetKnockoutWinner" method="post">
+                <div class="modal-body">
+                    <input type="hidden" name="matchId" id="knockoutMatchId" />
+                    <div class="d-grid gap-2">
+                        <button type="submit" name="winner" value="home"
+                                class="btn btn-outline-primary btn-lg" id="knockoutHomeBtn">
+                        </button>
+                        <button type="submit" name="winner" value="away"
+                                class="btn btn-outline-primary btn-lg" id="knockoutAwayBtn">
+                        </button>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Abbrechen</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById('groupModal').addEventListener('show.bs.modal', e => {
+            const btn = e.relatedTarget;
+            document.getElementById('groupMatchId').value = btn.dataset.matchId;
+            document.getElementById('groupHomeLabel').textContent = btn.dataset.home;
+            document.getElementById('groupAwayLabel').textContent = btn.dataset.away;
+            document.getElementById('groupHomeGoals').value = btn.dataset.homeGoals;
+            document.getElementById('groupAwayGoals').value = btn.dataset.awayGoals;
+        });
+
+        document.getElementById('knockoutModal').addEventListener('show.bs.modal', e => {
+            const btn = e.relatedTarget;
+            document.getElementById('knockoutMatchId').value = btn.dataset.matchId;
+            document.getElementById('knockoutHomeBtn').textContent = '🏆 ' + btn.dataset.home;
+            document.getElementById('knockoutAwayBtn').textContent = '🏆 ' + btn.dataset.away;
+        });
+    </script>
+}

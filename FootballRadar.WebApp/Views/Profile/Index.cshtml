@@ -1,0 +1,163 @@
+﻿@model FootballRadar.Business.Entities.Betting.UserProfile
+
+<div class="container mt-4">
+    <h2 class="mb-4">My Profile</h2>
+
+    @* Profile Header *@
+    <div class="row g-3 mb-5">
+        <div class="col-6 col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    @if (Model.ProfilePictureUrl != null)
+                    {
+                        <img src="@Model.ProfilePictureUrl" class="rounded-circle mb-2" height="60" width="60" style="object-fit:cover" />
+                    }
+                    else
+                    {
+                        <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center mx-auto mb-2" style="width:60px;height:60px">
+                            <span class="text-white fw-bold fs-4">@Model.Nickname.FirstOrDefault()</span>
+                        </div>
+                    }
+                    <h5 class="mb-0">@Model.Nickname</h5>
+                    <small class="text-muted">Nickname</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card text-center shadow-sm border-info">
+                <div class="card-body">
+                    <h3 class="mb-0 text-info">@Model.Wallet?.Credits.ToString("N2")</h3>
+                    <small class="text-muted">Credits</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card text-center shadow-sm border-success">
+                <div class="card-body">
+                    <h3 class="mb-0 text-success">@Model.Wallet?.Credits.ToString("N2")</h3>
+                    <small class="text-muted">Balance</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h3 class="mb-0">@Model.ActiveBets.Count</h3>
+                    <small class="text-muted">Active Bets</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @* Edit Profile *@
+    <h4 class="mb-3">Edit Profile</h4>
+    <div class="card shadow-sm mb-5">
+        <div class="card-body">
+            <form method="post" asp-action="UpdateProfile">
+                <input type="hidden" name="userId" value="@Model.UserId" />
+                <div class="mb-3">
+                    <label class="form-label">Nickname</label>
+                    <input type="text" name="nickname" class="form-control" value="@Model.Nickname" required />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Profile Picture URL</label>
+                    <input type="url" name="profilePictureUrl" class="form-control" value="@Model.ProfilePictureUrl" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </form>
+        </div>
+    </div>
+
+    @* Notification Preferences *@
+    <h4 class="mb-3">Notification Preferences</h4>
+    <div class="card shadow-sm mb-5">
+        <div class="card-body">
+            <form method="post" asp-action="UpdateNotifications">
+                <input type="hidden" name="userId" value="@Model.UserId" />
+                @if (!Model.EventNotificationPreferences.Any())
+                {
+                    <p class="text-muted">No notification preferences configured.</p>
+                }
+                else
+                {
+                    foreach (var pref in Model.EventNotificationPreferences)
+                    {
+                        <div class="form-check mb-2">
+                            <input type="hidden" name="preferences[@pref.Key]" value="false" />
+                            <input class="form-check-input" type="checkbox"
+                                   name="preferences[@pref.Key]"
+                                   value="true"
+                                   id="pref_@pref.Key"
+                            @(pref.Value ? "checked" : "") />
+                            <label class="form-check-label" for="pref_@pref.Key">@pref.Key</label>
+                        </div>
+                    }
+                    <button type="submit" class="btn btn-primary mt-2">Save</button>
+                }
+            </form>
+        </div>
+    </div>
+
+    @* Active Bets *@
+    <h4 class="mb-3">Active Bets <span class="badge bg-secondary">@Model.ActiveBets.Count</span></h4>
+    @if (!Model.ActiveBets.Any())
+    {
+        <p class="text-muted mb-5">No active bets.</p>
+    }
+    else
+    {
+        <div class="row g-3 mb-5">
+            @foreach (var bet in Model.ActiveBets)
+            {
+                <div class="col-12 col-md-6">
+                    <div class="card shadow-sm border-warning">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <span>Market: <strong>@bet.PredictionMarketId</strong></span>
+                                <span>Stake: <strong>@bet.Credits.ToString("N2")</strong></span>
+                            </div>
+                            <small class="text-muted">Placed: @bet.PlacedAt.ToString("dd.MM.yyyy HH:mm")</small>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    @* Transaction History *@
+    <h4 class="mb-3">Transaction History <span class="badge bg-secondary">@Model.RecentTransactions.Count</span></h4>
+    @if (!Model.RecentTransactions.Any())
+    {
+        <p class="text-muted">No transactions yet.</p>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                        <th class="text-end">Credits</th>
+                        <th class="text-end">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var tx in Model.RecentTransactions)
+                    {
+                        var statusClass = tx.Status.ToString() == "Completed" ? "text-success" :
+                                          tx.Status.ToString() == "Failed" ? "text-danger" : "text-warning";
+                        <tr>
+                            <td>@tx.CreatedAt.ToString("dd.MM.yyyy HH:mm")</td>
+                            <td>@tx.Type</td>
+                            <td class="@statusClass">@tx.Status</td>
+                            <td class="text-end">@tx.Credits.ToString("N2")</td>
+                            <td class="text-end">@tx.Amount.ToString()</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

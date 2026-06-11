@@ -32,23 +32,31 @@ namespace FootballRadar.Data.Repositories
             return await dbContext.Users.FirstOrDefaultAsync(x => x.Email.ToLower() == email.ToLower(), cancellationToken);
         }
 
-        public void Update(User user)
+        public async Task UpdateAsync(User user, CancellationToken cancellationToken)
         {
             using var dbContext = dbContextFactory.CreateDbContext();
             dbContext.Users.Update(user);
             dbContext.SaveChanges();
         }
 
-        public void Delete(User user)
+        public async Task DeleteAsync(User user, CancellationToken cancellationToken)
         {
             using var dbContext = dbContextFactory.CreateDbContext();
             dbContext.Users.Remove(user);
             dbContext.SaveChanges();
         }
 
-        public Task<UserProfile> GetCurrentUserProfile(CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<User>> GetAllAsync(CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            using var dbContext = await dbContextFactory.CreateDbContextAsync(cancellationToken);
+            return await dbContext.Users.ToListAsync(cancellationToken);
+        }
+        public async Task<UserProfile?> GetProfileByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
+        {
+            using var dbContext = await dbContextFactory.CreateDbContextAsync(cancellationToken);
+
+            return await dbContext.UserProfiles
+                .FirstOrDefaultAsync(x => x.UserId == userId, cancellationToken);
         }
     }
 }

@@ -1,25 +1,22 @@
 ﻿using FootballRadar.Abstractions;
-using FootballRadar.Business.Entities.Betting;
+using FootballRadar.Business.Services.Commands;
+using FootballRadar.Business.Services.Queries;
 using FootballRadar.Web.Utilities;
 using FootballRadar.WebApp.Models;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace FootballRadar.WebApp.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly IUserRepository userRepository;
-        private readonly IPasswordHasher passwordHasher;
-        private readonly IWalletRepository walletRepository;
+        private readonly IMediator mediator;
+        private readonly IWebAuthenticationService authService;
 
-        public AccountController(IUserRepository userRepository, IPasswordHasher passwordHasher, IWalletRepository walletRepository)
+        public AccountController(IMediator mediator, IWebAuthenticationService authService)
         {
-            this.userRepository = userRepository;
-            this.passwordHasher = passwordHasher;
-            this.walletRepository = walletRepository;
+            this.mediator = mediator;
+            this.authService = authService;
         }
 
         [HttpGet]
@@ -35,19 +32,20 @@ namespace FootballRadar.WebApp.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(LoginViewModel model, string? returnUrl = null)
         {
-            var user = await userRepository.GetByEmailAsync(model.Email);
-            if (user is null || !passwordHasher.Verify(model.Password, user.PasswordHash))
+            var result = await mediator.Send(new LoginQuery
+            {
+                Email = model.Email,
+                Password = model.Password
+            });
+
+            if (!result.Success)
             {
                 ModelState.AddModelError(string.Empty, "Invalid email or password");
                 return View(model);
             }
 
-            await SignInAsync(user);
-
-            if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
-                return Redirect(returnUrl);
-
-            return RedirectToAction(nameof(LeagueController.LeaguesList), ControllerName.For<LeagueController>());
+            await authService.SignInAsync(result.User!);
+            return RedirectToLocal(returnUrl, nameof(LeagueController.LeaguesList), ControllerName.For<LeagueController>());
         }
 
         [HttpGet]
@@ -56,7 +54,6 @@ namespace FootballRadar.WebApp.Controllers
             ViewData["ReturnUrl"] = returnUrl;
             return View();
         }
-
 
         [HttpPost]
         public async Task<IActionResult> Register(RegisterViewModel model, string? returnUrl = null)
@@ -67,49 +64,35 @@ namespace FootballRadar.WebApp.Controllers
                 return View(model);
             }
 
-            var existing = await userRepository.GetByEmailAsync(model.Email);
-            if (existing is not null)
+            var result = await mediator.Send(new RegisterCommand
             {
-                ModelState.AddModelError(string.Empty, "Email already in use");
+                Name = model.Name,
+                Email = model.Email,
+                Password = model.Password
+            });
+
+            if (!result.Success)
+            {
+                ModelState.AddModelError(string.Empty, result.Error!);
                 return View(model);
             }
 
-            var user = new User
-            {
-                Id = Guid.NewGuid(),
-                Name = model.Name,
-                Email = model.Email,
-                PasswordHash = passwordHasher.Hash(model.Password)
-            };
-
-            await userRepository.AddAsync(user);
-            var wallet = new Wallet(user.Id);
-            await walletRepository.AddAsync(wallet);
-            await SignInAsync(user);
-
-            if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
-                return Redirect(returnUrl);
-
-            return RedirectToAction(nameof(LeagueController.LeaguesList), ControllerName.For<LeagueController>());
+            await authService.SignInAsync(result.User!);
+            return RedirectToLocal(returnUrl, nameof(LeagueController.LeaguesList), ControllerName.For<LeagueController>());
         }
 
         public async Task<IActionResult> Logout()
         {
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            await authService.SignOutAsync();
             return RedirectToAction(nameof(HomeController.Index), ControllerName.For<HomeController>());
         }
 
-        private async Task SignInAsync(User user)
+        private IActionResult RedirectToLocal(string? returnUrl, string action, string controller)
         {
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Name, user.Name),
-                new Claim(ClaimTypes.Email, user.Email)
-            };
-            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            var principal = new ClaimsPrincipal(identity);
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+            if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+                return Redirect(returnUrl);
+
+            return RedirectToAction(action, controller);
         }
     }
 }

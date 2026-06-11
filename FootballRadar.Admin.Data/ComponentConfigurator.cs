@@ -31,6 +31,9 @@ namespace FootballRadar.Admin.Data
             services.AddTransient<ILeagueRepository, LeagueRepository>();
             services.AddTransient<INationalTeamRepository, NationalTeamRepository>();
             services.AddTransient<ITeamRepository, TeamRepository>();
+            services.AddTransient<IMatchRepository, MatchRepository>();
+            services.AddTransient<IWmTipRepository, WmTipRepository>();
+
         }
     }
 }

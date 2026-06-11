@@ -15,14 +15,14 @@ namespace FootballRadar.Admin.Business.Services.CommandHandlers.Delete
 
         public async Task<bool> Handle(DeleteLeagueCommand request, CancellationToken cancellationToken)
         {
-            var league = await leagueRepository.GetByIdAsync(request.Id);
+            var league = await leagueRepository.GetByIdAsync(request.Id, cancellationToken);
 
             if (league == null)
             {
                 return false;
             }
 
-            leagueRepository.Delete(league);
+            leagueRepository.Delete(league, cancellationToken);
             return true;
         }
     }

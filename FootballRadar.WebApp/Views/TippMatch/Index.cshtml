@@ -6,18 +6,12 @@
     ViewData["Title"] = "Tippspiel – Gruppen";
 }
 
-<div class="container mt-4">
-
+<div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="fw-bold">WM 2026 – Gruppenübersicht</h2>
-
-        @if (Model.TipperName != null)
-        {
-            <span class="text-muted">
-                @Model.TipperName
-            </span>
-        }
     </div>
+
+    <a href="@Url.Action(nameof(BonusController.Index), ControllerName.For<BonusController>())" class="btn btn-primary me-2">Bonus</a>
 
     @if (!Model.Groups.Any())
     {
@@ -114,6 +108,20 @@
                 </div>
             }
 
+        </div>
+    }
+    @* --- KO-BRACKET --- *@
+    @if (Model.AllGroupTipped && Model.KoBracket != null)
+    {
+        <hr class="my-5" />
+        <h3 class="fw-bold mb-4">KO-Phase</h3>
+        <partial name="_KoBracket" model="Model.KoBracket" />
+    }
+    else if (!Model.AllGroupTipped)
+    {
+        <hr class="my-5" />
+        <div class="alert alert-info">
+            Tippe zuerst alle Gruppenspiele um die KO-Phase freizuschalten.
         </div>
     }
 

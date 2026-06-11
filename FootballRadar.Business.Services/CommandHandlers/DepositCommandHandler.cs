@@ -8,18 +8,18 @@ namespace FootballRadar.Business.Services.CommandHandlers
 {
     internal sealed class DepositCommandHandler : IRequestHandler<DepositCommand, WalletTransaction>
     {
-        private readonly IWalletRepository _walletRepository;
-        private readonly IWalletTransactionRepository _walletTransactionRepository;
+        private readonly IWalletRepository walletRepository;
+        private readonly IWalletTransactionRepository walletTransactionRepository;
 
         public DepositCommandHandler(IWalletRepository walletRepository, IWalletTransactionRepository walletTransactionRepository)
         {
-            _walletRepository = walletRepository;
-            _walletTransactionRepository = walletTransactionRepository;
+            this.walletRepository = walletRepository;
+            this.walletTransactionRepository = walletTransactionRepository;
         }
 
         public async Task<WalletTransaction> Handle(DepositCommand request, CancellationToken cancellationToken)
         {
-            var wallet = await _walletRepository.GetByIdAsync(request.WalletId, cancellationToken);
+            var wallet = await walletRepository.GetByIdAsync(request.WalletId, cancellationToken);
             if (wallet is null)
                 throw new InvalidOperationException("Wallet not found");
 
@@ -33,7 +33,7 @@ namespace FootballRadar.Business.Services.CommandHandlers
                 Status = WalletTransactionStatus.Pending,
                 CreatedAt = DateTimeOffset.UtcNow
             };
-            await _walletTransactionRepository.AddAsync(transaction, cancellationToken);
+            await walletTransactionRepository.AddAsync(transaction, cancellationToken);
             return transaction;
         }
     }

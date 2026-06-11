@@ -4,11 +4,11 @@ namespace FootballRadar.Admin.Abstractions
 {
     public interface INationalTeamRepository
     {
-        Task AddAsync(NationalTeam nationalTeam);
-        Task<IEnumerable<NationalTeam>> GetAllAsync();
-        Task<NationalTeam?> GetByIdAsync(Guid id);
-        Task<NationalTeam?> GetByNameAsync(string name);
-        void Update(NationalTeam nationalTeam);
-        void Delete(NationalTeam nationalTeam);
+        Task AddAsync(NationalTeam nationalTeam, CancellationToken cancellationToken);
+        Task<IEnumerable<NationalTeam>> GetAllAsync(CancellationToken cancellationToken);
+        Task<NationalTeam?> GetByIdAsync(Guid id, CancellationToken cancellationToken);
+        Task<NationalTeam?> GetByNameAsync(string name, CancellationToken cancellationToken);
+        void Update(NationalTeam nationalTeam, CancellationToken cancellationToken);
+        void Delete(NationalTeam nationalTeam, CancellationToken cancellationToken);
     }
 }

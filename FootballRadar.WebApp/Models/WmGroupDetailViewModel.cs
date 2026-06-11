@@ -11,5 +11,7 @@ namespace FootballRadar.WebApp.Models
         public List<WmMatchViewModel> UpcomingMatches { get; set; } = [];
         public List<WmTip> ExistingTips { get; set; } = [];
         public List<WmTeamStandingRow> GroupStandings { get; set; } = new();
+        public List<KnockoutMatchViewModel> KnockoutMatches { get; set; } = [];
+        public bool KnockoutUnlocked { get; set; }
     }
 }

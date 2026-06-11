@@ -9,15 +9,10 @@ namespace FootballRadar.Admin.WebApp.Controllers
 {
     public class TeamController : Controller
     {
-        private readonly IMediator mediator;
-
-        public TeamController(IMediator mediator)
-        {
-            this.mediator = mediator;
-        }
-
+        [HttpGet]
         public async Task<IActionResult> TeamsList(CancellationToken cancellationToken = default)
         {
+            var mediator = HttpContext.RequestServices.GetRequiredService<IMediator>();
             var teams = await mediator.Send(new GetTeamsQuery(), cancellationToken);
             var countries = await mediator.Send(new GetCountriesQuery(), cancellationToken);
             var vm = teams.Select(t => new TeamViewModel
@@ -31,8 +26,10 @@ namespace FootballRadar.Admin.WebApp.Controllers
             return View(vm);
         }
 
+        [HttpGet]
         public async Task<IActionResult> CreateTeam(CancellationToken cancellationToken = default)
         {
+            var mediator = HttpContext.RequestServices.GetRequiredService<IMediator>();
             var countries = await mediator.Send(new GetCountriesQuery(), cancellationToken);
             var vm = new CreateTeamViewModel
             {
@@ -49,6 +46,7 @@ namespace FootballRadar.Admin.WebApp.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateTeam(CreateTeamViewModel vm, CancellationToken cancellationToken = default)
         {
+            var mediator = HttpContext.RequestServices.GetRequiredService<IMediator>();
             if (!ModelState.IsValid)
             {
                 var countries = await mediator.Send(new GetCountriesQuery(), cancellationToken);
@@ -74,6 +72,7 @@ namespace FootballRadar.Admin.WebApp.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken = default)
         {
+            var mediator = HttpContext.RequestServices.GetRequiredService<IMediator>();
             await mediator.Send(new DeleteTeamCommand { Id = id }, cancellationToken);
             return RedirectToAction(nameof(TeamsList));
         }

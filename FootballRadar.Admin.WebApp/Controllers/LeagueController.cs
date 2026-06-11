@@ -9,15 +9,11 @@ namespace FootballRadar.Admin.WebApp.Controllers
 {
     public class LeagueController : Controller
     {
-        private readonly IMediator mediator;
-
-        public LeagueController(IMediator mediator)
-        {
-            this.mediator = mediator;
-        }
-
+        [HttpGet]
         public async Task<IActionResult> LeaguesList(CancellationToken cancellationToken = default)
         {
+            var mediator = HttpContext.RequestServices.GetRequiredService<IMediator>();
+
             var leagues = await mediator.Send(new GetLeaguesQuery(), cancellationToken);
             var countries = await mediator.Send(new GetCountriesQuery(), cancellationToken);
 
@@ -32,8 +28,10 @@ namespace FootballRadar.Admin.WebApp.Controllers
             return View(vm);
         }
 
+        [HttpGet]
         public async Task<IActionResult> CreateLeague(CancellationToken cancellationToken = default)
         {
+            var mediator = HttpContext.RequestServices.GetRequiredService<IMediator>();
             var countries = await mediator.Send(new GetCountriesQuery(), cancellationToken);
             var vm = new CreateLeagueViewModel
             {
@@ -51,6 +49,7 @@ namespace FootballRadar.Admin.WebApp.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateLeague(CreateLeagueViewModel vm, CancellationToken cancellationToken = default)
         {
+            var mediator = HttpContext.RequestServices.GetRequiredService<IMediator>();
             if (!ModelState.IsValid)
             {
                 var countries = await mediator.Send(new GetCountriesQuery(), cancellationToken);
@@ -78,6 +77,7 @@ namespace FootballRadar.Admin.WebApp.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken = default)
         {
+            var mediator = HttpContext.RequestServices.GetRequiredService<IMediator>();
             await mediator.Send(new DeleteLeagueCommand { Id = id }, cancellationToken);
             return RedirectToAction(nameof(LeaguesList));
         }

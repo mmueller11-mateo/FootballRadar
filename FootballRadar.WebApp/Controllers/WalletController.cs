@@ -13,18 +13,11 @@ namespace FootballRadar.WebApp.Controllers
     [Authorize]
     public class WalletController : Controller
     {
-        private readonly IMediator mediator;
-        private readonly ICurrencyConverter currencyConverter;
-
-        public WalletController(IMediator mediator, ICurrencyConverter currencyConverter)
-        {
-            this.mediator = mediator;
-            this.currencyConverter = currencyConverter;
-        }
-
         [HttpGet]
         public async Task<IActionResult> Overview(CancellationToken cancellationToken = default)
         {
+            var mediator = HttpContext.RequestServices.GetRequiredService<IMediator>();
+            var currencyConverter = HttpContext.RequestServices.GetRequiredService<ICurrencyConverter>();
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             var wallet = await mediator.Send(new GetWalletQuery { UserId = userId }, cancellationToken);
             var vm = new WalletOverviewViewModel
@@ -38,6 +31,8 @@ namespace FootballRadar.WebApp.Controllers
         [HttpPost]
         public async Task<IActionResult> Deposit(WalletOverviewViewModel model, CancellationToken cancellationToken = default)
         {
+            var mediator = HttpContext.RequestServices.GetRequiredService<IMediator>();
+            var currencyConverter = HttpContext.RequestServices.GetRequiredService<ICurrencyConverter>();
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             var wallet = await mediator.Send(new GetWalletQuery { UserId = userId }, cancellationToken);
             if (wallet is null)
@@ -59,6 +54,9 @@ namespace FootballRadar.WebApp.Controllers
         [HttpPost]
         public async Task<IActionResult> Withdraw(WalletOverviewViewModel model, CancellationToken cancellationToken = default)
         {
+            var mediator = HttpContext.RequestServices.GetRequiredService<IMediator>();
+            var currencyConverter = HttpContext.RequestServices.GetRequiredService<ICurrencyConverter>();
+
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             var wallet = await mediator.Send(new GetWalletQuery { UserId = userId }, cancellationToken);
             if (wallet is null)
@@ -80,6 +78,8 @@ namespace FootballRadar.WebApp.Controllers
         [HttpGet]
         public async Task<IActionResult> GetBalance(CancellationToken cancellationToken = default)
         {
+            var mediator = HttpContext.RequestServices.GetRequiredService<IMediator>();
+
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             var wallet = await mediator.Send(new GetWalletQuery { UserId = userId }, cancellationToken);
             return Json(new { credits = wallet?.Credits ?? 0 });
@@ -88,6 +88,7 @@ namespace FootballRadar.WebApp.Controllers
         [HttpGet]
         public async Task<IActionResult> TransactionStatus(Guid id, CancellationToken cancellationToken = default)
         {
+            var mediator = HttpContext.RequestServices.GetRequiredService<IMediator>();
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             var transaction = await mediator.Send(new GetTransactionQuery { TransactionId = id }, cancellationToken);
             var wallet = await mediator.Send(new GetWalletQuery { UserId = userId }, cancellationToken);

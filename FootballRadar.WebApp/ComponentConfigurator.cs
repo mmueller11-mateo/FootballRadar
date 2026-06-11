@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Identity;
+﻿using FootballRadar.Abstractions;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace FootballRadar.WebApp
 {
@@ -24,6 +24,8 @@ namespace FootballRadar.WebApp
             services.AddControllersWithViews();
             services.AddRazorPages();
             services.AddAuthorization();
+            services.AddHttpContextAccessor();
+            services.AddScoped<IWebAuthenticationService, CookieAuthenticationService>();
         }
     }
 }

@@ -9,15 +9,10 @@ namespace FootballRadar.Admin.WebApp.Controllers
 {
     public class CountryController : Controller
     {
-        private readonly IMediator mediator;
-
-        public CountryController(IMediator mediator)
-        {
-            this.mediator = mediator;
-        }
-
+        [HttpGet]
         public async Task<IActionResult> CountriesList(CancellationToken cancellationToken = default)
         {
+            var mediator = HttpContext.RequestServices.GetRequiredService<IMediator>();
             var countries = await mediator.Send(new GetCountriesQuery(), cancellationToken);
             var vm = countries.Select(c => new CountryViewModel
             {
@@ -29,6 +24,7 @@ namespace FootballRadar.Admin.WebApp.Controllers
             return View(vm);
         }
 
+        [HttpGet]
         public IActionResult CreateCountry()
         {
             return View(new CreateCountryViewModel());
@@ -37,6 +33,8 @@ namespace FootballRadar.Admin.WebApp.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateCountry(CreateCountryViewModel vm, CancellationToken cancellationToken = default)
         {
+            var mediator = HttpContext.RequestServices.GetRequiredService<IMediator>();
+
             if (!ModelState.IsValid)
                 return View(vm);
 
@@ -53,6 +51,7 @@ namespace FootballRadar.Admin.WebApp.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken = default)
         {
+            var mediator = HttpContext.RequestServices.GetRequiredService<IMediator>();
             await mediator.Send(new DeleteCountryCommand { Id = id }, cancellationToken);
             return RedirectToAction(nameof(CountriesList));
         }

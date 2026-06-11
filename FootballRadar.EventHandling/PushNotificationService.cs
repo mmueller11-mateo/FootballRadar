@@ -8,21 +8,40 @@ namespace FootballRadar.EventHandling
     {
         private readonly IHubContext<EventNotificationHub> eventHub;
         private readonly IUserRepository userRepository;
+        private readonly ICurrentUserService currentUserService;
 
-        public PushNotificationService(IHubContext<EventNotificationHub> eventHub, IUserRepository userRepository)
+        public PushNotificationService(
+            IHubContext<EventNotificationHub> eventHub,
+            ICurrentUserService currentUserService,
+            IUserRepository userRepository)
         {
             this.eventHub = eventHub;
             this.userRepository = userRepository;
+            this.currentUserService = currentUserService;
         }
 
-        public async Task Handle<TEvent>(TEvent @event, CancellationToken cancellationToken) where TEvent : IEvent
+        public async Task Handle<TEvent>(TEvent @event, CancellationToken cancellationToken)
+            where TEvent : IEvent
         {
-            var currentUser = await userRepository.GetCurrentUserProfile(cancellationToken);
+            var userProfile = await userRepository.GetProfileByUserIdAsync(
+                currentUserService.UserId,
+                cancellationToken);
 
-            if (currentUser.EventNotificationPreferences.TryGetValue(typeof(TEvent).FullName!, out var isNotificationEnabled) && isNotificationEnabled == true)
+            if (userProfile is null)
+                return;
+
+            if (userProfile.EventNotificationPreferences.TryGetValue(
+                    typeof(TEvent).FullName!,
+                    out var isEnabled)
+                && isEnabled)
             {
                 var message = EventSerializer.Serialize(@event);
-                await eventHub.Clients.User(currentUser.UserId.ToString()).SendAsync("ReceiveEvent", message, cancellationToken);
+
+                await eventHub.Clients.User(userProfile.UserId.ToString())
+                    .SendAsync("ReceiveEvent",
+                        typeof(TEvent).Name,
+                        message,
+                        cancellationToken);
             }
         }
     }

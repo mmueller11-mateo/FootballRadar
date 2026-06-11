@@ -7,15 +7,9 @@ namespace FootballRadar.WebApp.Controllers
 {
     public class RanglisteController : Controller
     {
-        private readonly IMediator mediator;
-
-        public RanglisteController(IMediator mediator)
-        {
-            this.mediator = mediator;
-        }
-
         public async Task<IActionResult> Index()
         {
+            var mediator = HttpContext.RequestServices.GetRequiredService<IMediator>();
             var entries = await mediator.Send(new GetRanglisteQuery());
 
             var model = new RanglisteViewModel

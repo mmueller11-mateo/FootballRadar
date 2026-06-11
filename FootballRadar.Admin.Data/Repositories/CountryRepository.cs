@@ -14,39 +14,39 @@ namespace FootballRadar.Admin.Data.Repositories
             this.dbContextFactory = dbContextFactory;
         }
 
-        public async Task AddAsync(Country country)
+        public async Task AddAsync(Country country, CancellationToken cancellationToken)
         {
             using var dbContext = await this.dbContextFactory.CreateDbContextAsync();
             await dbContext.Countries.AddAsync(country);
             await dbContext.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<Country>> GetAllAsync()
+        public async Task<IEnumerable<Country>> GetAllAsync(CancellationToken cancellationToken)
         {
             using var dbContext = await this.dbContextFactory.CreateDbContextAsync();
             return await dbContext.Countries.OrderBy(c => c.Name).ToListAsync();
         }
 
-        public async Task<Country?> GetByIdAsync(Guid id)
+        public async Task<Country?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
         {
             using var dbContext = await this.dbContextFactory.CreateDbContextAsync();
             return await dbContext.Countries.FirstOrDefaultAsync(c => c.Id == id);
         }
 
-        public async Task<Country?> GetByNameAsync(string name)
+        public async Task<Country?> GetByNameAsync(string name, CancellationToken cancellationToken)
         {
             using var dbContext = await dbContextFactory.CreateDbContextAsync();
             return await dbContext.Countries.FirstOrDefaultAsync(x => x.Name.ToLower() == name.ToLower());
         }
 
-        public void Update(Country country)
+        public void Update(Country country, CancellationToken cancellationToken)
         {
             using var dbContext = this.dbContextFactory.CreateDbContext();
             dbContext.Countries.Update(country);
             dbContext.SaveChanges();
         }
 
-        public void Delete(Country country)
+        public void Delete(Country country, CancellationToken cancellationToken)
         {
             using var dbContext = this.dbContextFactory.CreateDbContext();
             dbContext.Countries.Remove(country);

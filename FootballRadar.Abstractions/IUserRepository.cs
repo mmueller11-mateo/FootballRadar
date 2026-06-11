@@ -7,8 +7,9 @@ namespace FootballRadar.Abstractions
         Task AddAsync(User user, CancellationToken cancellationToken = default);
         Task<User?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
         Task<User?> GetByEmailAsync(string email, CancellationToken cancellationToken = default);
-        void Update(User user);
-        void Delete(User user);
-        Task<UserProfile> GetCurrentUserProfile(CancellationToken cancellationToken = default);
+        Task UpdateAsync(User user, CancellationToken cancellationToken = default);
+        Task DeleteAsync(User user, CancellationToken cancellationToken = default);
+        Task<IEnumerable<User>> GetAllAsync(CancellationToken cancellationToken = default);
+        Task<UserProfile?> GetProfileByUserIdAsync(Guid userId, CancellationToken cancellationToken = default);
     }
 }
