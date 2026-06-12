@@ -8,15 +8,11 @@ namespace FootballRadar.WebApp.Models
 
         public string HomeTeam { get; set; } = "";
         public string AwayTeam { get; set; } = "";
-
         public string HomeLogoUrl { get; set; } = "";
         public string AwayLogoUrl { get; set; } = "";
-
         public DateTimeOffset KickoffUtc { get; set; }
-
         public string? WmGroup { get; set; }
         public WmPhase WmPhase { get; set; }
-
         public int? HomeGoals { get; set; }
         public int? AwayGoals { get; set; }
     }

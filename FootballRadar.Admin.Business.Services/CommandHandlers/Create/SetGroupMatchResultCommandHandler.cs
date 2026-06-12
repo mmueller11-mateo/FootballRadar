@@ -22,32 +22,36 @@ namespace FootballRadar.Admin.Business.Services.CommandHandlers.Create
             var match = await matchRepository.GetByIdAsync(request.MatchId, cancellationToken);
             if (match == null) return;
 
-            // Resultat speichern
             match.HomeGoals = request.HomeGoals;
             match.AwayGoals = request.AwayGoals;
             match.Status = "FT";
             await matchRepository.UpdateAsync(match, cancellationToken);
 
-            // Punkte berechnen
             var tips = await wmTipRepository.GetByMatchIdAsync(request.MatchId, cancellationToken);
             foreach (var tip in tips)
             {
-                bool exact = tip.HomeGoals == request.HomeGoals
-                          && tip.AwayGoals == request.AwayGoals;
-
-                if (exact)
-                {
-                    tip.Points = 3;
-                }
-                else
-                {
-                    int actualTendency = Math.Sign(request.HomeGoals - request.AwayGoals);
-                    int tippedTendency = Math.Sign(tip.HomeGoals - tip.AwayGoals);
-                    tip.Points = actualTendency == tippedTendency ? 1 : 0;
-                }
-
+                var pts = CalculatePoints(tip.HomeGoals, tip.AwayGoals, request.HomeGoals, request.AwayGoals);
+                tip.Points = pts;
                 await wmTipRepository.UpdateAsync(tip, cancellationToken);
             }
+        }
+
+        private static int CalculatePoints(int predHome, int predAway, int actHome, int actAway)
+        {
+            int actualDiff = actHome - actAway;
+            int predictedDiff = predHome - predAway;
+
+            if (Math.Sign(predictedDiff) != Math.Sign(actualDiff)) return 0;
+
+            if (predHome == actHome && predAway == actAway)
+                return actualDiff > 0 ? 4 : actualDiff == 0 ? 4 : 5;
+
+            if (actualDiff == 0) return 3;
+
+            if (predictedDiff == actualDiff)
+                return actualDiff > 0 ? 3 : 4;
+
+            return actualDiff > 0 ? 2 : 3;
         }
     }
 }

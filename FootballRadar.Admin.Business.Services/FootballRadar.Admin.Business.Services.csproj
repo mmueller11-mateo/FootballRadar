@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FootballRadar.Admin.Abstractions\FootballRadar.Admin.Abstractions.csproj" />
+    <ProjectReference Include="..\FootballRadar.Business.Services\FootballRadar.Business.Services.csproj" />
   </ItemGroup>
 
 </Project>

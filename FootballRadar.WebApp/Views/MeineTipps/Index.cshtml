@@ -80,13 +80,9 @@
                                 {
                                     <span class="text-muted">–</span>
                                 }
-                                else if (entry.Points == 3)
+                                else if (entry.Points > 0)
                                 {
-                                    <span class="badge bg-success">3</span>
-                                }
-                                else if (entry.Points == 1)
-                                {
-                                    <span class="badge bg-warning text-dark">1</span>
+                                    <span class="badge bg-success">@entry.Points</span>
                                 }
                                 else
                                 {
@@ -146,9 +142,9 @@
                                 {
                                     <span class="text-muted">–</span>
                                 }
-                                else if (entry.Points == 3)
+                                else if (entry.Points > 0)
                                 {
-                                    <span class="badge bg-success">3</span>
+                                    <span class="badge bg-success">@entry.Points</span>
                                 }
                                 else
                                 {

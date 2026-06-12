@@ -26,15 +26,16 @@ namespace FootballRadar.UnitTests
         public void Returns0_WhenMatchNotPlayed()
             => Assert.AreEqual(0, PredictionScoringService.Calculate(Tip(2, 1), Match(null, null)));
 
-        [TestMethod]
-        [DataRow(2, 1, 2, 1, 4, "Exact result")]
-        [DataRow(0, 0, 0, 0, 4, "Exact draw")]
-        [DataRow(2, 1, 3, 2, 3, "Correct diff (+1), wrong score")]
-        [DataRow(1, 1, 2, 2, 2, "Correct tendency (draw), wrong score → 2pts, no diff tier for draws")]
-        [DataRow(2, 1, 3, 0, 2, "Home win correct, diff wrong")]
-        [DataRow(1, 2, 0, 3, 2, "Away win correct, diff wrong")]
-        [DataRow(2, 0, 0, 2, 0, "Completely wrong")]
-        [DataRow(1, 1, 2, 0, 0, "Predicted draw, actual home win")]
+        [DataRow(2, 1, 2, 1, 4, "Heimsieg exakt → 4")]
+        [DataRow(0, 0, 0, 0, 4, "Unentschieden exakt → 4")]
+        [DataRow(2, 1, 3, 2, 3, "Heimsieg Tordifferenz (+1) → 3")]
+        [DataRow(1, 1, 2, 2, 3, "Unentschieden Tendenz → 3")]
+        [DataRow(1, 0, 3, 1, 2, "Heimsieg Tendenz → 2")]
+        [DataRow(0, 2, 1, 3, 4, "Auswärtssieg Tordifferenz (-2) → 4")]
+        [DataRow(0, 1, 1, 3, 3, "Auswärtssieg Tendenz → 3")]
+        [DataRow(1, 2, 1, 2, 5, "Auswärtssieg exakt → 5")]
+        [DataRow(2, 0, 0, 2, 0, "Falsche Tendenz → 0")]
+        [DataRow(1, 1, 2, 0, 0, "Unentschieden getippt, Heimsieg → 0")]
         public void Calculate_ReturnsExpectedPoints(int predH, int predA, int actH, int actA, int expected, string scenario)
             => Assert.AreEqual(expected,
                 PredictionScoringService.Calculate(Tip(predH, predA), Match(actH, actA)));

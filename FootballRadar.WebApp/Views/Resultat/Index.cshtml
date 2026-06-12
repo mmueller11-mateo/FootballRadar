@@ -42,17 +42,13 @@
                                     <td>@tip.TipperName</td>
                                     <td class="text-center">@tip.PredictedHome : @tip.PredictedAway</td>
                                     <td class="text-center">
-                                        @if (tip.Points == 3)
+                                        @if (tip.Points == null)
                                         {
-                                            <span class="badge bg-success">3</span>
+                                            <span class="text-muted">–</span>
                                         }
-                                        else if (tip.Points == 2)
+                                        else if (tip.Points > 0)
                                         {
-                                            <span class="badge bg-primary">2</span>
-                                        }
-                                        else if (tip.Points == 1)
-                                        {
-                                            <span class="badge bg-warning text-dark">1</span>
+                                            <span class="badge bg-success">@tip.Points</span>
                                         }
                                         else
                                         {

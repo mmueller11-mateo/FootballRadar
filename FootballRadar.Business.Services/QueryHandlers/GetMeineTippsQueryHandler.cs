@@ -20,12 +20,14 @@ namespace FootballRadar.Business.Services.QueryHandlers
         public async Task<IEnumerable<MeinTippEntry>> Handle(GetMeineTippsQuery request, CancellationToken cancellationToken)
         {
             var tips = await wmTipRepository.GetByUserIdAsync(request.UserId, cancellationToken);
+
             var matches = await matchRepository.GetAllAsync(cancellationToken);
             var teams = await nationalTeamRepository.GetAllAsync(cancellationToken);
 
             return tips.Select(tip =>
             {
                 var match = matches.FirstOrDefault(m => m.Id == tip.WmMatchId);
+
                 var home = teams.FirstOrDefault(t => t.Id == match?.HomeNationalTeamId);
                 var away = teams.FirstOrDefault(t => t.Id == match?.AwayNationalTeamId);
 

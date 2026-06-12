@@ -34,7 +34,13 @@ namespace FootballRadar.Admin.Data.Repositories
         public async Task UpdateAsync(WmTip tip, CancellationToken cancellationToken)
         {
             using var context = await this.context.CreateDbContextAsync();
-            context.WmTips.Update(tip);
+            var existing = await context.WmTips
+                .FirstOrDefaultAsync(t => t.Id == tip.Id, cancellationToken);
+
+            if (existing == null) return;
+
+            existing.Points = tip.Points;
+            context.Entry(existing).State = EntityState.Modified;
             await context.SaveChangesAsync(cancellationToken);
         }
 
