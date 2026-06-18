@@ -17,32 +17,31 @@ namespace FootballRadar.Business.Services.TippSpiel
             int actualDiff = actualHome - actualAway;
             int predictedDiff = predictedHome - predictedAway;
 
-            // Falsche Tendenz → 0
-            if (Math.Sign(predictedDiff) != Math.Sign(actualDiff))
+            // Falsche Tendenz
+            if (Math.Sign(actualDiff) != Math.Sign(predictedDiff))
                 return 0;
 
             // Exaktes Ergebnis
-            if (predictedHome == actualHome && predictedAway == actualAway)
+            if (actualHome == predictedHome &&
+                actualAway == predictedAway)
             {
-                if (actualDiff == 0) return 4; // Unentschieden exakt
-                if (actualDiff > 0) return 4; // Heimsieg exakt
-                return 5;                       // Auswärtssieg exakt
+                return 4;
             }
 
-            // Unentschieden: kein Tordifferenz-Tier → direkt Tendenz
+            // Unentschieden (nicht exakt)
             if (actualDiff == 0)
-                return 3;
-
-            // Richtige Tordifferenz (nur bei Siegen)
-            if (predictedDiff == actualDiff)
             {
-                if (actualDiff > 0) return 3; // Heimsieg Tordifferenz
-                return 4;                      // Auswärtssieg Tordifferenz
+                return 2;
             }
 
-            // Nur Tendenz
-            if (actualDiff > 0) return 2; // Heimsieg Tendenz
-            return 3;                      // Auswärtssieg Tendenz
+            // Sieg mit richtiger Tordifferenz
+            if (actualDiff == predictedDiff)
+            {
+                return 3;
+            }
+
+            // Nur richtige Tendenz
+            return 2;
         }
     }
 }

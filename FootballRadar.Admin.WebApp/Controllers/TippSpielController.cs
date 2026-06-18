@@ -72,5 +72,15 @@ namespace FootballRadar.Admin.WebApp.Controllers
             TempData["SuccessMessage"] = "Sieger gespeichert & Punkte berechnet.";
             return RedirectToAction(nameof(MatchList));
         }
+
+        [HttpPost]
+        public async Task<IActionResult> RecalculatePoints(CancellationToken cancellationToken = default)
+        {
+            var mediator = HttpContext.RequestServices.GetRequiredService<IMediator>();
+            await mediator.Send(new RecalculateAllPointsCommand(), cancellationToken);
+
+            TempData["SuccessMessage"] = "Alle Punkte neu berechnet.";
+            return RedirectToAction(nameof(MatchList));
+        }
     }
 }

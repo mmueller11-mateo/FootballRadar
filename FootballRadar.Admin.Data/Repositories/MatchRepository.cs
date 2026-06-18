@@ -43,5 +43,13 @@ namespace FootballRadar.Admin.Data.Repositories
             await dbContext.Fixtures.AddAsync(match, cancellationToken);
             await dbContext.SaveChangesAsync(cancellationToken);
         }
+
+        public async Task<IEnumerable<Match>> GetByStatusAsync(string status, CancellationToken cancellationToken)
+        {
+            using var dbContext = await context.CreateDbContextAsync();
+            return await dbContext.Fixtures
+                .Where(m => m.WmPhase != null && m.Status == status)
+                .ToListAsync(cancellationToken);
+        }
     }
 }

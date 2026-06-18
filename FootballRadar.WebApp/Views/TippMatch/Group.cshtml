@@ -38,12 +38,10 @@
         @foreach (var match in Model.UpcomingMatches.OrderBy(m => m.KickoffUtc))
         {
             var tip = Model.ExistingTips.FirstOrDefault(t => t.WmMatchId == match.Id);
-
             <div class="col-12 col-md-6 col-lg-4">
 
                 <div class="card shadow-sm h-100 border-0">
                     <div class="card-body">
-
                         <div class="d-flex justify-content-between mb-2">
                             <small class="text-muted">
                                 @match.KickoffUtc.ToLocalTime().ToString("dd.MM HH:mm")
@@ -51,15 +49,11 @@
                         </div>
 
                         <div class="d-flex justify-content-between align-items-center mb-3">
-
                             <div class="text-center" style="width:40%;">
-                                <img src="@match.HomeLogoUrl"
-                                     style="width:34px;height:34px;object-fit:contain;" />
+                                <img src="@match.HomeLogoUrl" style="width:34px;height:34px;object-fit:contain;" />
                                 <div class="small fw-semibold">@match.HomeTeam</div>
                             </div>
-
                             <div class="fw-bold text-muted">VS</div>
-
                             <div class="text-center" style="width:40%;">
                                 <img src="@match.AwayLogoUrl"
                                      style="width:34px;height:34px;object-fit:contain;" />

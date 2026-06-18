@@ -42,16 +42,10 @@ namespace FootballRadar.Admin.Business.Services.CommandHandlers.Create
             int predictedDiff = predHome - predAway;
 
             if (Math.Sign(predictedDiff) != Math.Sign(actualDiff)) return 0;
-
-            if (predHome == actHome && predAway == actAway)
-                return actualDiff > 0 ? 4 : actualDiff == 0 ? 4 : 5;
-
-            if (actualDiff == 0) return 3;
-
-            if (predictedDiff == actualDiff)
-                return actualDiff > 0 ? 3 : 4;
-
-            return actualDiff > 0 ? 2 : 3;
+            if (predHome == actHome && predAway == actAway) return 4;
+            if (actualDiff == 0) return 2;      // Unentschieden Tendenz → 2, keine Differenz-Stufe
+            if (predictedDiff == actualDiff) return 3;  // Sieg Tordifferenz → 3
+            return 2;                                    // Sieg Tendenz → 2
         }
     }
 }
