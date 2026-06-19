@@ -26,7 +26,7 @@ namespace FootballRadar.EventHandling
                 IsDispatched = false
             };
 
-            db.Events.Add(eventRecord);
+            db.EventRecords.Add(eventRecord);
 
             await db.SaveChangesAsync(cancellationToken);
         }
@@ -35,14 +35,14 @@ namespace FootballRadar.EventHandling
         {
             await using var db = await dbContextFactory.CreateDbContextAsync(cancellationToken);
 
-            return await db.Events.Where(@event => eventTypes.Contains(@event.EventType) && @event.IsDispatched == false).ToArrayAsync(cancellationToken);
+            return await db.EventRecords.Where(@event => eventTypes.Contains(@event.EventType) && @event.IsDispatched == false).ToArrayAsync(cancellationToken);
         }
 
         public async Task MarkEventAsProcessed(Guid eventId, CancellationToken cancellationToken)
         {
             await using var db = await dbContextFactory.CreateDbContextAsync(cancellationToken);
 
-            await db.Events.Where(@event => @event.Id == eventId).ExecuteUpdateAsync(update => update.SetProperty(@event => @event.IsDispatched, true), cancellationToken);
+            await db.EventRecords.Where(@event => @event.Id == eventId).ExecuteUpdateAsync(update => update.SetProperty(@event => @event.IsDispatched, true), cancellationToken);
         }
     }
 }

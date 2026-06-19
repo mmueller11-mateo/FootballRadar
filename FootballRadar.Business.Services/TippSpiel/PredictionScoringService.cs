@@ -22,8 +22,7 @@ namespace FootballRadar.Business.Services.TippSpiel
                 return 0;
 
             // Exaktes Ergebnis
-            if (actualHome == predictedHome &&
-                actualAway == predictedAway)
+            if (actualHome == predictedHome && actualAway == predictedAway)
             {
                 return 4;
             }

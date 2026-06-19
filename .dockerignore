@@ -1,0 +1,14 @@
+# Build-Outputs
+**/bin/
+**/obj/
+publish/
+TestResults/
+
+# IDE
+.vs/
+.git/
+*.user
+
+# Test-Projekte
+FootballRadar.UnitTests/
+FootballRadar.Admin.UnitTests/

@@ -7,7 +7,6 @@ using FootballRadar.Business.Entities.TippSpiel;
 using FootballRadar.Business.Entities.TransferEntities;
 
 using Microsoft.EntityFrameworkCore;
-
 using System.Text.Json;
 
 namespace FootballRadar.Data
@@ -44,7 +43,6 @@ namespace FootballRadar.Data
         public DbSet<NationalTeam> NationalTeams { get; set; }
         public DbSet<BonusQuestion> BonusQuestions { get; set; }
         public DbSet<BonusTip> BonusTips { get; set; }
-
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

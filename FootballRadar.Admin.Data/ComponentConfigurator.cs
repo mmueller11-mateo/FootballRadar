@@ -35,5 +35,12 @@ namespace FootballRadar.Admin.Data
             services.AddTransient<IWmTipRepository, WmTipRepository>();
 
         }
+
+        public static void EnsureDatabase(IServiceProvider services)
+        {
+            var factory = services.GetRequiredService<IDbContextFactory<AdminDbContext>>();
+            using var db = factory.CreateDbContext();
+            db.Database.EnsureCreated();
+        }
     }
 }

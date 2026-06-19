@@ -72,31 +72,62 @@
     <h4 class="mb-3">Notification Preferences</h4>
     <div class="card shadow-sm mb-5">
         <div class="card-body">
-            <form method="post" asp-action="UpdateNotifications">
-                <input type="hidden" name="userId" value="@Model.UserId" />
-                @if (!Model.EventNotificationPreferences.Any())
+            @{
+                // Jeder Eintrag entspricht einer Event-Klasse aus FootballRadar.Abstractions.Events.
+                // Key im Dictionary = typeof(TEvent).FullName (siehe PushNotificationService.Handle<TEvent>).
+                // Label/Beschreibung sind rein für die Anzeige.
+                var eventTypes = new (string FullName, string Label, string Description, string Icon)[]
                 {
-                    <p class="text-muted">No notification preferences configured.</p>
-                }
-                else
-                {
-                    foreach (var pref in Model.EventNotificationPreferences)
-                    {
-                        <div class="form-check mb-2">
-                            <input type="hidden" name="preferences[@pref.Key]" value="false" />
-                            <input class="form-check-input" type="checkbox"
-                                   name="preferences[@pref.Key]"
-                                   value="true"
-                                   id="pref_@pref.Key"
-                            @(pref.Value ? "checked" : "") />
-                            <label class="form-check-label" for="pref_@pref.Key">@pref.Key</label>
+                    ("FootballRadar.Abstractions.Events.CreditDeposited", "Credit Deposited", "When credits are added to your wallet", "bi-cash-coin"),
+                    ("FootballRadar.Abstractions.Events.TransferConfirmed", "Transfer Confirmed", "When a transfer you follow is confirmed", "bi-arrow-left-right"),
+                    ("FootballRadar.Abstractions.Events.TransferRumorReported", "Transfer Rumor Reported", "When a new transfer rumor is reported", "bi-megaphone"),
+                    ("FootballRadar.Abstractions.Events.PredictionMarketClosed", "Prediction Market Closed", "When a prediction market you bet on closes", "bi-flag"),
+                };
+                var prefs = Model.EventNotificationPreferences;
+            }
+
+            @foreach (var eventType in eventTypes)
+            {
+                var isEnabled = prefs.TryGetValue(eventType.FullName, out var value) && value;
+
+                <div class="d-flex align-items-center justify-content-between py-2 border-bottom">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi @eventType.Icon text-secondary"></i>
+                        <div>
+                            <div>@eventType.Label</div>
+                            <small class="text-muted">@eventType.Description</small>
                         </div>
-                    }
-                    <button type="submit" class="btn btn-primary mt-2">Save</button>
-                }
-            </form>
+                    </div>
+                    <div class="form-check form-switch m-0">
+                        <input class="form-check-input notification-toggle" type="checkbox" role="switch"
+                               data-event-type="@eventType.FullName"
+                               id="pref_@eventType.FullName"
+                               style="width: 2.5em; height: 1.4em; cursor: pointer;"
+                        @(isEnabled ? "checked" : "") />
+                    </div>
+                </div>
+            }
         </div>
     </div>
+
+    <script>
+            document.querySelectorAll('.notification-toggle').forEach(function (toggle) {
+                toggle.addEventListener('change', function () {
+                    fetch('@Url.Action("SetNotificationPreference", "Profile")', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            userId: '@Model.UserId',
+                            eventType: toggle.dataset.eventType,
+                            isEnabled: toggle.checked
+                        })
+                    }).catch(function () {
+                        // Bei Fehler den Toggle zurücksetzen
+                        toggle.checked = !toggle.checked;
+                    });
+                });
+            });
+    </script>
 
     @* Active Bets *@
     <h4 class="mb-3">Active Bets <span class="badge bg-secondary">@Model.ActiveBets.Count</span></h4>

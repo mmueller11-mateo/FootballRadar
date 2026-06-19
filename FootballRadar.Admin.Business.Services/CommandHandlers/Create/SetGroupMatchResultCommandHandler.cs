@@ -9,9 +9,7 @@ namespace FootballRadar.Admin.Business.Services.CommandHandlers.Create
         private readonly IMatchRepository matchRepository;
         private readonly IWmTipRepository wmTipRepository;
 
-        public SetGroupMatchResultCommandHandler(
-            IMatchRepository matchRepository,
-            IWmTipRepository wmTipRepository)
+        public SetGroupMatchResultCommandHandler(IMatchRepository matchRepository, IWmTipRepository wmTipRepository)
         {
             this.matchRepository = matchRepository;
             this.wmTipRepository = wmTipRepository;
@@ -26,7 +24,6 @@ namespace FootballRadar.Admin.Business.Services.CommandHandlers.Create
             match.AwayGoals = request.AwayGoals;
             match.Status = "FT";
             await matchRepository.UpdateAsync(match, cancellationToken);
-
             var tips = await wmTipRepository.GetByMatchIdAsync(request.MatchId, cancellationToken);
             foreach (var tip in tips)
             {

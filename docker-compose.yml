@@ -1,0 +1,79 @@
+services:
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: footballradar-sql
+    environment:
+      SA_PASSWORD: "FootballRadar_SA!2024"
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: "Express"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver-data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD", "/opt/mssql-tools18/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "FootballRadar_SA!2024", "-Q", "SELECT 1", "-No"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  webapp:
+    build:
+      context: .
+      dockerfile: FootballRadar.WebApp/Dockerfile
+    container_name: footballradar-webapp
+    ports:
+      - "5000:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__ApplicationDB=Server=sqlserver;Database=FootballRadar_AppDB;User Id=sa;Password=FootballRadar_SA!2024;TrustServerCertificate=True;
+      - ApiSports__ApiKey=f7ee30c5953455799e17db227c692816
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+
+  admin:
+    build:
+      context: .
+      dockerfile: FootballRadar.Admin.WebApp/Dockerfile
+    container_name: footballradar-admin
+    ports:
+      - "5001:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__ApplicationDB=Server=sqlserver;Database=FootballRadar_AppDB;User Id=sa;Password=FootballRadar_SA!2024;TrustServerCertificate=True;
+      - ApiSports__ApiKey=f7ee30c5953455799e17db227c692816
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+
+  datacollector:
+    build:
+      context: .
+      dockerfile: FootballRadar.DataCollector/Dockerfile
+    container_name: footballradar-datacollector
+    environment:
+      - DOTNET_ENVIRONMENT=Production
+      - ConnectionStrings__ApplicationDB=Server=sqlserver;Database=FootballRadar_AppDB;User Id=sa;Password=FootballRadar_SA!2024;TrustServerCertificate=True;
+      - ApiSports__ApiKey=f7ee30c5953455799e17db227c692816
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+
+  datacollector-transfermarkt:
+    build:
+      context: .
+      dockerfile: FootballRadar.DataCollector.Transfermarkt/Dockerfile
+    container_name: footballradar-datacollector-transfermarkt
+    environment:
+      - DOTNET_ENVIRONMENT=Production
+      - ConnectionStrings__ApplicationDB=Server=sqlserver;Database=FootballRadar_AppDB;User Id=sa;Password=FootballRadar_SA!2024;TrustServerCertificate=True;
+      - Kaggle__ApiToken=KGAT_548c617d6b52a336f767a5340f6c3599
+      - Kaggle__OutputPath=/tmp/kaggle
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+
+volumes:
+  sqlserver-data:

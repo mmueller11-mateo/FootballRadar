@@ -37,5 +37,12 @@ namespace FootballRadar.EventHandling
             services.AddKeyedTransient<IEventHandler, EmailNotificationService>(EventDispatchType.Email);
             services.AddTransient<ICurrentUserService, CurrentUserService>();
         }
+
+        public static void EnsureDatabase(IServiceProvider services)
+        {
+            var factory = services.GetRequiredService<IDbContextFactory<EventDbContext>>();
+            using var db = factory.CreateDbContext();
+            db.Database.EnsureCreated();
+        }
     }
 }

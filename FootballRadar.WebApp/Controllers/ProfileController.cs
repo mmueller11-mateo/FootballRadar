@@ -28,16 +28,27 @@ namespace FootballRadar.WebApp.Controllers
             return RedirectToAction(nameof(Index), new { userId });
         }
 
+        // Wird per fetch() vom Toggle-Switch aufgerufen - speichert sofort, kein Page Reload.
         [HttpPost]
-        public async Task<IActionResult> UpdateNotifications(Guid userId, Dictionary<string, bool> preferences, CancellationToken cancellationToken)
+        public async Task<IActionResult> SetNotificationPreference(
+            [FromBody] SetNotificationPreferenceRequest request,
+            CancellationToken cancellationToken)
         {
             var mediator = HttpContext.RequestServices.GetRequiredService<IMediator>();
-            await mediator.Send(new UpdateNotificationPreferencesCommand
+            await mediator.Send(new SetNotificationPreferenceCommand
             {
-                UserId = userId,
-                Preferences = preferences
+                UserId = request.UserId,
+                EventType = request.EventType,
+                IsEnabled = request.IsEnabled
             }, cancellationToken);
-            return RedirectToAction(nameof(Index), new { userId });
+            return Ok();
         }
+    }
+
+    public sealed class SetNotificationPreferenceRequest
+    {
+        public Guid UserId { get; set; }
+        public string EventType { get; set; } = string.Empty;
+        public bool IsEnabled { get; set; }
     }
 }

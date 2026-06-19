@@ -13,7 +13,7 @@ namespace FootballRadar.EventHandling
             ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
         }
 
-        public DbSet<EventRecord> Events { get; set; }
+        public DbSet<EventRecord> EventRecords { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -21,7 +21,7 @@ namespace FootballRadar.EventHandling
 
             builder.Entity<EventRecord>(entity =>
             {
-                entity.ToTable("Events");
+                entity.ToTable("EventRecords");
                 entity.HasKey(e => e.Id);
             });
 

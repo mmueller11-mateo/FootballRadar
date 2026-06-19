@@ -28,7 +28,7 @@ namespace FootballRadar.Admin.Data.ORM
 
             modelBuilder.Entity<Country>(entity =>
             {
-                entity.ToTable("Countries", t => t.ExcludeFromMigrations());
+                entity.ToTable("Countries");
                 entity.HasKey(c => c.Id);
                 entity.Property(c => c.Name).IsRequired().HasMaxLength(100);
                 entity.Property(c => c.Code);
@@ -37,7 +37,7 @@ namespace FootballRadar.Admin.Data.ORM
 
             modelBuilder.Entity<PublicLeague>(entity =>
             {
-                entity.ToTable("Leagues", t => t.ExcludeFromMigrations());
+                entity.ToTable("Leagues");
                 entity.HasKey(l => l.Id);
                 entity.Property(l => l.Name).IsRequired().HasMaxLength(100);
                 entity.Property(l => l.Logo).HasMaxLength(2048);
@@ -45,7 +45,7 @@ namespace FootballRadar.Admin.Data.ORM
 
             modelBuilder.Entity<Team>(entity =>
             {
-                entity.ToTable("Teams", t => t.ExcludeFromMigrations());
+                entity.ToTable("Teams");
                 entity.HasKey(t => t.Id);
                 entity.Property(t => t.Name).IsRequired().HasMaxLength(100);
             });
@@ -57,16 +57,17 @@ namespace FootballRadar.Admin.Data.ORM
                 entity.Property(nt => nt.Level).IsRequired();
                 entity.Property(nt => nt.CountryId).IsRequired();
             });
+
             modelBuilder.Entity<Match>(entity =>
             {
-                entity.ToTable("Fixtures", t => t.ExcludeFromMigrations());
+                entity.ToTable("Fixtures");
                 entity.HasKey(m => m.Id);
                 entity.Property(m => m.WmPhase).HasConversion<string>();
             });
 
             modelBuilder.Entity<WmTip>(entity =>
             {
-                entity.ToTable("WmTips", t => t.ExcludeFromMigrations());
+                entity.ToTable("WmTips");
                 entity.HasKey(t => t.Id);
             });
         }

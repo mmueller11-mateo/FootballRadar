@@ -14,6 +14,12 @@ namespace FootballRadar.WebApp
 
             var app = builder.Build();
 
+            using (var scope = app.Services.CreateScope())
+            {
+                FootballRadar.Data.ComponentConfigurator.EnsureDatabase(scope.ServiceProvider);
+                FootballRadar.EventHandling.ComponentConfigurator.EnsureDatabase(scope.ServiceProvider);
+            }
+
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {

@@ -42,5 +42,12 @@ namespace FootballRadar.Data
             services.AddTransient<IBonusQuestionRepository, BonusQuestionRepository>();
             services.AddTransient<IBonusTipRepository, BonusTipRepository>();
         }
+
+        public static void EnsureDatabase(IServiceProvider services)
+        {
+            var factory = services.GetRequiredService<IDbContextFactory<ApplicationDbContext>>();
+            using var db = factory.CreateDbContext();
+            db.Database.EnsureCreated();
+        }
     }
 }

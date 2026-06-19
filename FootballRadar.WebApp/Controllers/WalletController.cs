@@ -94,5 +94,7 @@ namespace FootballRadar.WebApp.Controllers
             var wallet = await mediator.Send(new GetWalletQuery { UserId = userId }, cancellationToken);
             return Json(new { status = transaction?.Status.ToString(), credits = wallet?.Credits ?? 0 });
         }
+
+
     }
 }
