@@ -88,7 +88,7 @@
 
             @foreach (var eventType in eventTypes)
             {
-                var isEnabled = prefs.TryGetValue(eventType.FullName, out var value) && value;
+                var isEnabled = prefs.SingleOrDefault(x => x.EventType == eventType.FullName && x.IsEnabled) is not null;
 
                 <div class="d-flex align-items-center justify-content-between py-2 border-bottom">
                     <div class="d-flex align-items-center gap-2">

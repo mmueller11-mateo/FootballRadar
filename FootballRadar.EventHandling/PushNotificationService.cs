@@ -23,17 +23,15 @@ namespace FootballRadar.EventHandling
         public async Task Handle<TEvent>(TEvent @event, CancellationToken cancellationToken)
             where TEvent : IEvent
         {
-            var userProfile = await userRepository.GetProfileByUserIdAsync(
-                currentUserService.UserId,
-                cancellationToken);
+            var userProfile = await userRepository.GetProfileByUserIdAsync(currentUserService.UserId, cancellationToken);
 
             if (userProfile is null)
                 return;
 
-            if (userProfile.EventNotificationPreferences.TryGetValue(
-                    typeof(TEvent).FullName!,
-                    out var isEnabled)
-                && isEnabled)
+            var preference = userProfile.EventNotificationPreferences.SingleOrDefault(x => x.EventType == typeof(TEvent).FullName && x.IsEnabled);
+
+
+            if (preference is not null)
             {
                 var message = EventSerializer.Serialize(@event);
 

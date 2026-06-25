@@ -18,7 +18,6 @@ namespace FootballRadar.WebApp
 
             if (environment.IsDevelopment())
             {
-                services.AddDatabaseDeveloperPageExceptionFilter();
             }
 
             services.AddControllersWithViews();

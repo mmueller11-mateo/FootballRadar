@@ -7,5 +7,6 @@ namespace FootballRadar.Abstractions
         Task<IEnumerable<BonusQuestion>> GetAllAsync(CancellationToken ct);
         Task<BonusQuestion?> GetByIdAsync(Guid id, CancellationToken ct);
         Task UpdateAsync(BonusQuestion question, CancellationToken ct);
+        Task<IEnumerable<BonusQuestion>> GetByIdsAsync(IReadOnlySet<Guid> ids, CancellationToken ct);
     }
 }

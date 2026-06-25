@@ -48,6 +48,7 @@ namespace FootballRadar.Data
             var factory = services.GetRequiredService<IDbContextFactory<ApplicationDbContext>>();
             using var db = factory.CreateDbContext();
             db.Database.EnsureCreated();
+            db.Database.Migrate();
         }
     }
 }

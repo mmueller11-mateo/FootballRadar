@@ -7,7 +7,7 @@ namespace FootballRadar.Business.Entities.Betting
         public Guid UserId { get; set; }
         public string Nickname { get; set; } = string.Empty;
         public string? ProfilePictureUrl { get; set; }
-        public Dictionary<string, bool> EventNotificationPreferences { get; set; } = [];
+        public ICollection<NotificationPreference> EventNotificationPreferences { get; set; } = [];
 
         [NotMapped]
         public IReadOnlyList<Bet> ActiveBets { get; set; } = [];

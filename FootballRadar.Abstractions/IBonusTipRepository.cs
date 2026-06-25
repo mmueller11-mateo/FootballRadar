@@ -10,5 +10,6 @@ namespace FootballRadar.Data.Repositories
         Task UpsertAsync(BonusTip tip, CancellationToken ct);
         Task UpdateAsync(BonusTip tip, CancellationToken ct);
         Task<IEnumerable<BonusTip>> GetAllAsync(CancellationToken ct);
+        Task<IEnumerable<BonusTip>> GetByQuestionIdsAsync(IReadOnlySet<Guid> questionIds, CancellationToken ct);
     }
 }

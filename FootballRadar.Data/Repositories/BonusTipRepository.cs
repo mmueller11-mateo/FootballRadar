@@ -60,5 +60,11 @@ namespace FootballRadar.Data.Repositories
             using var dbContext = await dbContextFactory.CreateDbContextAsync(cancellationToken);
             return await dbContext.BonusTips.AsNoTracking().ToListAsync(cancellationToken);
         }
+
+        public async Task<IEnumerable<BonusTip>> GetByQuestionIdsAsync(IReadOnlySet<Guid> questionIds, CancellationToken cancellationToken)
+        {
+            using var dbContext = await dbContextFactory.CreateDbContextAsync(cancellationToken);
+            return await dbContext.BonusTips.AsNoTracking().Where(x => questionIds.Contains(x.BonusQuestionId)).ToListAsync(cancellationToken);
+        }
     }
 }

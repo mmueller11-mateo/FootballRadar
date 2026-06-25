@@ -1,4 +1,5 @@
 ﻿using FootballRadar.Abstractions;
+using FootballRadar.Business.Entities.Betting;
 using FootballRadar.Business.Services.Commands;
 using MediatR;
 
@@ -19,7 +20,20 @@ namespace FootballRadar.Business.Services.CommandHandlers
             if (profile is null)
                 throw new InvalidOperationException("User profile not found.");
 
-            profile.EventNotificationPreferences[request.EventType] = request.IsEnabled;
+            var preference = profile.EventNotificationPreferences.SingleOrDefault(x => x.EventType == request.EventType);
+            if (preference is not null)
+            {
+                preference.IsEnabled = request.IsEnabled;
+            }
+            else
+            {
+                profile.EventNotificationPreferences.Add(new NotificationPreference
+                {
+                    UserId = request.UserId,
+                    EventType = request.EventType,
+                    IsEnabled = request.IsEnabled
+                });
+            }
             await userProfileRepository.UpdateAsync(profile, cancellationToken);
         }
     }

@@ -20,10 +20,8 @@ namespace FootballRadar.WebApp
                 FootballRadar.EventHandling.ComponentConfigurator.EnsureDatabase(scope.ServiceProvider);
             }
 
-            // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
-                app.UseMigrationsEndPoint();
             }
             else
             {

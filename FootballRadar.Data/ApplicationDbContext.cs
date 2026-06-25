@@ -43,6 +43,7 @@ namespace FootballRadar.Data
         public DbSet<NationalTeam> NationalTeams { get; set; }
         public DbSet<BonusQuestion> BonusQuestions { get; set; }
         public DbSet<BonusTip> BonusTips { get; set; }
+        public DbSet<NotificationPreference> NotificationPreferences { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -51,14 +52,19 @@ namespace FootballRadar.Data
             {
                 entity.ToTable("UserProfiles");
                 entity.HasKey(e => e.UserId);
-                entity.Property(e => e.EventNotificationPreferences)
-                    .HasConversion(
-                        property => JsonSerializer.Serialize(property),
-                        value => JsonSerializer.Deserialize<Dictionary<string, bool>>(value) ?? new Dictionary<string, bool>()
-                    );
                 entity.HasOne<User>()
                     .WithOne()
                     .HasForeignKey<UserProfile>(e => e.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            builder.Entity<NotificationPreference>(entity =>
+            {
+                entity.ToTable("NotificationPreferences");
+                entity.HasKey(e => e.Id);
+                entity.HasOne<User>()
+                    .WithMany()
+                    .HasForeignKey(e => e.UserId)
                     .OnDelete(DeleteBehavior.Cascade);
             });
 
