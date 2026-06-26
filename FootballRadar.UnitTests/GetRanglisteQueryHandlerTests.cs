@@ -12,10 +12,8 @@ namespace FootballRadar.UnitTests
     {
         private static readonly Guid _user1Id = Guid.NewGuid();
         private static readonly Guid _user2Id = Guid.NewGuid();
-
         private static readonly Guid _match1Id = Guid.NewGuid();
         private static readonly Guid _match2Id = Guid.NewGuid();
-        private static readonly Guid _match3Id = Guid.NewGuid();
 
         private static User MakeUser(Guid id, string name) => new()
         {
@@ -25,11 +23,7 @@ namespace FootballRadar.UnitTests
             PasswordHash = "x"
         };
 
-        private static WmTip MakeGroupTip(
-            Guid userId,
-            Guid matchId,
-            int home,
-            int away)
+        private static WmTip MakeGroupTip(Guid userId, Guid matchId, int home, int away)
             => new()
             {
                 Id = Guid.NewGuid(),
@@ -40,40 +34,28 @@ namespace FootballRadar.UnitTests
                 IsKoMatch = false
             };
 
-        private static WmTip MakeKoTip(
-    Guid userId,
-    Guid matchId,
-    int home,
-    int away)
-    => new()
-    {
-        Id = Guid.NewGuid(),
-        UserId = userId,
-        WmMatchId = matchId,
-        IsKoMatch = true,
-        HomeGoals = home,
-        AwayGoals = away,
-    };
+        private static WmTip MakeKoTip(Guid userId, Guid matchId, int home, int away)
+        => new()
+        {
+            Id = Guid.NewGuid(),
+            UserId = userId,
+            WmMatchId = matchId,
+            IsKoMatch = true,
+            HomeGoals = home,
+            AwayGoals = away,
+        };
 
-        private static Business.Entities.LeagueEntities.Match MakeMatch(
-            Guid id,
-            int? homeGoals,
-            int? awayGoals,
-            Guid? homeTeamId = null,
-            Guid? awayTeamId = null)
-            => new()
-            {
-                Id = id,
-                HomeGoals = homeGoals,
-                AwayGoals = awayGoals,
-                HomeNationalTeamId = homeTeamId,
-                AwayNationalTeamId = awayTeamId
-            };
+        private static Business.Entities.LeagueEntities.Match MakeMatch(Guid id, int? homeGoals, int? awayGoals, Guid? homeTeamId = null, Guid? awayTeamId = null)
+        => new()
+        {
+            Id = id,
+            HomeGoals = homeGoals,
+            AwayGoals = awayGoals,
+            HomeNationalTeamId = homeTeamId,
+            AwayNationalTeamId = awayTeamId
+        };
 
-        private static GetRanglisteQueryHandler BuildHandler(
-     IEnumerable<WmTip> tips,
-     IEnumerable<Business.Entities.LeagueEntities.Match> matches,
-     IEnumerable<User> users)
+        private static GetRanglisteQueryHandler BuildHandler(IEnumerable<WmTip> tips, IEnumerable<Business.Entities.LeagueEntities.Match> matches, IEnumerable<User> users)
         {
             var tipRepo = new Mock<IWmTipRepository>();
             var matchRepo = new Mock<IMatchRepository>();
@@ -92,12 +74,7 @@ namespace FootballRadar.UnitTests
                 .Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
                 .ReturnsAsync(users);
 
-            return new GetRanglisteQueryHandler(
-                tipRepo.Object,
-                userRepo.Object,
-                matchRepo.Object,
-                bonustipRepo.Object
-                );
+            return new GetRanglisteQueryHandler(tipRepo.Object, userRepo.Object, matchRepo.Object, bonustipRepo.Object);
         }
 
         [TestMethod]
@@ -120,9 +97,7 @@ namespace FootballRadar.UnitTests
 
             var handler = BuildHandler(tips, matches, users);
 
-            var result = (await handler.Handle(
-                new GetRanglisteQuery(),
-                CancellationToken.None)).ToList();
+            var result = (await handler.Handle(new GetRanglisteQuery(), CancellationToken.None)).ToList();
 
             Assert.AreEqual(4, result[0].TotalPoints);
         }
@@ -147,9 +122,7 @@ namespace FootballRadar.UnitTests
 
             var handler = BuildHandler(tips, matches, users);
 
-            var result = (await handler.Handle(
-                new GetRanglisteQuery(),
-                CancellationToken.None)).ToList();
+            var result = (await handler.Handle(new GetRanglisteQuery(), CancellationToken.None)).ToList();
 
             Assert.AreEqual(3, result[0].TotalPoints);
         }
@@ -159,24 +132,22 @@ namespace FootballRadar.UnitTests
         {
             var tips = new[]
             {
-        MakeGroupTip(_user1Id, _match1Id, 2, 0)
-    };
+                MakeGroupTip(_user1Id, _match1Id, 2, 0)
+            };
 
             var matches = new[]
             {
-        MakeMatch(_match1Id, 4, 1)
-    };
+                MakeMatch(_match1Id, 4, 1)
+            };
 
             var users = new[]
             {
-        MakeUser(_user1Id, "Alice")
-    };
+                MakeUser(_user1Id, "Alice")
+            };
 
             var handler = BuildHandler(tips, matches, users);
 
-            var result = (await handler.Handle(
-                new GetRanglisteQuery(),
-                CancellationToken.None)).ToList();
+            var result = (await handler.Handle(new GetRanglisteQuery(), CancellationToken.None)).ToList();
 
             Assert.AreEqual(2, result[0].TotalPoints);
         }
@@ -201,9 +172,7 @@ namespace FootballRadar.UnitTests
 
             var handler = BuildHandler(tips, matches, users);
 
-            var result = (await handler.Handle(
-                new GetRanglisteQuery(),
-                CancellationToken.None)).ToList();
+            var result = (await handler.Handle(new GetRanglisteQuery(), CancellationToken.None)).ToList();
 
             Assert.AreEqual(0, result[0].TotalPoints);
         }
@@ -278,15 +247,15 @@ namespace FootballRadar.UnitTests
         {
             var tips = new WmTip[]
             {
-        MakeGroupTip(_user1Id, _match1Id, 2, 1), // exakt → 4 Punkte
-        MakeKoTip(_user1Id, _match2Id, 2, 0)     // richtige Differenz → 3 Punkte
+                MakeGroupTip(_user1Id, _match1Id, 2, 1), // exakt → 4 Punkte
+                MakeKoTip(_user1Id, _match2Id, 2, 0)     // richtige Differenz → 3 Punkte
             };
 
             var matches = new[]
             {
-        MakeMatch(_match1Id, 2, 1),
-        MakeMatch(_match2Id, 3, 1)
-    };
+                MakeMatch(_match1Id, 2, 1),
+                MakeMatch(_match2Id, 3, 1)
+            };
 
             var users = new[] { MakeUser(_user1Id, "Alice") };
 
@@ -301,24 +270,24 @@ namespace FootballRadar.UnitTests
         {
             var tips = new WmTip[]
             {
-        MakeGroupTip(_user1Id, _match1Id, 2, 1), // exakt → 4
-        MakeKoTip(_user1Id, _match2Id, 2, 0),    // richtige Differenz → 3
+                MakeGroupTip(_user1Id, _match1Id, 2, 1), // exakt → 4
+                MakeKoTip(_user1Id, _match2Id, 2, 0),    // richtige Differenz → 3
 
-        MakeGroupTip(_user2Id, _match1Id, 0, 0), // falsch → 0
-        MakeKoTip(_user2Id, _match2Id, 0, 1)     // falsche Tendenz → 0
+                MakeGroupTip(_user2Id, _match1Id, 0, 0), // falsch → 0
+                MakeKoTip(_user2Id, _match2Id, 0, 1)     // falsche Tendenz → 0
             };
 
             var matches = new[]
             {
-        MakeMatch(_match1Id, 2, 1),
-        MakeMatch(_match2Id, 3, 1)
-    };
+                MakeMatch(_match1Id, 2, 1),
+                MakeMatch(_match2Id, 3, 1)
+            };
 
             var users = new[]
             {
-        MakeUser(_user1Id, "Alice"),
-        MakeUser(_user2Id, "Bob")
-    };
+                MakeUser(_user1Id, "Alice"),
+                MakeUser(_user2Id, "Bob")
+            };
 
             var result = (await BuildHandler(tips, matches, users)
                 .Handle(new GetRanglisteQuery(), CancellationToken.None)).ToList();

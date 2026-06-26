@@ -116,9 +116,97 @@
         let h = '';
         for (let i = 0; i < n; i++) {
             if (i % 2 === 0) h += `<div class="conn-wrap" style="flex:2"><div class="conn-pair${rev ? ' conn-pair-rev' : ''}"><div class="top"></div><div class="bot"></div></div></div>`;
-            else h += `<div class="conn-wrap" style="flex:2"><div style="width:14px;height:1px;background:var(--bs-border-color-translucent)"></div></div>`;
+            else h += `<div class="conn-wrap" style="flex:2"></div>`;
         }
         return h;
+    }
+
+    function render() {
+        document.getElementById('ko-bracket').innerHTML = `
+    <div style="display:flex;align-items:stretch;flex:1">
+        ${col('Rd. 32', 'r32_L')}
+        <div class="conn-col" id="conn-r32-r16-L">${conns(8, false)}</div>
+        ${col('Rd. 16', 'r16_L')}
+        <div class="conn-col" id="conn-r16-qf-L">${conns(4, false)}</div>
+        ${col('Viertelfinale', 'qf_L')}
+        <div class="conn-col" id="conn-qf-sf-L">${conns(2, false)}</div>
+        ${col('Halbfinale', 'sf_L')}
+        <div class="conn-col" style="width:14px"><div class="conn-wrap" style="flex:1"><div style="width:14px;height:1px;background:var(--bs-border-color-translucent)"></div></div></div>
+    </div>
+    <div class="final-col">
+        <div class="round-lbl">Finale</div>
+        <div style="font-size:18px">🏆</div>
+        ${card('final', 0, 'final')}
+        <div class="round-lbl" style="margin-top:8px">Platz 3</div>
+        ${card('third', 0, 'third')}
+    </div>
+    <div style="display:flex;align-items:stretch;flex:1;flex-direction:row-reverse">
+        ${col('Rd. 32', 'r32_R', 'right')}
+        <div class="conn-col" id="conn-r32-r16-R">${conns(8, true)}</div>
+        ${col('Rd. 16', 'r16_R', 'right')}
+        <div class="conn-col" id="conn-r16-qf-R">${conns(4, true)}</div>
+        ${col('Viertelfinale', 'qf_R', 'right')}
+        <div class="conn-col" id="conn-qf-sf-R">${conns(2, true)}</div>
+        ${col('Halbfinale', 'sf_R', 'right')}
+        <div class="conn-col" style="width:14px"><div class="conn-wrap" style="flex:1"><div style="width:14px;height:1px;background:var(--bs-border-color-translucent)"></div></div></div>
+    </div>`;
+
+        requestAnimationFrame(drawConnectors);
+    }
+
+    function drawConnectors() {
+        const bracket = document.getElementById('ko-bracket');
+        const bracketTop = bracket.getBoundingClientRect().top;
+
+        function getCardMid(selector) {
+            const el = bracket.querySelector(selector);
+            if (!el) return null;
+            const r = el.getBoundingClientRect();
+            return r.top + r.height / 2 - bracketTop;
+        }
+
+        function drawPairs(connColId, srcRk, dstRk, rev) {
+            const col = document.getElementById(connColId);
+            if (!col) return;
+            const colRect = col.getBoundingClientRect();
+            const colH = colRect.height;
+
+            const wraps = col.querySelectorAll('.conn-wrap');
+            const pairs = col.querySelectorAll('.conn-pair');
+            let pairIdx = 0;
+
+            const cards = bracket.querySelectorAll(`[data-rk="${srcRk}"] .match-card`);
+
+            for (let i = 0; i < cards.length; i += 2) {
+                const c1 = cards[i];
+                const c2 = cards[i + 1];
+                if (!c1 || !c2) continue;
+
+                const m1 = c1.getBoundingClientRect().top + c1.getBoundingClientRect().height / 2 - colRect.top;
+                const m2 = c2.getBoundingClientRect().top + c2.getBoundingClientRect().height / 2 - colRect.top;
+
+                const pair = pairs[pairIdx++];
+                if (!pair) continue;
+
+                const height = m2 - m1;
+                const top = m1;
+
+                pair.parentElement.style.position = 'absolute';
+                pair.parentElement.style.top = top + 'px';
+                pair.parentElement.style.height = height + 'px';
+                pair.parentElement.style.left = '0';
+                pair.parentElement.style.right = '0';
+            }
+
+            col.style.position = 'relative';
+        }
+
+        drawPairs('conn-r32-r16-L', 'r32_L', 'r16_L', false);
+        drawPairs('conn-r32-r16-R', 'r32_R', 'r16_R', true);
+        drawPairs('conn-r16-qf-L', 'r16_L', 'qf_L', false);
+        drawPairs('conn-r16-qf-R', 'r16_R', 'qf_R', true);
+        drawPairs('conn-qf-sf-L', 'qf_L', 'sf_L', false);
+        drawPairs('conn-qf-sf-R', 'qf_R', 'sf_R', true);
     }
 
     function col(label, rk, align) {
@@ -128,36 +216,7 @@
         </div>`;
     }
 
-    function render() {
-        document.getElementById('ko-bracket').innerHTML = `
-        <div style="display:flex;align-items:stretch;flex:1">
-            ${col('Rd. 32', 'r32_L')}
-            <div class="conn-col">${conns(8, false)}</div>
-            ${col('Rd. 16', 'r16_L')}
-            <div class="conn-col">${conns(4, false)}</div>
-            ${col('Viertelfinale', 'qf_L')}
-            <div class="conn-col">${conns(2, false)}</div>
-            ${col('Halbfinale', 'sf_L')}
-            <div class="conn-col" style="width:14px"><div class="conn-wrap" style="flex:1"><div style="width:14px;height:1px;background:var(--bs-border-color-translucent)"></div></div></div>
-        </div>
-        <div class="final-col">
-            <div class="round-lbl">Finale</div>
-            <div style="font-size:18px">🏆</div>
-            ${card('final', 0, 'final')}
-            <div class="round-lbl" style="margin-top:8px">Platz 3</div>
-            ${card('third', 0, 'third')}
-        </div>
-        <div style="display:flex;align-items:stretch;flex:1;flex-direction:row-reverse">
-            ${col('Rd. 32', 'r32_R', 'right')}
-            <div class="conn-col">${conns(8, true)}</div>
-            ${col('Rd. 16', 'r16_R', 'right')}
-            <div class="conn-col">${conns(4, true)}</div>
-            ${col('Viertelfinale', 'qf_R', 'right')}
-            <div class="conn-col">${conns(2, true)}</div>
-            ${col('Halbfinale', 'sf_R', 'right')}
-            <div class="conn-col" style="width:14px"><div class="conn-wrap" style="flex:1"><div style="width:14px;height:1px;background:var(--bs-border-color-translucent)"></div></div></div>
-        </div>`;
-    }
+   
 
     window.bracketOpen = openModal;
     render();

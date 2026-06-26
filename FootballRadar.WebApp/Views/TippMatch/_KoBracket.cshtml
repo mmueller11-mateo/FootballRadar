@@ -1,10 +1,40 @@
 ﻿@model FootballRadar.WebApp.Models.KoBracketViewModel
 
+@{
+    var r32 = Model.RoundOf32.ToDictionary(m => m.ApiFixtureId);
+    var r16 = Model.RoundOf16.ToDictionary(m => m.ApiFixtureId);
+    var qf = Model.QuarterFinals.ToDictionary(m => m.ApiFixtureId);
+    var sf = Model.SemiFinals.ToDictionary(m => m.ApiFixtureId);
+
+    var r32L = new[] { 74, 77, 73, 75, 83, 84, 81, 82 }.Where(r32.ContainsKey).Select(id => r32[id]).ToList();
+    var r32R = new[] { 76, 78, 79, 80, 86, 88, 85, 87 }.Where(r32.ContainsKey).Select(id => r32[id]).ToList();
+    var r16L = new[] { 89, 90, 93, 94 }.Where(r16.ContainsKey).Select(id => r16[id]).ToList();
+    var r16R = new[] { 91, 92, 95, 96 }.Where(r16.ContainsKey).Select(id => r16[id]).ToList();
+    var qfL = new[] { 97, 98 }.Where(qf.ContainsKey).Select(id => qf[id]).ToList();
+    var qfR = new[] { 99, 100 }.Where(qf.ContainsKey).Select(id => qf[id]).ToList();
+    var sfL = sf.ContainsKey(101) ? sf[101] : null;
+    var sfR = sf.ContainsKey(102) ? sf[102] : null;
+
+    object MatchJson(KoMatchViewModel? m) => m == null ? (object)new { } : new
+    {
+        fixtureId = m.FixtureId,
+        home = m.HomeTeam ?? m.HomeQualificationCode ?? "?",
+        away = m.AwayTeam ?? m.AwayQualificationCode ?? "?",
+        homeLogo = m.HomeLogoUrl,
+        awayLogo = m.AwayLogoUrl,
+        homeId = m.HomeTeamId,
+        awayId = m.AwayTeamId,
+        winnerId = m.PredictedWinnerId,
+        predictedHomeGoals = m.PredictedHomeGoals,
+        predictedAwayGoals = m.PredictedAwayGoals,
+        kickoffUtc = m.KickoffUtc
+    };
+}
+
 <link rel="stylesheet" href="~/css/ko-bracket.css" />
 
 <div class="bracket-scroll">
-    <div id="ko-bracket" style="display:flex; gap:0; align-items:stretch; min-width:1100px;">
-    </div>
+    <div id="ko-bracket" style="display:flex; gap:0; align-items:stretch; min-width:1100px;"></div>
 </div>
 
 <div class="modal fade" id="ko-modal" tabindex="-1">
@@ -42,158 +72,22 @@
         </div>
     </div>
 </div>
+
 <script id="bracket-data" type="application/json">
     @Html.Raw(System.Text.Json.JsonSerializer.Serialize(new
     {
             rounds = new
             {
-                    r32_L = Model.RoundOf32.Take(8).Select(m => new
-                    {
-                            fixtureId = m.FixtureId,
-                            home = m.HomeTeam ?? m.HomeQualificationCode ?? "?",
-                            away = m.AwayTeam ?? m.AwayQualificationCode ?? "?",
-                            homeLogo = m.HomeLogoUrl,
-                            awayLogo = m.AwayLogoUrl,
-                            homeId = m.HomeTeamId,
-                            awayId = m.AwayTeamId,
-                            winnerId = m.PredictedWinnerId,
-                            predictedHomeGoals = m.PredictedHomeGoals,
-                            predictedAwayGoals = m.PredictedAwayGoals,
-                            kickoffUtc = m.KickoffUtc
-                    }),
-                    r32_R = Model.RoundOf32.Skip(8).Select(m => new
-                    {
-                            fixtureId = m.FixtureId,
-                            home = m.HomeTeam ?? m.HomeQualificationCode ?? "?",
-                            away = m.AwayTeam ?? m.AwayQualificationCode ?? "?",
-                            homeLogo = m.HomeLogoUrl,
-                            awayLogo = m.AwayLogoUrl,
-                            homeId = m.HomeTeamId,
-                            awayId = m.AwayTeamId,
-                            winnerId = m.PredictedWinnerId,
-                            predictedHomeGoals = m.PredictedHomeGoals,
-                            predictedAwayGoals = m.PredictedAwayGoals,
-                            kickoffUtc = m.KickoffUtc
-
-                    }),
-                    r16_L = Model.RoundOf16.Take(4).Select(m => new
-                    {
-                            fixtureId = m.FixtureId,
-                            home = m.HomeTeam ?? "?",
-                            away = m.AwayTeam ?? "?",
-                            homeLogo = m.HomeLogoUrl,
-                            awayLogo = m.AwayLogoUrl,
-                            homeId = m.HomeTeamId,
-                            awayId = m.AwayTeamId,
-                            winnerId = m.PredictedWinnerId,
-                            predictedHomeGoals = m.PredictedHomeGoals,
-                            predictedAwayGoals = m.PredictedAwayGoals,
-                            kickoffUtc = m.KickoffUtc
-
-                    }),
-                    r16_R = Model.RoundOf16.Skip(4).Select(m => new
-                    {
-                            fixtureId = m.FixtureId,
-                            home = m.HomeTeam ?? "?",
-                            away = m.AwayTeam ?? "?",
-                            homeLogo = m.HomeLogoUrl,
-                            awayLogo = m.AwayLogoUrl,
-                            homeId = m.HomeTeamId,
-                            awayId = m.AwayTeamId,
-                            winnerId = m.PredictedWinnerId,
-                            predictedHomeGoals = m.PredictedHomeGoals,
-                            predictedAwayGoals = m.PredictedAwayGoals,
-                            kickoffUtc = m.KickoffUtc
-
-                    }),
-                    qf_L = Model.QuarterFinals.Take(2).Select(m => new
-                    {
-                            fixtureId = m.FixtureId,
-                            home = m.HomeTeam ?? "?",
-                            away = m.AwayTeam ?? "?",
-                            homeLogo = m.HomeLogoUrl,
-                            awayLogo = m.AwayLogoUrl,
-                            homeId = m.HomeTeamId,
-                            awayId = m.AwayTeamId,
-                            winnerId = m.PredictedWinnerId,
-                            predictedHomeGoals = m.PredictedHomeGoals,
-                            predictedAwayGoals = m.PredictedAwayGoals,
-                            kickoffUtc = m.KickoffUtc
-
-                    }),
-                    qf_R = Model.QuarterFinals.Skip(2).Select(m => new
-                    {
-                            fixtureId = m.FixtureId,
-                            home = m.HomeTeam ?? "?",
-                            away = m.AwayTeam ?? "?",
-                            homeLogo = m.HomeLogoUrl,
-                            awayLogo = m.AwayLogoUrl,
-                            homeId = m.HomeTeamId,
-                            awayId = m.AwayTeamId,
-                            winnerId = m.PredictedWinnerId,
-                            predictedHomeGoals = m.PredictedHomeGoals,
-                            predictedAwayGoals = m.PredictedAwayGoals,
-                            kickoffUtc = m.KickoffUtc
-
-                    }),
-                    sf_L = Model.SemiFinals.Take(1).Select(m => new
-                    {
-                            fixtureId = m.FixtureId,
-                            home = m.HomeTeam ?? "?",
-                            away = m.AwayTeam ?? "?",
-                            homeLogo = m.HomeLogoUrl,
-                            awayLogo = m.AwayLogoUrl,
-                            homeId = m.HomeTeamId,
-                            awayId = m.AwayTeamId,
-                            winnerId = m.PredictedWinnerId,
-                            predictedHomeGoals = m.PredictedHomeGoals,
-                            predictedAwayGoals = m.PredictedAwayGoals,
-                            kickoffUtc = m.KickoffUtc
-
-                    }),
-                    sf_R = Model.SemiFinals.Skip(1).Select(m => new
-                    {
-                            fixtureId = m.FixtureId,
-                            home = m.HomeTeam ?? "?",
-                            away = m.AwayTeam ?? "?",
-                            homeLogo = m.HomeLogoUrl,
-                            awayLogo = m.AwayLogoUrl,
-                            homeId = m.HomeTeamId,
-                            awayId = m.AwayTeamId,
-                            winnerId = m.PredictedWinnerId,
-                            predictedHomeGoals = m.PredictedHomeGoals,
-                            predictedAwayGoals = m.PredictedAwayGoals,
-                            kickoffUtc = m.KickoffUtc
-
-                    }),
-                    final = Model.Final == null ? new object[] { } : new[] { new {
-                            fixtureId = Model.Final.FixtureId,
-                            home = Model.Final.HomeTeam ?? "?",
-                            away = Model.Final.AwayTeam ?? "?",
-                            homeLogo = Model.Final.HomeLogoUrl,
-                            awayLogo = Model.Final.AwayLogoUrl,
-                            homeId = Model.Final.HomeTeamId,
-                            awayId = Model.Final.AwayTeamId,
-                            winnerId = Model.Final.PredictedWinnerId,
-                            predictedHomeGoals = Model.Final.PredictedHomeGoals,
-                            predictedAwayGoals = Model.Final.PredictedAwayGoals,
-                            kickoffUtc = Model.Final.KickoffUtc
-
-                    }},
-                    third = Model.ThirdPlace == null ? new object[] { } : new[] { new {
-                            fixtureId = Model.ThirdPlace.FixtureId,
-                            home = Model.ThirdPlace.HomeTeam ?? "?",
-                            away = Model.ThirdPlace.AwayTeam ?? "?",
-                            homeLogo = Model.ThirdPlace.HomeLogoUrl,
-                            awayLogo = Model.ThirdPlace.AwayLogoUrl,
-                            homeId = Model.ThirdPlace.HomeTeamId,
-                            awayId = Model.ThirdPlace.AwayTeamId,
-                            winnerId = Model.ThirdPlace.PredictedWinnerId,
-                            predictedHomeGoals = Model.ThirdPlace.PredictedHomeGoals,
-                            predictedAwayGoals = Model.ThirdPlace.PredictedAwayGoals,
-                            kickoffUtc = Model.ThirdPlace.KickoffUtc
-
-                    }}
+                    r32_L = r32L.Select(m => MatchJson(m)),
+                    r32_R = r32R.Select(m => MatchJson(m)),
+                    r16_L = r16L.Select(m => MatchJson(m)),
+                    r16_R = r16R.Select(m => MatchJson(m)),
+                    qf_L = qfL.Select(m => MatchJson(m)),
+                    qf_R = qfR.Select(m => MatchJson(m)),
+                    sf_L = sfL != null ? new[] { MatchJson(sfL) } : Array.Empty<object>(),
+                    sf_R = sfR != null ? new[] { MatchJson(sfR) } : Array.Empty<object>(),
+                    final = Model.Final != null ? new[] { MatchJson(Model.Final) } : Array.Empty<object>(),
+                    third = Model.ThirdPlace != null ? new[] { MatchJson(Model.ThirdPlace) } : Array.Empty<object>(),
             }
     }))
 </script>
