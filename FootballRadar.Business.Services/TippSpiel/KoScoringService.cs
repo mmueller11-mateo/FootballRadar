@@ -6,18 +6,27 @@ namespace FootballRadar.Business.Services.TippSpiel
     {
         public static int Calculate(WmTip tip, Match match)
         {
-            if (!match.HomeGoals.HasValue || !match.AwayGoals.HasValue)
+            if (match.HomeGoals is null || match.AwayGoals is null)
                 return 0;
 
-            var actualWinner =
-                match.HomeGoals > match.AwayGoals
-                    ? match.HomeNationalTeamId
-                    : match.AwayNationalTeamId;
+            int actualHome = match.HomeGoals.Value;
+            int actualAway = match.AwayGoals.Value;
+            int predictedHome = tip.HomeGoals;
+            int predictedAway = tip.AwayGoals;
 
-            if (tip.PredictedWinnerId == actualWinner)
-                return 3; // oder 5, je nachdem wie wichtig KO sein soll
+            int actualDiff = actualHome - actualAway;
+            int predictedDiff = predictedHome - predictedAway;
 
-            return 0;
+            if (Math.Sign(actualDiff) != Math.Sign(predictedDiff))
+                return 0;
+
+            if (actualHome == predictedHome && actualAway == predictedAway)
+                return 4;
+
+            if (actualDiff == predictedDiff)
+                return 3;
+
+            return 2;
         }
     }
 }

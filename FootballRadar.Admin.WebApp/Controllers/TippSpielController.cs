@@ -60,16 +60,17 @@ namespace FootballRadar.Admin.WebApp.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> SetKnockoutWinner(Guid matchId, string winner, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> SetKnockoutResult(Guid matchId, int homeGoals, int awayGoals, CancellationToken cancellationToken = default)
         {
             var mediator = HttpContext.RequestServices.GetRequiredService<IMediator>();
-            await mediator.Send(new SetKnockoutMatchWinnerCommand
+            await mediator.Send(new SetKnockoutMatchResultCommand
             {
                 MatchId = matchId,
-                Winner = winner
+                HomeGoals = homeGoals,
+                AwayGoals = awayGoals
             }, cancellationToken);
 
-            TempData["SuccessMessage"] = "Sieger gespeichert & Punkte berechnet.";
+            TempData["SuccessMessage"] = "Resultat gespeichert & Punkte berechnet.";
             return RedirectToAction(nameof(MatchList));
         }
 

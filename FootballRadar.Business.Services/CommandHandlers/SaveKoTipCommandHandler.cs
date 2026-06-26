@@ -21,6 +21,8 @@ namespace FootballRadar.Business.Services.CommandHandlers
             if (existing != null)
             {
                 existing.PredictedWinnerId = request.WinnerId;
+                existing.HomeGoals = request.HomeGoals;
+                existing.AwayGoals = request.AwayGoals;
                 existing.SubmittedAt = DateTimeOffset.UtcNow;
                 await wmTipRepository.UpdateAsync(existing, cancellationToken);
             }
@@ -33,8 +35,8 @@ namespace FootballRadar.Business.Services.CommandHandlers
                     WmMatchId = request.FixtureId,
                     IsKoMatch = true,
                     PredictedWinnerId = request.WinnerId,
-                    HomeGoals = 0,
-                    AwayGoals = 0,
+                    HomeGoals = request.HomeGoals,
+                    AwayGoals = request.AwayGoals,
                     SubmittedAt = DateTimeOffset.UtcNow,
                 };
                 await wmTipRepository.AddAsync(tip, cancellationToken);

@@ -2,7 +2,6 @@
 
 <link rel="stylesheet" href="~/css/ko-bracket.css" />
 
-
 <div class="bracket-scroll">
     <div id="ko-bracket" style="display:flex; gap:0; align-items:stretch; min-width:1100px;">
     </div>
@@ -36,9 +35,13 @@
                     Kein Unentschieden möglich – bitte einen Gewinner bestimmen.
                 </div>
             </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Abbrechen</button>
+                <button id="modal-save" type="button" class="btn btn-primary btn-sm">Speichern</button>
+            </div>
+        </div>
     </div>
 </div>
-
 <script id="bracket-data" type="application/json">
     @Html.Raw(System.Text.Json.JsonSerializer.Serialize(new
     {
@@ -53,7 +56,10 @@
                             awayLogo = m.AwayLogoUrl,
                             homeId = m.HomeTeamId,
                             awayId = m.AwayTeamId,
-                            winnerId = m.PredictedWinnerId
+                            winnerId = m.PredictedWinnerId,
+                            predictedHomeGoals = m.PredictedHomeGoals,
+                            predictedAwayGoals = m.PredictedAwayGoals,
+                            kickoffUtc = m.KickoffUtc
                     }),
                     r32_R = Model.RoundOf32.Skip(8).Select(m => new
                     {
@@ -64,7 +70,11 @@
                             awayLogo = m.AwayLogoUrl,
                             homeId = m.HomeTeamId,
                             awayId = m.AwayTeamId,
-                            winnerId = m.PredictedWinnerId
+                            winnerId = m.PredictedWinnerId,
+                            predictedHomeGoals = m.PredictedHomeGoals,
+                            predictedAwayGoals = m.PredictedAwayGoals,
+                            kickoffUtc = m.KickoffUtc
+
                     }),
                     r16_L = Model.RoundOf16.Take(4).Select(m => new
                     {
@@ -75,7 +85,11 @@
                             awayLogo = m.AwayLogoUrl,
                             homeId = m.HomeTeamId,
                             awayId = m.AwayTeamId,
-                            winnerId = m.PredictedWinnerId
+                            winnerId = m.PredictedWinnerId,
+                            predictedHomeGoals = m.PredictedHomeGoals,
+                            predictedAwayGoals = m.PredictedAwayGoals,
+                            kickoffUtc = m.KickoffUtc
+
                     }),
                     r16_R = Model.RoundOf16.Skip(4).Select(m => new
                     {
@@ -86,7 +100,11 @@
                             awayLogo = m.AwayLogoUrl,
                             homeId = m.HomeTeamId,
                             awayId = m.AwayTeamId,
-                            winnerId = m.PredictedWinnerId
+                            winnerId = m.PredictedWinnerId,
+                            predictedHomeGoals = m.PredictedHomeGoals,
+                            predictedAwayGoals = m.PredictedAwayGoals,
+                            kickoffUtc = m.KickoffUtc
+
                     }),
                     qf_L = Model.QuarterFinals.Take(2).Select(m => new
                     {
@@ -97,7 +115,11 @@
                             awayLogo = m.AwayLogoUrl,
                             homeId = m.HomeTeamId,
                             awayId = m.AwayTeamId,
-                            winnerId = m.PredictedWinnerId
+                            winnerId = m.PredictedWinnerId,
+                            predictedHomeGoals = m.PredictedHomeGoals,
+                            predictedAwayGoals = m.PredictedAwayGoals,
+                            kickoffUtc = m.KickoffUtc
+
                     }),
                     qf_R = Model.QuarterFinals.Skip(2).Select(m => new
                     {
@@ -108,7 +130,11 @@
                             awayLogo = m.AwayLogoUrl,
                             homeId = m.HomeTeamId,
                             awayId = m.AwayTeamId,
-                            winnerId = m.PredictedWinnerId
+                            winnerId = m.PredictedWinnerId,
+                            predictedHomeGoals = m.PredictedHomeGoals,
+                            predictedAwayGoals = m.PredictedAwayGoals,
+                            kickoffUtc = m.KickoffUtc
+
                     }),
                     sf_L = Model.SemiFinals.Take(1).Select(m => new
                     {
@@ -119,7 +145,11 @@
                             awayLogo = m.AwayLogoUrl,
                             homeId = m.HomeTeamId,
                             awayId = m.AwayTeamId,
-                            winnerId = m.PredictedWinnerId
+                            winnerId = m.PredictedWinnerId,
+                            predictedHomeGoals = m.PredictedHomeGoals,
+                            predictedAwayGoals = m.PredictedAwayGoals,
+                            kickoffUtc = m.KickoffUtc
+
                     }),
                     sf_R = Model.SemiFinals.Skip(1).Select(m => new
                     {
@@ -130,17 +160,39 @@
                             awayLogo = m.AwayLogoUrl,
                             homeId = m.HomeTeamId,
                             awayId = m.AwayTeamId,
-                            winnerId = m.PredictedWinnerId
+                            winnerId = m.PredictedWinnerId,
+                            predictedHomeGoals = m.PredictedHomeGoals,
+                            predictedAwayGoals = m.PredictedAwayGoals,
+                            kickoffUtc = m.KickoffUtc
+
                     }),
                     final = Model.Final == null ? new object[] { } : new[] { new {
-                            fixtureId = Model.Final.FixtureId, home = Model.Final.HomeTeam ?? "?", away = Model.Final.AwayTeam ?? "?",
-                            homeLogo = Model.Final.HomeLogoUrl, awayLogo = Model.Final.AwayLogoUrl,
-                            homeId = Model.Final.HomeTeamId, awayId = Model.Final.AwayTeamId, winnerId = Model.Final.PredictedWinnerId
+                            fixtureId = Model.Final.FixtureId,
+                            home = Model.Final.HomeTeam ?? "?",
+                            away = Model.Final.AwayTeam ?? "?",
+                            homeLogo = Model.Final.HomeLogoUrl,
+                            awayLogo = Model.Final.AwayLogoUrl,
+                            homeId = Model.Final.HomeTeamId,
+                            awayId = Model.Final.AwayTeamId,
+                            winnerId = Model.Final.PredictedWinnerId,
+                            predictedHomeGoals = Model.Final.PredictedHomeGoals,
+                            predictedAwayGoals = Model.Final.PredictedAwayGoals,
+                            kickoffUtc = Model.Final.KickoffUtc
+
                     }},
                     third = Model.ThirdPlace == null ? new object[] { } : new[] { new {
-                            fixtureId = Model.ThirdPlace.FixtureId, home = Model.ThirdPlace.HomeTeam ?? "?", away = Model.ThirdPlace.AwayTeam ?? "?",
-                            homeLogo = Model.ThirdPlace.HomeLogoUrl, awayLogo = Model.ThirdPlace.AwayLogoUrl,
-                            homeId = Model.ThirdPlace.HomeTeamId, awayId = Model.ThirdPlace.AwayTeamId, winnerId = Model.ThirdPlace.PredictedWinnerId
+                            fixtureId = Model.ThirdPlace.FixtureId,
+                            home = Model.ThirdPlace.HomeTeam ?? "?",
+                            away = Model.ThirdPlace.AwayTeam ?? "?",
+                            homeLogo = Model.ThirdPlace.HomeLogoUrl,
+                            awayLogo = Model.ThirdPlace.AwayLogoUrl,
+                            homeId = Model.ThirdPlace.HomeTeamId,
+                            awayId = Model.ThirdPlace.AwayTeamId,
+                            winnerId = Model.ThirdPlace.PredictedWinnerId,
+                            predictedHomeGoals = Model.ThirdPlace.PredictedHomeGoals,
+                            predictedAwayGoals = Model.ThirdPlace.PredictedAwayGoals,
+                            kickoffUtc = Model.ThirdPlace.KickoffUtc
+
                     }}
             }
     }))

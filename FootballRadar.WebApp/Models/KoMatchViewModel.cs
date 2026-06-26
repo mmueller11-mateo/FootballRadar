@@ -23,6 +23,6 @@
         // Beide Teams bekannt?
         public bool IsReady => HomeTeamId.HasValue && AwayTeamId.HasValue;
         // Bereits getippt?
-        public bool IsTipped => PredictedWinnerId.HasValue;
+        public bool IsTipped => PredictedWinnerId.HasValue || (PredictedHomeGoals.HasValue && PredictedAwayGoals.HasValue);
     }
 }

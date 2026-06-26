@@ -84,7 +84,7 @@
                     <th>Datum</th>
                     <th>Phase</th>
                     <th>Heim</th>
-                    <th class="text-center">Sieger</th>
+                    <th class="text-center">Resultat</th>
                     <th>Gast</th>
                     <th>Status</th>
                     <th></th>
@@ -100,12 +100,11 @@
                         <td class="text-center">
                             @if (m.HasResult)
                             {
-                                var winner = m.HomeGoals > m.AwayGoals ? m.HomeTeam : m.AwayTeam;
-                                <span class="badge bg-success">🏆 @winner</span>
+                                <span class="badge bg-success fs-6">@m.HomeGoals : @m.AwayGoals</span>
                             }
                             else
                             {
-                                <span class="text-muted">-</span>
+                                <span class="text-muted">-:-</span>
                             }
                         </td>
                         <td class="fw-semibold">@m.AwayTeam</td>
@@ -120,8 +119,10 @@
                                     data-bs-target="#knockoutModal"
                                     data-match-id="@m.Id"
                                     data-home="@m.HomeTeam"
-                                    data-away="@m.AwayTeam">
-                                Sieger setzen
+                                    data-away="@m.AwayTeam"
+                                    data-home-goals="@m.HomeGoals"
+                                    data-away-goals="@m.AwayGoals">
+                                Resultat setzen
                             </button>
                         </td>
                     </tr>
@@ -129,7 +130,6 @@
             </tbody>
         </table>
     </div>
-</div>
 
 <!-- ===== MODAL: Gruppenspiel Resultat ===== -->
 <div class="modal fade" id="groupModal" tabindex="-1">
@@ -166,33 +166,43 @@
     </div>
 </div>
 
-<!-- ===== MODAL: K.O. Sieger ===== -->
-<div class="modal fade" id="knockoutModal" tabindex="-1">
-    <div class="modal-dialog modal-sm">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Sieger auswählen</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <form asp-controller="TippSpiel" asp-action="SetKnockoutWinner" method="post">
-                <div class="modal-body">
-                    <input type="hidden" name="matchId" id="knockoutMatchId" />
-                    <div class="d-grid gap-2">
-                        <button type="submit" name="winner" value="home"
-                                class="btn btn-outline-primary btn-lg" id="knockoutHomeBtn">
-                        </button>
-                        <button type="submit" name="winner" value="away"
-                                class="btn btn-outline-primary btn-lg" id="knockoutAwayBtn">
-                        </button>
+    <!-- ===== MODAL: K.O. Resultat ===== -->
+    <div class="modal fade" id="knockoutModal" tabindex="-1">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Resultat setzen</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form asp-controller="TippSpiel" asp-action="SetKnockoutResult" method="post">
+                    <div class="modal-body">
+                        <input type="hidden" name="matchId" id="knockoutMatchId" />
+                        <div class="d-flex align-items-center justify-content-center gap-3">
+                            <div class="text-center">
+                                <div class="small text-muted mb-1" id="knockoutHomeLabel"></div>
+                                <input type="number" name="homeGoals" id="knockoutHomeGoals"
+                                       min="0" max="99" value="0"
+                                       class="form-control form-control-lg text-center"
+                                       style="width:72px;" />
+                            </div>
+                            <div class="fs-4 fw-bold text-muted mt-3">:</div>
+                            <div class="text-center">
+                                <div class="small text-muted mb-1" id="knockoutAwayLabel"></div>
+                                <input type="number" name="awayGoals" id="knockoutAwayGoals"
+                                       min="0" max="99" value="0"
+                                       class="form-control form-control-lg text-center"
+                                       style="width:72px;" />
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Abbrechen</button>
-                </div>
-            </form>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Abbrechen</button>
+                        <button type="submit" class="btn btn-primary">Speichern</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-</div>
 
 @section Scripts {
     <script>
@@ -205,11 +215,13 @@
             document.getElementById('groupAwayGoals').value = btn.dataset.awayGoals;
         });
 
-        document.getElementById('knockoutModal').addEventListener('show.bs.modal', e => {
-            const btn = e.relatedTarget;
-            document.getElementById('knockoutMatchId').value = btn.dataset.matchId;
-            document.getElementById('knockoutHomeBtn').textContent = '🏆 ' + btn.dataset.home;
-            document.getElementById('knockoutAwayBtn').textContent = '🏆 ' + btn.dataset.away;
-        });
+                        document.getElementById('knockoutModal').addEventListener('show.bs.modal', e => {
+                    const btn = e.relatedTarget;
+                    document.getElementById('knockoutMatchId').value = btn.dataset.matchId;
+                    document.getElementById('knockoutHomeLabel').textContent = btn.dataset.home;
+                    document.getElementById('knockoutAwayLabel').textContent = btn.dataset.away;
+                    document.getElementById('knockoutHomeGoals').value = btn.dataset.homeGoals;
+                    document.getElementById('knockoutAwayGoals').value = btn.dataset.awayGoals;
+                });
     </script>
 }

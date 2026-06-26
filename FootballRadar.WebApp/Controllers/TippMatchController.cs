@@ -90,6 +90,9 @@ namespace FootballRadar.WebApp.Controllers
             PredictedWinnerId = r.ExistingTip?.PredictedWinnerId,
         };
 
+        public record SaveKoTipRequest(Guid FixtureId, Guid? WinnerId, int HomeGoals, int AwayGoals);
+
+
         [HttpPost]
         public async Task<IActionResult> SaveKoTip([FromBody] SaveKoTipRequest request, CancellationToken cancellationToken)
         {
@@ -99,12 +102,12 @@ namespace FootballRadar.WebApp.Controllers
                 UserId = CurrentUserId,
                 FixtureId = request.FixtureId,
                 WinnerId = request.WinnerId,
+                HomeGoals = request.HomeGoals,
+                AwayGoals = request.AwayGoals,
             }, cancellationToken);
 
             return Ok();
         }
-
-        public record SaveKoTipRequest(Guid FixtureId, Guid? WinnerId);
 
         public async Task<IActionResult> Group(string groupName, CancellationToken cancellationToken)
         {

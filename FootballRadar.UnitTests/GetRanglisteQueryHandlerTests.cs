@@ -41,17 +41,19 @@ namespace FootballRadar.UnitTests
             };
 
         private static WmTip MakeKoTip(
-            Guid userId,
-            Guid matchId,
-            Guid predictedWinnerId)
-            => new()
-            {
-                Id = Guid.NewGuid(),
-                UserId = userId,
-                WmMatchId = matchId,
-                IsKoMatch = true,
-                PredictedWinnerId = predictedWinnerId
-            };
+    Guid userId,
+    Guid matchId,
+    int home,
+    int away)
+    => new()
+    {
+        Id = Guid.NewGuid(),
+        UserId = userId,
+        WmMatchId = matchId,
+        IsKoMatch = true,
+        HomeGoals = home,
+        AwayGoals = away,
+    };
 
         private static Business.Entities.LeagueEntities.Match MakeMatch(
             Guid id,
@@ -207,61 +209,53 @@ namespace FootballRadar.UnitTests
         }
 
         [TestMethod]
-        public async Task KoMatch_CorrectWinner_Returns3Points()
+        public async Task KoMatch_ExactResult_Returns4Points()
         {
-            var homeId = Guid.NewGuid();
-            var awayId = Guid.NewGuid();
+            var tips = new[] { MakeKoTip(_user1Id, _match1Id, 2, 1) };
+            var matches = new[] { MakeMatch(_match1Id, 2, 1) };
+            var users = new[] { MakeUser(_user1Id, "Alice") };
 
-            var tips = new[]
-            {
-                MakeKoTip(_user1Id, _match1Id, homeId)
-            };
+            var result = (await BuildHandler(tips, matches, users)
+                .Handle(new GetRanglisteQuery(), CancellationToken.None)).ToList();
 
-            var matches = new[]
-            {
-                MakeMatch(_match1Id, 2, 1, homeId, awayId)
-            };
+            Assert.AreEqual(4, result[0].TotalPoints);
+        }
 
-            var users = new[]
-            {
-                MakeUser(_user1Id, "Alice")
-            };
+        [TestMethod]
+        public async Task KoMatch_CorrectDifference_Returns3Points()
+        {
+            var tips = new[] { MakeKoTip(_user1Id, _match1Id, 2, 1) };
+            var matches = new[] { MakeMatch(_match1Id, 3, 2) };
+            var users = new[] { MakeUser(_user1Id, "Alice") };
 
-            var handler = BuildHandler(tips, matches, users);
-
-            var result = (await handler.Handle(
-                new GetRanglisteQuery(),
-                CancellationToken.None)).ToList();
+            var result = (await BuildHandler(tips, matches, users)
+                .Handle(new GetRanglisteQuery(), CancellationToken.None)).ToList();
 
             Assert.AreEqual(3, result[0].TotalPoints);
         }
 
         [TestMethod]
-        public async Task KoMatch_WrongWinner_Returns0Points()
+        public async Task KoMatch_CorrectTendency_Returns2Points()
         {
-            var homeId = Guid.NewGuid();
-            var awayId = Guid.NewGuid();
+            var tips = new[] { MakeKoTip(_user1Id, _match1Id, 3, 1) };
+            var matches = new[] { MakeMatch(_match1Id, 1, 0) };
+            var users = new[] { MakeUser(_user1Id, "Alice") };
 
-            var tips = new[]
-            {
-                MakeKoTip(_user1Id, _match1Id, awayId)
-            };
+            var result = (await BuildHandler(tips, matches, users)
+                .Handle(new GetRanglisteQuery(), CancellationToken.None)).ToList();
 
-            var matches = new[]
-            {
-                MakeMatch(_match1Id, 3, 1, homeId, awayId)
-            };
+            Assert.AreEqual(2, result[0].TotalPoints);
+        }
 
-            var users = new[]
-            {
-                MakeUser(_user1Id, "Alice")
-            };
+        [TestMethod]
+        public async Task KoMatch_WrongTendency_Returns0Points()
+        {
+            var tips = new[] { MakeKoTip(_user1Id, _match1Id, 0, 2) };
+            var matches = new[] { MakeMatch(_match1Id, 2, 0) };
+            var users = new[] { MakeUser(_user1Id, "Alice") };
 
-            var handler = BuildHandler(tips, matches, users);
-
-            var result = (await handler.Handle(
-                new GetRanglisteQuery(),
-                CancellationToken.None)).ToList();
+            var result = (await BuildHandler(tips, matches, users)
+                .Handle(new GetRanglisteQuery(), CancellationToken.None)).ToList();
 
             Assert.AreEqual(0, result[0].TotalPoints);
         }
@@ -269,29 +263,12 @@ namespace FootballRadar.UnitTests
         [TestMethod]
         public async Task KoMatch_NotPlayed_Returns0Points()
         {
-            var homeId = Guid.NewGuid();
-            var awayId = Guid.NewGuid();
+            var tips = new[] { MakeKoTip(_user1Id, _match1Id, 2, 1) };
+            var matches = new[] { MakeMatch(_match1Id, null, null) };
+            var users = new[] { MakeUser(_user1Id, "Alice") };
 
-            var tips = new[]
-            {
-                MakeKoTip(_user1Id, _match1Id, homeId)
-            };
-
-            var matches = new[]
-            {
-                MakeMatch(_match1Id, null, null, homeId, awayId)
-            };
-
-            var users = new[]
-            {
-                MakeUser(_user1Id, "Alice")
-            };
-
-            var handler = BuildHandler(tips, matches, users);
-
-            var result = (await handler.Handle(
-                new GetRanglisteQuery(),
-                CancellationToken.None)).ToList();
+            var result = (await BuildHandler(tips, matches, users)
+                .Handle(new GetRanglisteQuery(), CancellationToken.None)).ToList();
 
             Assert.AreEqual(0, result[0].TotalPoints);
         }
@@ -299,34 +276,22 @@ namespace FootballRadar.UnitTests
         [TestMethod]
         public async Task GroupAndKoPoints_AreSummedCorrectly()
         {
-            var home1 = Guid.NewGuid();
-            var away1 = Guid.NewGuid();
-
-            var home2 = Guid.NewGuid();
-            var away2 = Guid.NewGuid();
-
             var tips = new WmTip[]
             {
-                MakeGroupTip(_user1Id, _match1Id, 2, 1),
-                MakeKoTip(_user1Id, _match2Id, home2)
+        MakeGroupTip(_user1Id, _match1Id, 2, 1), // exakt → 4 Punkte
+        MakeKoTip(_user1Id, _match2Id, 2, 0)     // richtige Differenz → 3 Punkte
             };
 
             var matches = new[]
             {
-                MakeMatch(_match1Id, 2, 1, home1, away1),
-                MakeMatch(_match2Id, 1, 0, home2, away2)
-            };
+        MakeMatch(_match1Id, 2, 1),
+        MakeMatch(_match2Id, 3, 1)
+    };
 
-            var users = new[]
-            {
-                MakeUser(_user1Id, "Alice")
-            };
+            var users = new[] { MakeUser(_user1Id, "Alice") };
 
-            var handler = BuildHandler(tips, matches, users);
-
-            var result = (await handler.Handle(
-                new GetRanglisteQuery(),
-                CancellationToken.None)).ToList();
+            var result = (await BuildHandler(tips, matches, users)
+                .Handle(new GetRanglisteQuery(), CancellationToken.None)).ToList();
 
             Assert.AreEqual(7, result[0].TotalPoints);
         }
@@ -334,44 +299,33 @@ namespace FootballRadar.UnitTests
         [TestMethod]
         public async Task TwoUsers_AreRankedCorrectly()
         {
-            var home1 = Guid.NewGuid();
-            var away1 = Guid.NewGuid();
-
-            var home2 = Guid.NewGuid();
-            var away2 = Guid.NewGuid();
-
             var tips = new WmTip[]
             {
-                MakeGroupTip(_user1Id, _match1Id, 2, 1),
-                MakeKoTip(_user1Id, _match2Id, home2),
+        MakeGroupTip(_user1Id, _match1Id, 2, 1), // exakt → 4
+        MakeKoTip(_user1Id, _match2Id, 2, 0),    // richtige Differenz → 3
 
-                MakeGroupTip(_user2Id, _match1Id, 0, 0),
-                MakeKoTip(_user2Id, _match2Id, away2)
+        MakeGroupTip(_user2Id, _match1Id, 0, 0), // falsch → 0
+        MakeKoTip(_user2Id, _match2Id, 0, 1)     // falsche Tendenz → 0
             };
 
             var matches = new[]
             {
-                MakeMatch(_match1Id, 2, 1, home1, away1),
-                MakeMatch(_match2Id, 1, 0, home2, away2)
-            };
+        MakeMatch(_match1Id, 2, 1),
+        MakeMatch(_match2Id, 3, 1)
+    };
 
             var users = new[]
             {
-                MakeUser(_user1Id, "Alice"),
-                MakeUser(_user2Id, "Bob")
-            };
+        MakeUser(_user1Id, "Alice"),
+        MakeUser(_user2Id, "Bob")
+    };
 
-            var handler = BuildHandler(tips, matches, users);
-
-            var result = (await handler.Handle(
-                new GetRanglisteQuery(),
-                CancellationToken.None)).ToList();
+            var result = (await BuildHandler(tips, matches, users)
+                .Handle(new GetRanglisteQuery(), CancellationToken.None)).ToList();
 
             Assert.AreEqual(2, result.Count);
-
             Assert.AreEqual("Alice", result[0].TipperName);
             Assert.AreEqual(7, result[0].TotalPoints);
-
             Assert.AreEqual("Bob", result[1].TipperName);
             Assert.AreEqual(0, result[1].TotalPoints);
         }
