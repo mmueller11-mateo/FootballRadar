@@ -54,6 +54,22 @@ namespace FootballRadar.Business.Services.QueryHandlers
 
                     int bonusPoints = bonusPointsByUser.TryGetValue(g.Key, out var bp) ? bp : 0;
 
+                    foreach (var tip in g)
+                    {
+                        var match = matchCache[tip.WmMatchId];
+
+                        var calculated = tip.IsKoMatch
+                            ? KoScoringService.Calculate(tip, match)
+                            : PredictionScoringService.Calculate(tip, match);
+
+                        if (calculated != tip.Points)
+                        {
+                            Console.WriteLine(
+                                $"{user?.Name}: Match {tip.WmMatchId} - gespeichert={tip.Points}, berechnet={calculated}");
+                        }
+                    }
+
+
                     return new RanglisteEntry
                     {
                         TipperName = user?.Name ?? "Unbekannt",
