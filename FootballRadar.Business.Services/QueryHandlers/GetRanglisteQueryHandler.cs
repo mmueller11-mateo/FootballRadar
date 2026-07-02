@@ -42,21 +42,17 @@ namespace FootballRadar.Business.Services.QueryHandlers
                 {
                     userCache.TryGetValue(g.Key, out var user);
 
-                    int matchPoints = g
-                        .Where(t => matchCache.ContainsKey(t.WmMatchId))
-                        .Sum(t =>
-                        {
-                            var match = matchCache[t.WmMatchId];
-                            return t.IsKoMatch
-                                ? KoScoringService.Calculate(t, match)
-                                : PredictionScoringService.Calculate(t, match);
-                        });
+                    int matchPoints = g.Sum(t => t.Points ?? 0);
 
                     int bonusPoints = bonusPointsByUser.TryGetValue(g.Key, out var bp) ? bp : 0;
 
                     foreach (var tip in g)
                     {
-                        var match = matchCache[tip.WmMatchId];
+                        if (!matchCache.TryGetValue(tip.WmMatchId, out var match))
+                        {
+                            Console.WriteLine($"Match fehlt: {tip.WmMatchId}");
+                            continue;
+                        }
 
                         var calculated = tip.IsKoMatch
                             ? KoScoringService.Calculate(tip, match)
@@ -65,10 +61,9 @@ namespace FootballRadar.Business.Services.QueryHandlers
                         if (calculated != tip.Points)
                         {
                             Console.WriteLine(
-                                $"{user?.Name}: Match {tip.WmMatchId} - gespeichert={tip.Points}, berechnet={calculated}");
+                                $"{user?.Name}: Match {tip.WmMatchId}, gespeichert={tip.Points}, berechnet={calculated}");
                         }
                     }
-
 
                     return new RanglisteEntry
                     {
