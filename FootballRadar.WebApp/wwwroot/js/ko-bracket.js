@@ -216,7 +216,7 @@
         </div>`;
     }
 
-   
+
 
     window.bracketOpen = openModal;
     render();

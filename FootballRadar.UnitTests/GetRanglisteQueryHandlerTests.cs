@@ -24,15 +24,15 @@ namespace FootballRadar.UnitTests
         };
 
         private static WmTip MakeGroupTip(Guid userId, Guid matchId, int home, int away)
-            => new()
-            {
-                Id = Guid.NewGuid(),
-                UserId = userId,
-                WmMatchId = matchId,
-                HomeGoals = home,
-                AwayGoals = away,
-                IsKoMatch = false
-            };
+        => new()
+        {
+            Id = Guid.NewGuid(),
+            UserId = userId,
+            WmMatchId = matchId,
+            HomeGoals = home,
+            AwayGoals = away,
+            IsKoMatch = false,
+        };
 
         private static WmTip MakeKoTip(Guid userId, Guid matchId, int home, int away)
         => new()
@@ -210,8 +210,7 @@ namespace FootballRadar.UnitTests
             var matches = new[] { MakeMatch(_match1Id, 1, 0) };
             var users = new[] { MakeUser(_user1Id, "Alice") };
 
-            var result = (await BuildHandler(tips, matches, users)
-                .Handle(new GetRanglisteQuery(), CancellationToken.None)).ToList();
+            var result = (await BuildHandler(tips, matches, users).Handle(new GetRanglisteQuery(), CancellationToken.None)).ToList();
 
             Assert.AreEqual(2, result[0].TotalPoints);
         }
@@ -236,8 +235,7 @@ namespace FootballRadar.UnitTests
             var matches = new[] { MakeMatch(_match1Id, null, null) };
             var users = new[] { MakeUser(_user1Id, "Alice") };
 
-            var result = (await BuildHandler(tips, matches, users)
-                .Handle(new GetRanglisteQuery(), CancellationToken.None)).ToList();
+            var result = (await BuildHandler(tips, matches, users).Handle(new GetRanglisteQuery(), CancellationToken.None)).ToList();
 
             Assert.AreEqual(0, result[0].TotalPoints);
         }
@@ -328,15 +326,9 @@ namespace FootballRadar.UnitTests
                 .Setup(r => r.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync((User?)null);
 
-            var handler = new GetRanglisteQueryHandler(
-                tipRepo.Object,
-                userRepo.Object,
-                matchRepo.Object,
-                bonustipRepo.Object);
+            var handler = new GetRanglisteQueryHandler(tipRepo.Object, userRepo.Object, matchRepo.Object, bonustipRepo.Object);
 
-            var result = (await handler.Handle(
-                new GetRanglisteQuery(),
-                CancellationToken.None)).ToList();
+            var result = (await handler.Handle(new GetRanglisteQuery(), CancellationToken.None)).ToList();
 
             Assert.AreEqual("Unbekannt", result[0].TipperName);
         }

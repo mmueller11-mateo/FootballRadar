@@ -1,4 +1,6 @@
-﻿namespace FootballRadar.Business.Services.Queries
+﻿using FootballRadar.Business.Entities.Enums;
+
+namespace FootballRadar.Business.Services.Queries
 {
     public class MeinTippEntry
     {
@@ -6,6 +8,7 @@
         public string AwayTeam { get; set; } = "";
         public DateTimeOffset KickoffUtc { get; set; }
         public string? WmGroup { get; set; }
+        public WmPhase? Phase { get; set; }
         public int PredictedHome { get; set; }
         public int PredictedAway { get; set; }
         public int? ActualHome { get; set; }

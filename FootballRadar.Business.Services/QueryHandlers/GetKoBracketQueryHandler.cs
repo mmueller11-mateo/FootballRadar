@@ -51,11 +51,7 @@ namespace FootballRadar.Business.Services.QueryHandlers
             };
         }
 
-        private static List<KoMatchResult> BuildRound(
-            List<Match> fixtures,
-            WmPhase phase,
-            IEnumerable<NationalTeam> allTeams,
-            List<WmTip> koTips)
+        private static List<KoMatchResult> BuildRound(List<Match> fixtures, WmPhase phase, IEnumerable<NationalTeam> allTeams, List<WmTip> koTips)
         {
             return fixtures
                 .Where(f => f.WmPhase == phase)

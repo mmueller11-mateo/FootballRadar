@@ -11,7 +11,6 @@ namespace FootballRadar.UnitTests
         {
             var tip = new WmTip { HomeGoals = 2, AwayGoals = 1 };
             var match = new Match { HomeGoals = null, AwayGoals = null };
-
             Assert.AreEqual(0, KoScoringService.Calculate(tip, match));
         }
 
@@ -20,7 +19,6 @@ namespace FootballRadar.UnitTests
         {
             var tip = new WmTip { HomeGoals = 2, AwayGoals = 1 };
             var match = new Match { HomeGoals = 2, AwayGoals = 1 };
-
             Assert.AreEqual(4, KoScoringService.Calculate(tip, match));
         }
 
@@ -38,7 +36,6 @@ namespace FootballRadar.UnitTests
         {
             var tip = new WmTip { HomeGoals = 3, AwayGoals = 1 };
             var match = new Match { HomeGoals = 1, AwayGoals = 0 };
-
             Assert.AreEqual(2, KoScoringService.Calculate(tip, match));
         }
 
@@ -47,7 +44,6 @@ namespace FootballRadar.UnitTests
         {
             var tip = new WmTip { HomeGoals = 2, AwayGoals = 1 };
             var match = new Match { HomeGoals = 0, AwayGoals = 3 };
-
             Assert.AreEqual(0, KoScoringService.Calculate(tip, match));
         }
     }

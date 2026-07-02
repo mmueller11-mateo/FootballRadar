@@ -7,7 +7,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-
 namespace FootballRadar.Admin.Data
 {
     public static class ComponentConfigurator
@@ -33,7 +32,6 @@ namespace FootballRadar.Admin.Data
             services.AddTransient<ITeamRepository, TeamRepository>();
             services.AddTransient<IMatchRepository, MatchRepository>();
             services.AddTransient<IWmTipRepository, WmTipRepository>();
-
         }
 
         public static void EnsureDatabase(IServiceProvider services)

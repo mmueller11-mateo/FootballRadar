@@ -58,6 +58,7 @@ namespace FootballRadar.Business.Services.QueryHandlers
                     AwayTeam = awayName,
                     KickoffUtc = match?.Date ?? DateTimeOffset.MinValue,
                     WmGroup = match?.WmGroup,
+                    Phase = match?.WmPhase,
                     PredictedHome = tip.HomeGoals,
                     PredictedAway = tip.AwayGoals,
                     ActualHome = match?.HomeGoals,

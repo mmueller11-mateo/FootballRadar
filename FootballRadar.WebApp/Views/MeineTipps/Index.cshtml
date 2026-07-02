@@ -1,4 +1,5 @@
-﻿@model FootballRadar.WebApp.Models.MeineTippsViewModel
+﻿@using FootballRadar.Business.Entities.Enums
+@model FootballRadar.WebApp.Models.MeineTippsViewModel
 @{
     ViewData["Title"] = "Meine Tipps";
     var groupTips = Model.Entries.Where(e => !e.IsKoMatch).ToList();
@@ -96,65 +97,69 @@
         }
 
         <!-- ===== K.O.-PHASE ===== -->
-        @if (koTips.Any())
-        {
-            <h4 class="fw-semibold mb-3">K.O.-Phase</h4>
-            <table class="table table-hover">
-                <thead class="table-light">
-                    <tr>
-                        <th>Spiel</th>
-                        <th class="text-center">Runde</th>
-                        <th class="text-center">Datum</th>
-                        <th class="text-center">Dein Sieger-Tipp</th>
-                        <th class="text-center">Echter Sieger</th>
-                        <th class="text-center">Punkte</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var entry in koTips)
-                    {
-                        <tr>
-                            <td>@entry.HomeTeam – @entry.AwayTeam</td>
-                            <td class="text-center"><span class="badge bg-dark">@(entry.WmGroup ?? "KO")</span></td>
+@if (koTips.Any())
+{
+    <h4 class="fw-semibold mb-3">K.O.-Phase</h4>
+    <table class="table table-hover">
+        <thead class="table-light">
+            <tr>
+                <th>Spiel</th>
+                <th class="text-center">Runde</th>
+                <th class="text-center">Datum</th>
+                <th class="text-center">Dein Tipp</th>
+                <th class="text-center">Resultat</th>
+                <th class="text-center">Punkte</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var entry in koTips)
+            {
+                <tr>
+                    <td>@entry.HomeTeam – @entry.AwayTeam</td>
+                            <td class="text-center">
+                                <span class="badge bg-dark">
+                                    @(entry.Phase switch
+                                    {
+                                        WmPhase.RoundOf32 => "Rd. 32",
+                                        WmPhase.RoundOf16 => "Rd. 16",
+                                        WmPhase.QuarterFinal => "Viertelfinale",
+                                        WmPhase.SemiFinal => "Halbfinale",
+                                        WmPhase.ThirdPlace => "Platz 3",
+                                        WmPhase.Final => "Finale",
+                                        _ => entry.WmGroup ?? "KO"
+                                    })
+                                </span>
+                            </td>
                             <td class="text-center">@entry.KickoffUtc.ToLocalTime().ToString("dd.MM.yy HH:mm")</td>
-                            <td class="text-center fw-bold">
-                                @if (!string.IsNullOrEmpty(entry.PredictedWinnerName))
-                                {
-                                    <span>🏆 @entry.PredictedWinnerName</span>
-                                }
-                                else
-                                {
-                                    <span class="text-muted">–</span>
-                                }
-                            </td>
-                            <td class="text-center">
-                                @if (!string.IsNullOrEmpty(entry.ActualWinnerName))
-                                {
-                                    <span>@entry.ActualWinnerName</span>
-                                }
-                                else
-                                {
-                                    <span class="text-muted">–</span>
-                                }
-                            </td>
-                            <td class="text-center">
-                                @if (entry.Points == null)
-                                {
-                                    <span class="text-muted">–</span>
-                                }
-                                else if (entry.Points > 0)
-                                {
-                                    <span class="badge bg-success">@entry.Points</span>
-                                }
-                                else
-                                {
-                                    <span class="badge bg-danger">0</span>
-                                }
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+                    <td class="text-center fw-bold">@entry.PredictedHome : @entry.PredictedAway</td>
+                    <td class="text-center">
+                        @if (entry.ActualHome.HasValue)
+                        {
+                            <span>@entry.ActualHome : @entry.ActualAway</span>
+                        }
+                        else
+                        {
+                            <span class="text-muted">–</span>
+                        }
+                    </td>
+                    <td class="text-center">
+                        @if (entry.Points == null)
+                        {
+                            <span class="text-muted">–</span>
+                        }
+                        else if (entry.Points > 0)
+                        {
+                            <span class="badge bg-success">@entry.Points</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">0</span>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+     </table>
         }
     }
 </div>

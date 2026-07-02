@@ -13,11 +13,7 @@ namespace FootballRadar.Business.Services.QueryHandlers
         private readonly IMatchRepository matchRepository;
         private readonly IBonusTipRepository bonusTipRepository;
 
-        public GetRanglisteQueryHandler(
-            IWmTipRepository wmTipRepository,
-            IUserRepository userRepository,
-            IMatchRepository matchRepository,
-            IBonusTipRepository bonusTipRepository)
+        public GetRanglisteQueryHandler(IWmTipRepository wmTipRepository, IUserRepository userRepository, IMatchRepository matchRepository, IBonusTipRepository bonusTipRepository)
         {
             this.wmTipRepository = wmTipRepository;
             this.userRepository = userRepository;
@@ -25,9 +21,7 @@ namespace FootballRadar.Business.Services.QueryHandlers
             this.bonusTipRepository = bonusTipRepository;
         }
 
-        public async Task<IEnumerable<RanglisteEntry>> Handle(
-            GetRanglisteQuery request,
-            CancellationToken cancellationToken)
+        public async Task<IEnumerable<RanglisteEntry>> Handle(GetRanglisteQuery request, CancellationToken cancellationToken)
         {
             var tips = await wmTipRepository.GetAllAsync(cancellationToken);
             var matches = await matchRepository.GetAllAsync(cancellationToken);
