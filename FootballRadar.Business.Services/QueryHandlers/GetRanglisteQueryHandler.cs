@@ -27,11 +27,9 @@ namespace FootballRadar.Business.Services.QueryHandlers
             var matches = await matchRepository.GetAllAsync(cancellationToken);
             var users = await userRepository.GetAllAsync(cancellationToken);
             var bonusTips = await bonusTipRepository.GetAllAsync(cancellationToken);
-
             var matchCache = matches.ToDictionary(m => m.Id);
             var userCache = users.ToDictionary(u => u.Id);
 
-            // Bonuspunkte pro User summieren (nur aufgelöste Fragen haben Points != null)
             var bonusPointsByUser = bonusTips
                 .GroupBy(b => b.UserId)
                 .ToDictionary(g => g.Key, g => g.Sum(b => b.Points ?? 0));
@@ -42,9 +40,7 @@ namespace FootballRadar.Business.Services.QueryHandlers
                 {
                     userCache.TryGetValue(g.Key, out var user);
 
-                    int matchPoints = g.Sum(t => t.Points ?? 0);
-
-                    int bonusPoints = bonusPointsByUser.TryGetValue(g.Key, out var bp) ? bp : 0;
+                    int matchPoints = 0;
 
                     foreach (var tip in g)
                     {
@@ -63,7 +59,11 @@ namespace FootballRadar.Business.Services.QueryHandlers
                             Console.WriteLine(
                                 $"{user?.Name}: Match {tip.WmMatchId}, gespeichert={tip.Points}, berechnet={calculated}");
                         }
+
+                        matchPoints += calculated;
                     }
+
+                    int bonusPoints = bonusPointsByUser.TryGetValue(g.Key, out var bp) ? bp : 0;
 
                     return new RanglisteEntry
                     {
